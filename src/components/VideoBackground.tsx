@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { VIDEO_SOURCES, VIDEO_POSTERS } from '../config/videoConfig';
+import { ASSETS } from '../config/assets';
 import { usePerformanceTier } from '@/hooks/use-mobile';
 
 interface VideoBackgroundProps {
@@ -70,10 +69,10 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
     // Medium/Low: preload current and next only (optimized for all devices)
     const videosToLoad = new Set([activeIndex]);
 
-    videosToLoad.add((activeIndex + 1) % VIDEO_SOURCES.length);
+    videosToLoad.add((activeIndex + 1) % ASSETS.VIDEOS.length);
 
     if (performanceTier === 'high') {
-      videosToLoad.add((activeIndex - 1 + VIDEO_SOURCES.length) % VIDEO_SOURCES.length);
+      videosToLoad.add((activeIndex - 1 + ASSETS.VIDEOS.length) % ASSETS.VIDEOS.length);
     }
 
     const loadVideos = () => {
@@ -147,10 +146,10 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
   const videosToRender = useMemo(() => {
     if (useStaticFallback) return [];
 
-    return VIDEO_SOURCES.map((src, index) => {
+    return ASSETS.VIDEOS.map((src, index) => {
       const isCurrent = index === activeIndex;
-      const isNext = index === (activeIndex + 1) % VIDEO_SOURCES.length;
-      const isPrev = index === (activeIndex - 1 + VIDEO_SOURCES.length) % VIDEO_SOURCES.length;
+      const isNext = index === (activeIndex + 1) % ASSETS.VIDEOS.length;
+      const isPrev = index === (activeIndex - 1 + ASSETS.VIDEOS.length) % ASSETS.VIDEOS.length;
 
       // Render strategy for all devices (since fallback is disabled)
       // High tier: render current, next, and previous
@@ -165,9 +164,6 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
     });
   }, [activeIndex, loadedVideos, performanceTier, useStaticFallback]);
 
-  // Transition duration based on performance tier
-  const transitionDuration = performanceTier === 'high' ? 0.5 : 0.3;
-
   return (
     <div ref={containerRef} className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-background">
       {/* Base gradient for loading state */}
@@ -179,7 +175,7 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
       {/* Static fallback for low-end devices - DISABLED, but keeping block structure if needed later */}
       {useStaticFallback ? (
         <img
-          src={VIDEO_POSTERS[activeIndex]}
+          src={ASSETS.VIDEO_POSTERS[activeIndex]}
           alt="Background"
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"
@@ -189,23 +185,20 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
           }}
         />
       ) : (
-        <AnimatePresence mode="popLayout">
+        <>
           {videosToRender.map(({ src, index, isCurrent, shouldRender, shouldLoad }) => {
             if (!shouldRender) return null;
 
             return (
-              <motion.div
-                key={src.originalId}
-                className="absolute inset-0 w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: isCurrent ? 1 : 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: transitionDuration, ease: 'easeInOut' }}
+              <div
+                key={src}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${isCurrent ? 'opacity-100' : 'opacity-0'}`}
                 style={{ zIndex: index + 1, pointerEvents: 'none' }}
               >
                 {shouldLoad && !videoErrors.has(index) && (
                   <video
                     ref={(el) => { videoRefs.current[index] = el; }}
+                    src={src}
                     muted
                     loop
                     playsInline
@@ -216,26 +209,22 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{
                       filter: 'brightness(0.6) saturate(1.1)',
-                      willChange: isCurrent ? 'opacity' : 'auto',
                     }}
-                  >
-                    <source src={src.mobile} media="(max-width: 768px)" />
-                    <source src={src.desktop} media="(min-width: 769px)" />
-                  </video>
+                  />
                 )}
 
                 {videoErrors.has(index) && (
                   <img
-                    src={VIDEO_POSTERS[index]}
+                    src={ASSETS.VIDEO_POSTERS[index]}
                     alt={`Scene ${index + 1}`}
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ filter: 'brightness(0.6) saturate(1.1)' }}
                   />
                 )}
-              </motion.div>
+              </div>
             );
           })}
-        </AnimatePresence>
+        </>
       )}
 
       {/* Overlay gradient for content readability */}

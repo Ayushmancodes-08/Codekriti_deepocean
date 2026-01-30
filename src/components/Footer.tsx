@@ -3,6 +3,7 @@ import { TextHoverEffect } from './ui/text-hover-effect';
 import { Github, Twitter, Linkedin, Youtube, Mail, MapPin, Send } from 'lucide-react';
 import { subscribeNewsletter } from '@/utils/googleSheets';
 import { toast } from 'sonner';
+import { ASSETS } from '@/config/assets';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -64,7 +65,7 @@ const Footer = () => {
           <div className="lg:col-span-1 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <img
-                src="/images/codekriti-logo.jpg"
+                src={ASSETS.LOGO}
                 alt="CodeKriti Logo"
                 className="h-12 w-12 rounded-xl object-cover shadow-lg shadow-cyan-500/20"
               />

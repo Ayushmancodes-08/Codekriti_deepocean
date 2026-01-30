@@ -1,9 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useScrollProgress } from '@/hooks/useScrollProgress';
 import { Menu, X } from 'lucide-react';
-
-
+import { ASSETS } from '@/config/assets';
 
 const navItems = [
   { name: 'Home', href: '#hero', id: 'hero' },
@@ -31,25 +29,20 @@ const Navbar = () => {
   const handleLinkClick = () => setIsMobileMenuOpen(false);
 
   return (
-    <motion.header
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'glass-card py-3' : 'py-6'
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out transform ${scrolled ? 'glass-card py-3' : 'py-6 translate-y-0 opacity-100'
         }`}
     >
       <nav className="container mx-auto px-6 flex items-center justify-between relative z-50">
         {/* Logo */}
-        <motion.a
+        <a
           href="#hero"
-          className="flex items-center gap-3 touch-manipulation focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-3 touch-manipulation focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg transition-transform duration-200 hover:scale-105 active:scale-95"
           aria-label="CODEKRITI 4.0 - Home"
         >
           <div className="relative">
             <img
-              src="/images/codekriti-logo.jpg"
+              src={ASSETS.LOGO}
               alt="CodeKriti Logo"
               className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
             />
@@ -63,19 +56,16 @@ const Navbar = () => {
               4.0 EDITION
             </span>
           </div>
-        </motion.a>
+        </a>
 
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item, index) => {
+          {navItems.map((item) => {
             const isActive = activeSectionId === item.id;
             return (
-              <motion.a
+              <a
                 key={item.name}
                 href={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index, duration: 0.5 }}
                 className={`relative font-body text-sm font-medium transition-colors duration-300 group px-2 py-1.5 rounded touch-manipulation focus:outline-none ${isActive ? 'text-primary' : 'text-foreground/80 hover:text-primary active:text-primary'
                   }`}
                 aria-current={isActive ? 'page' : undefined}
@@ -83,16 +73,14 @@ const Navbar = () => {
                 {item.name}
                 <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full group-active:w-full'
                   }`} />
-              </motion.a>
+              </a>
             );
           })}
         </div>
 
         {/* Desktop CTA Button */}
         <div className="hidden md:block">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={(e) => {
               e.preventDefault();
               const eventsSection = document.getElementById('events');
@@ -118,67 +106,52 @@ const Navbar = () => {
                 requestAnimationFrame(animate);
               }
             }}
-            className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer"
+            className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95"
             aria-label="Dive In"
           >
             <span className="relative z-10 text-white">Dive In</span>
-          </motion.button>
+          </button>
         </div>
 
         {/* Mobile Menu Toggle */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={toggleMobileMenu}
-          className="md:hidden relative z-50 p-2 text-white/80 hover:text-white"
+          className="md:hidden relative z-50 p-2 text-white/80 hover:text-white transition-transform active:scale-90"
           aria-label="Toggle Menu"
         >
           {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </motion.button>
+        </button>
       </nav>
 
       {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-[#0a192f]/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8"
+      <div
+        className={`fixed inset-0 z-40 bg-[#0a192f]/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+      >
+        {navItems.map((item) => (
+          <a
+            key={item.name}
+            href={item.href}
+            onClick={handleLinkClick}
+            className={`text-2xl font-display font-bold tracking-widest transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0' : 'translate-y-4'} ${activeSectionId === item.id ? 'text-cyan-400' : 'text-white/70'
+              }`}
           >
-            {navItems.map((item, index) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                onClick={handleLinkClick}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + index * 0.1 }}
-                className={`text-2xl font-display font-bold tracking-widest ${activeSectionId === item.id ? 'text-cyan-400' : 'text-white/70'
-                  }`}
-              >
-                {item.name}
-              </motion.a>
-            ))}
+            {item.name}
+          </a>
+        ))}
 
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              onClick={() => {
-                handleLinkClick();
-                // ... same scroll logic trigger ...
-                const eventsSection = document.getElementById('events');
-                if (eventsSection) eventsSection.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="mt-4 px-8 py-3 rounded-full bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 font-bold uppercase tracking-widest"
-            >
-              Dive In
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+        <button
+          onClick={() => {
+            handleLinkClick();
+            const eventsSection = document.getElementById('events');
+            if (eventsSection) eventsSection.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className={`mt-4 px-8 py-3 rounded-full bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 font-bold uppercase tracking-widest transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          Dive In
+        </button>
+      </div>
+    </header>
   );
 };
 

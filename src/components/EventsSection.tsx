@@ -1,14 +1,39 @@
-import { useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 import { Calendar, Users, Trophy, Target, Code, Rocket, Lightbulb, Puzzle } from 'lucide-react';
 import OceanRegistrationModal from '@/components/registration/OceanRegistrationModal';
-import { cxImage } from '@/lib/cloudinary';
+import { ASSETS } from '@/config/assets';
+
+// Simple hook for intersection observer to replace framer-motion's useInView
+const useIntersectionObserver = (options = {}) => {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsIntersecting(true);
+        // Once visible, we disconnect to keep it visible (mimic once: true)
+        observer.disconnect();
+      }
+    }, options);
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) observer.disconnect();
+    };
+  }, []);
+
+  return [ref, isIntersecting] as const;
+};
 
 const EventsSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [preSelectedEvent, setPreSelectedEvent] = useState<string | null>(null);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+  const [sectionRef, isSectionVisible] = useIntersectionObserver({ threshold: 0.1 });
 
   const handleRegisterClick = (eventId: string) => {
     setPreSelectedEvent(eventId);
@@ -24,8 +49,7 @@ const EventsSection = () => {
       time: '10:00 AM',
       venue: 'Lab Complex 1',
       teamSize: 'Individual',
-      // Using Cloudinary optimized images (Upload these to your cloud!)
-      image: cxImage('event-algotocode', { width: 800 }),
+      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2670&auto=format&fit=crop',
       description: 'Transform algorithms into elegant code. Solve complex algorithmic challenges and optimize your solutions.',
       prize: '₹25,000',
       icon: <Code className="w-5 h-5 text-cyan-400" />
@@ -37,7 +61,7 @@ const EventsSection = () => {
       time: '02:00 PM',
       venue: 'Central Courtyard',
       teamSize: 'Team of 3',
-      image: cxImage('event-techmaze', { width: 800 }),
+      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2670&auto=format&fit=crop',
       description: 'Navigate through complex technological puzzles and logical labyrinths in a treasure hunt format.',
       prize: '₹15,000',
       icon: <Puzzle className="w-5 h-5 text-cyan-400" />
@@ -49,7 +73,7 @@ const EventsSection = () => {
       time: '09:00 AM',
       venue: 'Design Studio',
       teamSize: '1-2 Members',
-      image: cxImage('event-designathon', { width: 800 }),
+      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2664&auto=format&fit=crop',
       description: 'Craft beautiful, intuitive interfaces. 24-hour UI/UX challenge to solve real-world problems.',
       prize: '₹20,000',
       icon: <Lightbulb className="w-5 h-5 text-cyan-400" />
@@ -61,7 +85,7 @@ const EventsSection = () => {
       time: '48 Hours',
       venue: 'Main Auditorium',
       teamSize: 'Team of 2-4',
-      image: cxImage('event-devxtreme', { width: 800 }),
+      image: ASSETS.DEVXTREME_POSTER,
       description: '48 hours of pure creation. Build the next big thing from AI agents to Blockchain dApps.',
       prize: '₹50,000',
       icon: <Rocket className="w-5 h-5 text-cyan-400" />
@@ -69,27 +93,15 @@ const EventsSection = () => {
   ];
 
   return (
-    <section id="events" ref={ref} className="relative min-h-screen py-24 overflow-hidden bg-black/40">
-
-
+    <section id="events" ref={sectionRef} className="relative min-h-screen py-24 overflow-hidden bg-black/40">
 
       <div className="container mx-auto px-6 relative z-10">
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-900/20 backdrop-blur-sm text-blue-300 text-xs font-bold tracking-widest uppercase mb-6"
-          >
+        <div className={`text-center mb-16 transition-all duration-1000 transform ${isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-900/20 backdrop-blur-sm text-blue-300 text-xs font-bold tracking-widest uppercase mb-6">
             <Target className="w-3 h-3" />
             Choose Your Path
-          </motion.div>
+          </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">
               Expeditions
@@ -98,25 +110,17 @@ const EventsSection = () => {
           <p className="font-body text-gray-400 max-w-2xl mx-auto text-lg">
             Four legendary events await the brave. Choose your mission and prove your worth.
           </p>
-        </motion.div>
+        </div>
 
         <div className="max-w-6xl mx-auto">
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8"
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8 transition-all duration-1000 delay-200 transform ${isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
           >
             {events.map((event) => (
-              <motion.div
+              <div
                 key={event.id}
-                layoutId={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.1 * events.indexOf(event), ease: [0.25, 0.46, 0.45, 0.94] }}
-                whileHover={{ y: -8, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] } }}
-                className="group relative bg-black/40 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row"
+                className="group relative bg-black/40 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]"
               >
                 {/* Image Container - Left Side on Desktop */}
                 <div className="relative h-56 md:h-auto md:w-2/5 overflow-hidden bg-gray-900">
@@ -126,7 +130,7 @@ const EventsSection = () => {
                     alt={event.title}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
                     {event.icon}
@@ -171,9 +175,9 @@ const EventsSection = () => {
                     <Rocket className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 

@@ -1,27 +1,29 @@
-import { cxVideo, cxImage } from '@/lib/cloudinary';
+// Video configuration with CDN support
+// Set USE_CDN to true to load from CDN instead of bundled videos
 
-// Cloudinary Configuration
-// These are the Public IDs of your videos in Cloudinary
-// Ensure these match exactly what you uploaded (minus extension if auto-detected)
-const VIDEO_IDS = [
-    'scene-1',
-    'scene-2',
-    'scene-3',
-    'scene-4',
-    'scene-5',
+const USE_CDN = false; // Toggle this to switch between local and CDN
+const CDN_BASE_URL = 'https://your-cdn-url.com/videos'; // Update with your CDN URL
+
+const VIDEO_FILES = [
+    'scene-1.mp4',
+    'scene-2.mp4',
+    'scene-3.mp4',
+    'scene-4.mp4',
+    'scene-5.mp4',
 ];
 
-// Generate source objects for VideoBackground to use
-export const VIDEO_SOURCES = VIDEO_IDS.map(id => ({
-    desktop: cxVideo(id, { mobile: false, quality: 'auto' }),
-    mobile: cxVideo(id, { mobile: true, quality: 'eco' }), // 'eco' for better mobile perf
-    originalId: id
-}));
-
-// Fallback logic is largely deprecated by "Video Everywhere" plan, 
-// but we keep posters just in case of error.
-export const VIDEO_POSTERS = VIDEO_IDS.map(id =>
-    cxImage(id, { width: 640 }) // Small poster for quick loading
+export const VIDEO_SOURCES = VIDEO_FILES.map(filename =>
+    USE_CDN ? `${CDN_BASE_URL}/${filename}` : `/videos/${filename}`
 );
 
+// Static poster images for low-end device fallback
+// These should be placed in /public/videos/ as scene-1-poster.jpg etc.
+export const VIDEO_POSTERS = VIDEO_FILES.map(filename => {
+    const name = filename.replace('.mp4', '-poster.jpg');
+    return USE_CDN ? `${CDN_BASE_URL}/${name}` : `/videos/${name}`;
+});
+
+// For production, you might want to use environment variables:
+// const USE_CDN = import.meta.env.PROD; // Always use CDN in production
+// const CDN_BASE_URL = import.meta.env.VITE_CDN_URL || 'https://your-cdn-url.com/videos';
 

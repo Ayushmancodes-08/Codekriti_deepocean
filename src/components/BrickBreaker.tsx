@@ -240,32 +240,6 @@ const BrickBreaker = () => {
         reqRef.current = requestAnimationFrame(draw);
     };
 
-    // Visibility handling to pause game when off-screen
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry.isIntersecting && gameState === 'playing') {
-                    // Auto-pause or just stop loop? 
-                    // Let's just cancel the animation frame to save CPU
-                    if (reqRef.current) {
-                        cancelAnimationFrame(reqRef.current);
-                        reqRef.current = undefined;
-                    }
-                } else if (entry.isIntersecting && gameState === 'playing' && !reqRef.current) {
-                    // Resume
-                    draw();
-                }
-            },
-            { threshold: 0.1 }
-        );
-
-        if (canvasRef.current) {
-            observer.observe(canvasRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, [gameState]);
-
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (gameState !== 'playing') return;
         const relativeX = e.clientX - e.currentTarget.getBoundingClientRect().left;
@@ -274,12 +248,9 @@ const BrickBreaker = () => {
         }
     };
 
-    // Touch support optimized
+    // Touch support
     const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
         if (gameState !== 'playing') return;
-        // Prevent scrolling while playing
-        // e.preventDefault(); // React synthetic events don't support this well in passive listeners
-
         const rect = e.currentTarget.getBoundingClientRect();
         const touch = e.touches[0];
         const relativeX = touch.clientX - rect.left;

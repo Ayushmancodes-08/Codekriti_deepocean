@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ASSETS } from '@/config/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Waves, Users, User } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -241,7 +242,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                             <div
                                 className="relative rounded-2xl shadow-2xl border border-[#00D9FF]/30 overflow-hidden"
                                 style={{
-                                    backgroundImage: `url('/images/sea-rock-texture.png')`,
+                                    backgroundImage: `url(${ASSETS.ROCK_TEXTURE})`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
                                 }}

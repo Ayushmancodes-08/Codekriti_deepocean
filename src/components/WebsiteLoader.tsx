@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ASSETS } from '@/config/assets';
 import { motion } from 'framer-motion';
 import TetrisLoading from './ui/tetris-loader';
 import { Waves } from 'lucide-react';
@@ -34,7 +35,7 @@ export default function WebsiteLoader({ onFinish }: { onFinish: () => void }) {
                 <div
                     className="absolute inset-0 opacity-30"
                     style={{
-                        backgroundImage: `url('/images/sea-rock-texture.png')`,
+                        backgroundImage: `url(${ASSETS.ROCK_TEXTURE})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                     }}
