@@ -1,0 +1,81 @@
+import { useEffect } from 'react';
+import VideoBackground from '../components/VideoBackground';
+import Navbar from '../components/Navbar';
+import HeroSection from '../components/HeroSection';
+import AboutSection from '../components/AboutSection';
+import EventsSection from '../components/EventsSection';
+import RegisterSection from '../components/RegisterSection';
+import Footer from '../components/Footer';
+import SmoothScroll from '../components/SmoothScroll';
+import { useScrollProgress } from '../hooks/useScrollProgress';
+import { logPerformanceReport } from '../lib/lazyLoad';
+import { monitorChunkLoading, logBundleReport } from '../lib/bundleMonitor';
+
+const Index = () => {
+  const { activeVideoIndex, scrollProgress } = useScrollProgress();
+
+  // Monitor bundle performance in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      // Log performance metrics after 5 seconds (allow time for lazy loads)
+      const timer = setTimeout(() => {
+        console.log('\n--- Lazy Load Performance ---');
+        logPerformanceReport();
+
+        console.log('\n--- Bundle Size Monitoring ---');
+        const chunks = monitorChunkLoading();
+        if (chunks.length > 0) {
+          logBundleReport(chunks);
+        }
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  return (
+    <SmoothScroll>
+      <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/30">
+        {/* Skip to main content link for keyboard navigation */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground focus:rounded"
+        >
+          Skip to main content
+        </a>
+
+        <VideoBackground activeIndex={activeVideoIndex} />
+
+        {/* PERFORMANCE: Bubbles disabled for better performance */}
+        {/* Lazy load Bubbles with Suspense fallback */}
+        {/* <Suspense fallback={null}>
+          <LazyBubbles />
+        </Suspense> */}
+
+        <Navbar />
+
+        <main id="main-content" className="relative z-10">
+          <HeroSection />
+          <AboutSection />
+          <EventsSection />
+          <RegisterSection />
+        </main>
+
+        <Footer />
+
+        {/* Global Progress Bar */}
+        <div
+          className="fixed bottom-0 left-0 h-1 bg-gradient-to-r from-primary via-accent to-primary z-50 transition-all duration-300 pointer-events-none"
+          style={{ width: `${scrollProgress * 100}%` }}
+          role="progressbar"
+          aria-valuenow={Math.round(scrollProgress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Page scroll progress"
+        />
+      </div>
+    </SmoothScroll>
+  );
+};
+
+export default Index;
