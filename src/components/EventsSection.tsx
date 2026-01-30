@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Calendar, Users, Trophy, Target, Code, Rocket, Lightbulb, Puzzle } from 'lucide-react';
 import OceanRegistrationModal from '@/components/registration/OceanRegistrationModal';
+import { cxImage } from '@/lib/cloudinary';
 
 const EventsSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +24,8 @@ const EventsSection = () => {
       time: '10:00 AM',
       venue: 'Lab Complex 1',
       teamSize: 'Individual',
-      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2670&auto=format&fit=crop',
+      // Using Cloudinary optimized images (Upload these to your cloud!)
+      image: cxImage('event-algotocode', { width: 800 }),
       description: 'Transform algorithms into elegant code. Solve complex algorithmic challenges and optimize your solutions.',
       prize: '₹25,000',
       icon: <Code className="w-5 h-5 text-cyan-400" />
@@ -35,7 +37,7 @@ const EventsSection = () => {
       time: '02:00 PM',
       venue: 'Central Courtyard',
       teamSize: 'Team of 3',
-      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2670&auto=format&fit=crop',
+      image: cxImage('event-techmaze', { width: 800 }),
       description: 'Navigate through complex technological puzzles and logical labyrinths in a treasure hunt format.',
       prize: '₹15,000',
       icon: <Puzzle className="w-5 h-5 text-cyan-400" />
@@ -47,7 +49,7 @@ const EventsSection = () => {
       time: '09:00 AM',
       venue: 'Design Studio',
       teamSize: '1-2 Members',
-      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2664&auto=format&fit=crop',
+      image: cxImage('event-designathon', { width: 800 }),
       description: 'Craft beautiful, intuitive interfaces. 24-hour UI/UX challenge to solve real-world problems.',
       prize: '₹20,000',
       icon: <Lightbulb className="w-5 h-5 text-cyan-400" />
@@ -59,7 +61,7 @@ const EventsSection = () => {
       time: '48 Hours',
       venue: 'Main Auditorium',
       teamSize: 'Team of 2-4',
-      image: '/images/devxtreme-poster.png',
+      image: cxImage('event-devxtreme', { width: 800 }),
       description: '48 hours of pure creation. Build the next big thing from AI agents to Blockchain dApps.',
       prize: '₹50,000',
       icon: <Rocket className="w-5 h-5 text-cyan-400" />

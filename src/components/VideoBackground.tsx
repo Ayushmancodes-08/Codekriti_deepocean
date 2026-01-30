@@ -195,7 +195,7 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
 
             return (
               <motion.div
-                key={src}
+                key={src.originalId}
                 className="absolute inset-0 w-full h-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isCurrent ? 1 : 0 }}
@@ -206,7 +206,6 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
                 {shouldLoad && !videoErrors.has(index) && (
                   <video
                     ref={(el) => { videoRefs.current[index] = el; }}
-                    src={src}
                     muted
                     loop
                     playsInline
@@ -219,7 +218,10 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
                       filter: 'brightness(0.6) saturate(1.1)',
                       willChange: isCurrent ? 'opacity' : 'auto',
                     }}
-                  />
+                  >
+                    <source src={src.mobile} media="(max-width: 768px)" />
+                    <source src={src.desktop} media="(min-width: 769px)" />
+                  </video>
                 )}
 
                 {videoErrors.has(index) && (
