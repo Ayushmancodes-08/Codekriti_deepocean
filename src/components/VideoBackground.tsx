@@ -153,10 +153,10 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
 
       // Render strategy for all devices (since fallback is disabled)
       // High tier: render current, next, and previous
-      // Medium/Low tier: render current and next only to save memory
+      // Medium/Low tier: render ONLY current to save max memory/gpu on mobile
       const shouldRender = performanceTier === 'high'
         ? (isCurrent || isNext || isPrev)
-        : (isCurrent || isNext);
+        : isCurrent;
 
       const shouldLoad = loadedVideos.has(index);
 

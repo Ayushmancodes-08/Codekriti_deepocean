@@ -73,10 +73,12 @@ const GlowingParticles = ({ className = '', count }: GlowingParticlesProps) => {
     };
 
     const updateAndDraw = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-        // Clear canvas completely - no blur/trail effect
+        // Clear canvas completely
         ctx.clearRect(0, 0, width, height);
 
         const particles = particlesRef.current;
+
+        ctx.fillStyle = '#fff'; // Default fallback
 
         particles.forEach((p, i) => {
             // Update position with gentle wave motion
@@ -98,27 +100,20 @@ const GlowingParticles = ({ className = '', count }: GlowingParticlesProps) => {
             const twinkle = 0.7 + 0.3 * Math.sin(p.life * p.twinkleSpeed * Math.PI * 2);
             const opacity = fadeIn * fadeOut * twinkle;
 
-            // Draw based on particle type
+            if (opacity < 0.01) return;
+
+            // Draw based on particle type - Optimized drawing
             if (p.type === 'star') {
-                // Crisp 4-point star shape
-                ctx.save();
-                ctx.translate(p.x, p.y);
+                // Simplified 4-point star (Diamond shape) - faster than path
+                ctx.beginPath();
                 ctx.fillStyle = `hsla(${p.hue}, ${p.saturation}%, ${p.lightness}%, ${opacity})`;
 
-                // Draw cross/star shape
-                const size = p.radius * 2;
-                ctx.beginPath();
-                ctx.moveTo(0, -size);
-                ctx.lineTo(size * 0.3, -size * 0.3);
-                ctx.lineTo(size, 0);
-                ctx.lineTo(size * 0.3, size * 0.3);
-                ctx.lineTo(0, size);
-                ctx.lineTo(-size * 0.3, size * 0.3);
-                ctx.lineTo(-size, 0);
-                ctx.lineTo(-size * 0.3, -size * 0.3);
-                ctx.closePath();
+                // Draw diamond instead of complex path
+                ctx.moveTo(p.x, p.y - p.radius * 2);
+                ctx.lineTo(p.x + p.radius * 2, p.y);
+                ctx.lineTo(p.x, p.y + p.radius * 2);
+                ctx.lineTo(p.x - p.radius * 2, p.y);
                 ctx.fill();
-                ctx.restore();
             } else if (p.type === 'dust') {
                 // Simple dot
                 ctx.beginPath();
@@ -126,15 +121,15 @@ const GlowingParticles = ({ className = '', count }: GlowingParticlesProps) => {
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fill();
             } else {
-                // Orb with subtle inner glow (no blur)
-                const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2);
-                gradient.addColorStop(0, `hsla(${p.hue}, ${p.saturation}%, 95%, ${opacity})`);
-                gradient.addColorStop(0.5, `hsla(${p.hue}, ${p.saturation}%, ${p.lightness}%, ${opacity * 0.6})`);
-                gradient.addColorStop(1, `hsla(${p.hue}, ${p.saturation}%, ${p.lightness}%, 0)`);
-
+                // Orb - replace gradient with simple concentric circles (much faster)
+                ctx.fillStyle = `hsla(${p.hue}, ${p.saturation}%, ${p.lightness}%, ${opacity * 0.4})`;
                 ctx.beginPath();
-                ctx.fillStyle = gradient;
-                ctx.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.radius * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = `hsla(${p.hue}, ${p.saturation}%, 95%, ${opacity * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius * 0.5, 0, Math.PI * 2);
                 ctx.fill();
             }
         });

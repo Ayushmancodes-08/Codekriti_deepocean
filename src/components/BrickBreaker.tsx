@@ -93,8 +93,8 @@ const BrickBreaker = () => {
 
     const resetBallAndPaddle = () => {
         ballPos.current = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 30 };
-        // Increase speed based on level
-        const baseSpeed = 3 + (levelRef.current - 1) * 0.5;
+        // Increase speed based on level - Adjusted for mobile responsiveness (faster)
+        const baseSpeed = 4.5 + (levelRef.current - 1) * 0.7;
         ballDir.current = { dx: baseSpeed, dy: -baseSpeed };
         paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
     };

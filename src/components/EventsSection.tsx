@@ -33,7 +33,7 @@ const EventsSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [preSelectedEvent, setPreSelectedEvent] = useState<string | null>(null);
 
-  const [sectionRef, isSectionVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const [sectionRef, isSectionVisible] = useIntersectionObserver({ threshold: 0, rootMargin: '200px' });
 
   const handleRegisterClick = (eventId: string) => {
     setPreSelectedEvent(eventId);

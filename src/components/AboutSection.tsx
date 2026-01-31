@@ -43,7 +43,7 @@ const useIntersectionObserver = (options = {}) => {
 };
 
 const AboutSection = () => {
-  const [ref, isInView] = useIntersectionObserver({ threshold: 0.1 });
+  const [ref, isInView] = useIntersectionObserver({ threshold: 0, rootMargin: '200px' });
 
   return (
     <section id="about" ref={ref} className="relative min-h-screen py-20 md:py-32 flex flex-col items-center justify-center overflow-hidden">
