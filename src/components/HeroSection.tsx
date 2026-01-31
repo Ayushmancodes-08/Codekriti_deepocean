@@ -21,7 +21,7 @@ const HeroSection = () => {
         >
           {/* Subtitle */}
           <p
-            className="font-body text-sm md:text-xl text-primary/90 font-medium tracking-widest uppercase mb-4 md:mb-6 text-center w-full animate-fade-in-up delay-100 opacity-0 fill-mode-forwards"
+            className="font-body text-base sm:text-lg md:text-xl text-cyan-300/90 font-bold tracking-[0.2em] uppercase mb-4 md:mb-6 text-center w-full animate-fade-in-up delay-100 opacity-0 fill-mode-forwards drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             style={{ animationDelay: '0.3s' }}
           >
             Descend into the Digital Depths
@@ -29,17 +29,17 @@ const HeroSection = () => {
 
           {/* Main Title */}
           <h1
-            className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-9xl font-black text-foreground mb-6 md:mb-8 leading-tight text-center w-full animate-fade-in-up opacity-0 fill-mode-forwards"
+            className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white mb-6 md:mb-8 leading-[0.9] text-center w-full animate-fade-in-up opacity-0 fill-mode-forwards tracking-tighter drop-shadow-[0_4px_30px_rgba(0,217,255,0.25)]"
             style={{ animationDelay: '0.5s' }}
           >
             CODEKRITI
-            <span className="block text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+            <span className="block mt-1 md:mt-4 text-7xl sm:text-8xl md:text-9xl text-center text-transparent bg-clip-text bg-gradient-to-b from-cyan-200 via-cyan-400 to-blue-600 drop-shadow-[0_0_30px_rgba(6,182,212,0.6)] font-display italic transform -rotate-2">
               4.0
             </span>
           </h1>
 
           {/* Description */}
-          <div className="font-body text-base md:text-xl text-foreground/70 max-w-2xl mx-auto mb-8 md:mb-10 text-center px-4 animate-fade-in-up opacity-0 fill-mode-forwards" style={{ animationDelay: '0.7s' }}>
+          <div className="font-body text-lg md:text-xl text-blue-100/90 max-w-2xl mx-auto mb-10 md:mb-12 text-center px-6 leading-relaxed drop-shadow-md animate-fade-in-up opacity-0 fill-mode-forwards" style={{ animationDelay: '0.7s' }}>
             <TextReveal
               text="The pinnacle of innovation returns. Dive into the abyss of technology and creation where only the bravest master the digital depths."
               className="inline-block"
@@ -52,9 +52,9 @@ const HeroSection = () => {
             className="mb-10 md:mb-12 text-center w-full flex flex-col items-center animate-fade-in-up opacity-0 fill-mode-forwards"
             style={{ animationDelay: '0.9s' }}
           >
-            <div className="inline-block px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/30 backdrop-blur-sm mb-6">
-              <p className="font-body text-xs text-cyan-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <div className="inline-block px-4 py-1.5 rounded-full border border-cyan-500/30 bg-black/40 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(0,217,255,0.1)]">
+              <p className="font-body text-xs font-bold text-cyan-300 uppercase tracking-widest flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22d3ee]" />
                 Event Starts In
               </p>
             </div>

@@ -123,33 +123,56 @@ const Navbar = () => {
         </button>
       </nav>
 
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`fixed inset-0 z-40 bg-[#0a192f]/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
-      >
-        {navItems.map((item) => (
-          <a
-            key={item.name}
-            href={item.href}
-            onClick={handleLinkClick}
-            className={`text-2xl font-display font-bold tracking-widest transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0' : 'translate-y-4'} ${activeSectionId === item.id ? 'text-cyan-400' : 'text-white/70'
-              }`}
-          >
-            {item.name}
-          </a>
-        ))}
+      {/* Mobile Menu Slide-Down */}
+      <div className={`md:hidden absolute top-full left-0 w-full overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-dark-blue border-t border-cyan-500/20 backdrop-blur-xl flex flex-col">
+          {navItems.map((item) => (
+            <a
+              key={item.name}
+              href={item.href}
+              onClick={handleLinkClick}
+              className={`px-6 py-3 border-b border-white/5 font-display font-medium tracking-wide transition-colors duration-200 
+                ${activeSectionId === item.id
+                  ? 'text-cyan-400 bg-cyan-950/20 border-l-4 border-l-cyan-400 pl-5'
+                  : 'text-white/80 hover:text-white hover:bg-white/5 border-l-4 border-l-transparent'
+                }`}
+            >
+              {item.name}
+            </a>
+          ))}
 
-        <button
-          onClick={() => {
-            handleLinkClick();
-            const eventsSection = document.getElementById('events');
-            if (eventsSection) eventsSection.scrollIntoView({ behavior: 'smooth' });
-          }}
-          className={`mt-4 px-8 py-3 rounded-full bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 font-bold uppercase tracking-widest transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-        >
-          Dive In
-        </button>
+          <div className="p-6">
+            <button
+              onClick={() => {
+                handleLinkClick();
+                const eventsSection = document.getElementById('events');
+                if (eventsSection) {
+                  const start = window.scrollY;
+                  const target = eventsSection.getBoundingClientRect().top + window.scrollY;
+                  const distance = target - start;
+                  const duration = 1000;
+                  const startTime = performance.now();
+
+                  const animate = (currentTime: number) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const ease = progress < 0.5
+                      ? 8 * progress * progress * progress * progress
+                      : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+
+                    window.scrollTo(0, start + distance * ease);
+
+                    if (elapsed < duration) requestAnimationFrame(animate);
+                  };
+                  requestAnimationFrame(animate);
+                }
+              }}
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold uppercase tracking-wider shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform"
+            >
+              Dive In
+            </button>
+          </div>
+        </div>
       </div>
     </header>
   );
