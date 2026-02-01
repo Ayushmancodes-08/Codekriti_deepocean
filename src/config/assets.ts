@@ -8,7 +8,7 @@ export const ASSETS = {
     DEVXTREME_POSTER: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794944/devx_y2lkjc.jpg`,
     SEA_BG: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794945/sea_yyeaix.jpg`,
     ROCK_TEXTURE: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794945/sea_yyeaix.jpg`,
-    MUSIC_THEME: '/audio/codekritimusic (1).mp3',
+    MUSIC_THEME: '/audio/theme_music.mp3',
 
     // Videos (Optimized)
     // so_0: start offset 0 (ensure it starts from beginning)

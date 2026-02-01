@@ -4,7 +4,29 @@ import { Play, Send } from 'lucide-react';
 import { usePerformanceTier } from '@/hooks/use-mobile';
 import { smoothScrollTo } from '@/lib/smoothScroll';
 import { TextReveal } from '@/components/ui/text-reveal';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
+const ParallaxParticle = ({ index, left, top, delay, duration }: { index: number, left: string, top: string, delay: string, duration: string }) => {
+  const { scrollY } = useScroll();
+  // Create varying parallax speeds based on index
+  const speed = (index % 3) + 1;
+  const y = useTransform(scrollY, [0, 1000], [0, speed * -100]);
+
+  return (
+    <motion.div
+      style={{
+        y,
+        left,
+        top,
+        opacity: (index % 2 === 0) ? 0.4 : 0.2
+      }}
+      className="absolute w-2 h-2 rounded-full bg-primary animate-float"
+    >
+      {/* Add glow to some particles */}
+      {index % 2 === 0 && <div className="absolute inset-0 bg-primary blur-[4px]" />}
+    </motion.div>
+  );
+};
 
 const HeroSection = () => {
   // Get performance tier for animation optimization
@@ -123,18 +145,16 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Floating decorative elements */}
+      {/* Floating decorative elements with Parallax */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <div
+        {[...Array(8)].map((_, i) => (
+          <ParallaxParticle
             key={i}
-            className="absolute w-2 h-2 rounded-full bg-primary/40 animate-float"
-            style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${4 + i}s`,
-            }}
+            index={i}
+            left={`${10 + i * 12}%`}
+            top={`${15 + (i % 4) * 20}%`}
+            delay={`${i * 0.4}s`}
+            duration={`${5 + (i % 3)}s`}
           />
         ))}
       </div>

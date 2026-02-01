@@ -13,6 +13,12 @@ interface TrailParticle {
     y: number;
 }
 
+interface Ripple {
+    id: number;
+    x: number;
+    y: number;
+}
+
 /**
  * Custom Cursor Component
  * Beautiful ocean-themed cursor with smooth animations and interactive states
@@ -27,6 +33,7 @@ const CustomCursor = () => {
     const [isVisible, setIsVisible] = useState(false);
     const cursorRef = useRef<HTMLDivElement>(null);
     const [trail, setTrail] = useState<TrailParticle[]>([]);
+    const [ripples, setRipples] = useState<Ripple[]>([]);
 
     // Use motion values for smooth cursor tracking
     const cursorX = useMotionValue(0);
@@ -68,8 +75,16 @@ const CustomCursor = () => {
             }
         };
 
-        const handleMouseDown = () => {
+        const handleMouseDown = (e: MouseEvent) => {
             setCursorState(prev => ({ ...prev, isClicking: true }));
+
+            // Add sonar ripple
+            const newRipple = { id: Date.now(), x: e.clientX, y: e.clientY };
+            setRipples(prev => [...prev, newRipple]);
+
+            setTimeout(() => {
+                setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+            }, 1000);
         };
 
         const handleMouseUp = () => {
@@ -143,6 +158,36 @@ const CustomCursor = () => {
 
     return (
         <>
+            {/* Sonar Ripples */}
+            <AnimatePresence>
+                {ripples.map((ripple) => (
+                    <motion.div
+                        key={ripple.id}
+                        initial={{ width: 0, height: 0, opacity: 0.8, borderWidth: 2 }}
+                        animate={{ width: 300, height: 300, opacity: 0, borderWidth: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="fixed pointer-events-none rounded-full z-[9990]"
+                        style={{
+                            left: ripple.x,
+                            top: ripple.y,
+                            transform: 'translate(-50%, -50%)',
+                            borderColor: '#00D9FF',
+                            borderStyle: 'solid',
+                            background: 'radial-gradient(circle, rgba(0,217,255,0.1) 0%, rgba(0,0,0,0) 70%)',
+                            // We need to use x and y from style to center properly with fixed position if we don't use translate
+                            // But here we use 'translate(-50%, -50%)' in transform which works with fixed left/top.
+                            // Note: framer motion transform prop overrides style transform.
+                            // So we should put x: '-50%', y: '-50%' in animate if possible, or use x/y instead of left/top.
+                            // Let's stick to left/top + CSS transform for simplicity if it works.
+                            // Actually, better to use x and y in style with negative margins or x/y offset.
+                            x: "-50%",
+                            y: "-50%",
+                        }}
+                    />
+                ))}
+            </AnimatePresence>
+
             {/* Bubble Trail */}
             <AnimatePresence>
                 {trail.map((t) => (

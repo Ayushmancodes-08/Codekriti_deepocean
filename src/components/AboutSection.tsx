@@ -1,8 +1,9 @@
 
 import { useRef, useState, useEffect } from 'react';
 import Bubbles from './Bubbles';
-import { Waves, Cpu, Users, Calendar, Trophy, IndianRupee } from 'lucide-react';
+import { Waves, Cpu, Users, Calendar, Trophy, IndianRupee, Zap, Share2 } from 'lucide-react';
 import BrickBreaker from './BrickBreaker';
+import TiltCard from './ui/TiltCard';
 
 const features = [
   {
@@ -14,6 +15,16 @@ const features = [
     icon: <Cpu className="w-8 h-8 text-purple-400" />,
     title: 'Bioluminescent AI',
     description: 'Neural networks inspired by the glowing organisms of the midnight zone.',
+  },
+  {
+    icon: <Zap className="w-8 h-8 text-yellow-400" />,
+    title: 'Hydrothermal Innovation',
+    description: 'Harnessing the raw energy of code to create sustainable solutions.',
+  },
+  {
+    icon: <Share2 className="w-8 h-8 text-green-400" />,
+    title: 'Coral Connectivity',
+    description: 'Building resilient networks that thrive in the most challenging environments.',
   },
 ];
 
@@ -122,18 +133,20 @@ const AboutSection = () => {
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className={`glass-card rounded-2xl p-6 md:p-8 relative overflow-hidden group splash-effect transition-all duration-700 hover:-translate-y-2 transform ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              className={`transition-all duration-700 transform ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="mb-4 md:mb-6 transform group-hover:scale-110 transition-transform duration-500 bg-white/5 w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10">
-                {feature.icon}
-              </div>
-              <h3 className="font-display text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3 group-hover:text-primary transition-colors">
-                {feature.title}
-              </h3>
-              <p className="font-body text-sm text-foreground/60 leading-relaxed">
-                {feature.description}
-              </p>
+              <TiltCard className="glass-card rounded-2xl p-6 md:p-8 relative overflow-hidden group h-full flex flex-col items-start text-left">
+                <div className="mb-4 md:mb-6 transform group-hover:scale-110 transition-transform duration-500 bg-white/5 w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10">
+                  {feature.icon}
+                </div>
+                <h3 className="font-display text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3 group-hover:text-primary transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="font-body text-sm text-foreground/60 leading-relaxed">
+                  {feature.description}
+                </p>
+              </TiltCard>
             </div>
           ))}
         </div>

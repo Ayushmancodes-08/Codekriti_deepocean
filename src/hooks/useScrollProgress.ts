@@ -9,33 +9,13 @@ const sectionThresholds: SectionThreshold[] = [
   { id: 'hero', videoIndex: 0 },
   { id: 'about', videoIndex: 1 },
   { id: 'events', videoIndex: 2 },
+  { id: 'schedule', videoIndex: 2 },
   { id: 'register', videoIndex: 3 },
+  { id: 'faq', videoIndex: 3 },
   { id: 'footer', videoIndex: 4 },
 ];
 
-// Throttle function for performance
-const throttle = (func: Function, delay: number) => {
-  let timeoutId: NodeJS.Timeout | null = null;
-  let lastRan: number = 0;
 
-  return function (this: any, ...args: any[]) {
-    const now = Date.now();
-
-    if (!lastRan) {
-      func.apply(this, args);
-      lastRan = now;
-    } else {
-      if (timeoutId) clearTimeout(timeoutId);
-
-      timeoutId = setTimeout(() => {
-        if (now - lastRan >= delay) {
-          func.apply(this, args);
-          lastRan = now;
-        }
-      }, delay - (now - lastRan));
-    }
-  };
-};
 
 export const useScrollProgress = () => {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);

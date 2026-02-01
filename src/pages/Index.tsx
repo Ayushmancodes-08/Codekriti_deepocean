@@ -1,9 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import VideoBackground from '../components/VideoBackground';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import AboutSection from '../components/AboutSection';
-import EventsSection from '../components/EventsSection';
+import SponsorsRibbon from '../components/SponsorsRibbon';
+// Lazy loaded sections
+const AboutSection = lazy(() => import('../components/AboutSection'));
+const EventsSection = lazy(() => import('../components/EventsSection'));
+const UnderwaterTransition = lazy(() => import('../components/UnderwaterTransition'));
+const ScheduleSection = lazy(() => import('../components/ScheduleSection'));
+const FAQSection = lazy(() => import('../components/FAQSection'));
+
 import RegisterSection from '../components/RegisterSection';
 import Footer from '../components/Footer';
 import SmoothScroll from '../components/SmoothScroll';
@@ -35,7 +42,13 @@ const Index = () => {
 
   return (
     <SmoothScroll>
-      <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative min-h-screen bg-background text-foreground selection:bg-primary/30"
+      >
         {/* Skip to main content link for keyboard navigation */}
         <a
           href="#main-content"
@@ -46,19 +59,27 @@ const Index = () => {
 
         <VideoBackground activeIndex={activeVideoIndex} />
 
-        {/* PERFORMANCE: Bubbles disabled for better performance */}
-        {/* Lazy load Bubbles with Suspense fallback */}
-        {/* <Suspense fallback={null}>
-          <LazyBubbles />
-        </Suspense> */}
-
         <Navbar />
 
         <main id="main-content" className="relative z-10">
           <HeroSection />
-          <AboutSection />
-          <EventsSection />
+          <SponsorsRibbon />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <UnderwaterTransition key="hero-about-transition" />
+          </Suspense>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <AboutSection />
+          </Suspense>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <EventsSection />
+          </Suspense>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <ScheduleSection />
+          </Suspense>
           <RegisterSection />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <FAQSection />
+          </Suspense>
         </main>
 
         <Footer />
@@ -73,7 +94,7 @@ const Index = () => {
           aria-valuemax={100}
           aria-label="Page scroll progress"
         />
-      </div>
+      </motion.div>
     </SmoothScroll>
   );
 };
