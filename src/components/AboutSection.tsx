@@ -57,11 +57,12 @@ const AboutSection = () => {
   const [ref, isInView] = useIntersectionObserver({ threshold: 0, rootMargin: '200px' });
 
   return (
-    <section id="about" ref={ref} className="relative min-h-screen py-20 md:py-32 flex flex-col items-center justify-center overflow-hidden">
+    // Reduced py from 20 to 12 on mobile
+    <section id="about" ref={ref} className="relative min-h-screen py-12 sm:py-20 md:py-32 flex flex-col items-center justify-center overflow-hidden">
       <Bubbles />
 
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-start mb-16 md:mb-20">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-start mb-10 md:mb-20">
           {/* Content - Left Side */}
           <div className="text-left w-full">
             <span

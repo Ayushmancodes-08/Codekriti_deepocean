@@ -1,8 +1,92 @@
 import { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import foregroundRocks from '@/assets/foreground_rocks.png';
 import coralMidground from '@/assets/coral_midground.png';
 import underwaterMountains from '@/assets/underwater_mountains.png';
+
+interface OceanElement {
+    id: string;
+    src: string;
+    left: string;
+    top: string;
+    size: number;
+    zIndex: number;
+    parallaxSpeed: number;
+    animationDelay: number;
+    animationDuration: number;
+    flipX?: boolean;
+    rotation?: number;
+    type: 'creature' | 'environment';
+}
+
+// Sub-component to safely use hooks inside map
+const ParallaxOceanElement = ({ element, scrollYProgress }: { element: OceanElement; scrollYProgress: any }) => {
+    // Determine parallax range based on speed - deeper/faster elements move more
+    const rangeY = element.parallaxSpeed * 200; // Vertical movement
+    const rangeX = (element.rotation || 0) * 5; // Horizontal drift based on rotation seed
+
+    // Vertical Parallax
+    const parallaxY = useTransform(
+        scrollYProgress,
+        [0, 1],
+        ["-10%", `${rangeY}%`]
+    );
+
+    // Horizontal Parallax (Drift)
+    const parallaxX = useTransform(
+        scrollYProgress,
+        [0, 1],
+        ["0%", `${rangeX}%`]
+    );
+
+    // Rotational Parallax (tumbling effect for some items)
+    const rotateParallax = useTransform(
+        scrollYProgress,
+        [0, 1],
+        [0, element.type === 'environment' ? 5 : 15] // Creatures rotate more dynamically
+    );
+
+    // Dynamic blur based on depth
+    const blurAmount = element.parallaxSpeed < 0.3 ? '1px' : '0px';
+
+    return (
+        <motion.div
+            style={{
+                left: element.left,
+                top: element.top,
+                y: parallaxY,
+                x: parallaxX,
+                rotate: rotateParallax,
+                zIndex: element.zIndex,
+                width: element.size,
+                maxWidth: '60vw', // Responsive constraint for mobile
+                filter: `blur(${blurAmount})`,
+                transformOrigin: 'center center',
+                willChange: 'transform',
+            }}
+            // Mobile Optimization: Scale down slightly on small screens via CSS/Tailwind
+            className={`absolute ${element.type === 'creature' ? 'hover:scale-110 cursor-pointer' : ''} transition-transform duration-500 ease-out sm:scale-100 scale-75`}
+        >
+            <motion.div
+                // Separate flip container to avoid conflict with rotation
+                style={{ transform: `scaleX(${element.flipX ? -1 : 1})` }}
+            >
+                <motion.img
+                    src={element.src}
+                    alt=""
+                    className="w-full h-auto drop-shadow-2xl"
+                    style={{
+                        // Waxy/Glossy look
+                        filter: element.type === 'creature' ? 'drop-shadow(0 10px 15px rgba(0,20,50,0.4)) contrast(1.1) brightness(1.05)' : 'none',
+                        animation: element.animationDuration > 0
+                            ? `${element.type === 'creature' ? 'swim' : 'sway'} ${element.animationDuration}s ease-in-out ${element.animationDelay}s infinite alternate`
+                            : 'none'
+                    }}
+                />
+            </motion.div>
+        </motion.div >
+    );
+};
 
 const UnderwaterTransition = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -12,23 +96,160 @@ const UnderwaterTransition = () => {
         offset: ["start end", "end start"]
     });
 
-    // Parallax transforms - different speeds for depth
-    const foregroundY = useTransform(scrollYProgress, [0, 1], ["0%", "150%"]);
-    const midAY = useTransform(scrollYProgress, [0, 1], ["0%", "80%"]);
-    const midBY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-    const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+    // SMOOTH PHYSICS
+    const smoothProgress = useSpring(scrollYProgress, {
+        stiffness: 80, // Slightly softer spring for fluid underwater feel
+        damping: 25,
+        restDelta: 0.001
+    });
+
+    // Parallax transforms using the SMOOTH progress
+    const foregroundY = useTransform(smoothProgress, [0, 1], ["0%", "150%"]);
+    const midAY = useTransform(smoothProgress, [0, 1], ["0%", "80%"]);
+    const midBY = useTransform(smoothProgress, [0, 1], ["0%", "50%"]);
+    const bgY = useTransform(smoothProgress, [0, 1], ["0%", "20%"]);
 
     // God rays fade out as we scroll
-    const godRayOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+    const godRayOpacity = useTransform(smoothProgress, [0, 0.4], [1, 0]);
 
-    // Background color transition (surface → deep → abyss)
+    // Enhanced "Waxy" Background Colors
     const bgColor = useTransform(
-        scrollYProgress,
+        smoothProgress,
         [0, 0.5, 1],
-        ["#1E40AF", "#0C4A6E", "#0F172A"]
+        ["#172a45", "#0a192f", "#020c1b"]
     );
 
-    // Memoize bubbles - MORE bubbles (50 instead of 20)
+    // structured ocean elements for "proper" positioning
+    const oceanElements = useMemo<OceanElement[]>(() => {
+        const elements: OceanElement[] = [];
+
+        // --- 0. BASE FLOOR (Static Foundation) ---
+        // Anchors that MOVE with parallax (increased speed from 0.05 to 0.4 for visible motion)
+        elements.push(
+            {
+                id: 'base-stone-left',
+                src: '/assets/ocean/sea_stones_cluster_1769969544640.png',
+                left: '5%',
+                top: '60%', // Start higher so it has room to move down
+                size: 300,
+                zIndex: 40,
+                parallaxSpeed: 0.4, // Significant movement
+                animationDelay: 0,
+                animationDuration: 0,
+                type: 'environment'
+            },
+            {
+                id: 'base-stone-right',
+                src: '/assets/ocean/rock_mossy_single_1769969645447.png',
+                left: '65%',
+                top: '55%', // Start higher 
+                size: 350,
+                zIndex: 38,
+                parallaxSpeed: 0.5, // Even faster for depth variance
+                animationDelay: 0,
+                animationDuration: 0,
+                type: 'environment',
+                flipX: true
+            },
+            {
+                id: 'base-coral-center',
+                src: '/assets/ocean/coral_fan_seafan_1769969707382.png',
+                left: '40%',
+                top: '65%',
+                size: 250,
+                zIndex: 39,
+                parallaxSpeed: 0.45,
+                animationDelay: 2,
+                animationDuration: 12,
+                type: 'environment'
+            }
+        );
+
+        // --- 1. FOREGROUND (Fast, Close, "Hero" Elements) ---
+        // Placed in specific focal points to guide the eye
+        const foregroundItems = [
+            { src: '/assets/ocean/whale_humpback_1769969206274.png', left: '10%', top: '15%', size: 450, flipX: false },
+            { src: '/assets/ocean/manta_ray_1769969274048.png', left: '55%', top: '25%', size: 350, flipX: true },
+            { src: '/assets/ocean/sea_turtle_1769969240193.png', left: '80%', top: '45%', size: 200, flipX: true },
+            { src: '/assets/ocean/fish_school_1769969295035.png', left: '5%', top: '65%', size: 250, flipX: false },
+        ];
+
+        foregroundItems.forEach((item, i) => {
+            elements.push({
+                id: `fore-${i}`,
+                src: item.src,
+                left: item.left,
+                top: item.top,
+                size: item.size,
+                zIndex: 30,
+                parallaxSpeed: 0.6, // Fast but controlled
+                type: 'creature',
+                flipX: item.flipX,
+                rotation: (i % 2 === 0 ? 5 : -5),
+                animationDelay: i * 1.5,
+                animationDuration: 8 + i
+            });
+        });
+
+        // --- 2. MIDGROUND (Medium speed, "Filler" Ecosystem) ---
+        // Distributed in a grid-like pattern to avoid clumping
+        const midGrid = [
+            { x: '15%', y: '40%', src: '/assets/ocean/jellyfish_blue_1769969257533.png', size: 120, type: 'creature' },
+            { x: '85%', y: '15%', src: '/assets/ocean/jellyfish_blue_1769969257533.png', size: 100, type: 'creature' },
+            { x: '45%', y: '55%', src: '/assets/ocean/octopus_purple_1769969223447.png', size: 160, type: 'creature' },
+            { x: '75%', y: '60%', src: '/assets/ocean/fish_blue_tang_1769969189595.png', size: 90, type: 'creature' },
+            { x: '25%', y: '25%', src: '/assets/ocean/fish_clownfish_1769969172414.png', size: 80, type: 'creature' },
+            { x: '65%', y: '35%', src: '/assets/ocean/kelp_seaweed_tall_1769969577936.png', size: 200, type: 'environment' },
+            { x: '5%', y: '50%', src: '/assets/ocean/kelp_seaweed_tall_1769969577936.png', size: 180, type: 'environment' },
+        ];
+
+        midGrid.forEach((item, i) => {
+            elements.push({
+                id: `mid-${i}`,
+                src: item.src,
+                left: item.x,
+                top: item.y,
+                size: item.size,
+                zIndex: 20,
+                parallaxSpeed: 0.3, // Consistent mid-speed
+                type: item.type as 'creature' | 'environment',
+                animationDelay: i * 0.5,
+                animationDuration: 6 + Math.random() * 4,
+                flipX: Math.random() > 0.5,
+                rotation: Math.random() * 10 - 5
+            });
+        });
+
+        // --- 3. BACKGROUND (Slow, "Ambiance" Layer) ---
+        // Placed to fill gaps without distracting
+        const backGrid = [
+            { x: '5%', y: '10%', src: '/assets/ocean/fish_school_1769969295035.png', size: 150 },
+            { x: '80%', y: '5%', src: '/assets/ocean/fish_school_1769969295035.png', size: 150 },
+            { x: '90%', y: '80%', src: '/assets/ocean/sea_grass_cluster_1769969611847.png', size: 110 },
+            { x: '25%', y: '85%', src: '/assets/ocean/sea_grass_cluster_1769969611847.png', size: 100 },
+            { x: '50%', y: '10%', src: '/assets/ocean/coral_fan_seafan_1769969707382.png', size: 140 },
+        ];
+
+        backGrid.forEach((item, i) => {
+            elements.push({
+                id: `back-${i}`,
+                src: item.src,
+                left: item.x,
+                top: item.y,
+                size: item.size,
+                zIndex: 5,
+                parallaxSpeed: 0.1, // Slow drift
+                type: 'environment', // Treat varied schools as environment for motion
+                animationDelay: i,
+                animationDuration: 10,
+                flipX: i % 2 === 0
+            });
+        });
+
+        return elements;
+    }, []);
+
+    // Memoize bubbles
     const bubbles = useMemo(() => Array.from({ length: 50 }, (_, i) => ({
         id: i,
         left: `${Math.random() * 100}%`,
@@ -37,7 +258,7 @@ const UnderwaterTransition = () => {
         size: 3 + Math.random() * 10
     })), []);
 
-    // Floating particles for extra atmosphere
+    // Floating particles
     const particles = useMemo(() => Array.from({ length: 30 }, (_, i) => ({
         id: i,
         left: `${Math.random() * 100}%`,
@@ -53,13 +274,19 @@ const UnderwaterTransition = () => {
             className="relative w-full overflow-hidden"
             style={{
                 backgroundColor: bgColor,
-                minHeight: '120vh' // Increased from 100vh
+                minHeight: '140vh'
             }}
         >
+            {/* 1. WAXY AQUATIC OVERLAY: Creates the 'dense water' feel */}
+            <div className="absolute inset-0 z-30 pointer-events-none mix-blend-overlay">
+                <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-blue-600/20 to-indigo-900/40 backdrop-blur-[1px]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_70%)]" />
+            </div>
+
             {/* Darker overlay for depth */}
             <div className="absolute inset-0 bg-gradient-to-b from-blue-950/40 via-blue-900/60 to-slate-900/80 pointer-events-none z-5" />
 
-            {/* God Rays Overlay - MORE rays */}
+            {/* God Rays Overlay */}
             <motion.div
                 className="absolute inset-0 pointer-events-none z-10"
                 style={{ opacity: godRayOpacity }}
@@ -89,7 +316,7 @@ const UnderwaterTransition = () => {
                 ))}
             </div>
 
-            {/* Rising Bubbles - INCREASED count */}
+            {/* Rising Bubbles */}
             <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
                 {bubbles.map((bubble) => (
                     <div
@@ -106,7 +333,16 @@ const UnderwaterTransition = () => {
                 ))}
             </div>
 
-            {/* Layer 4: Background Mountains (Slowest - 20%) - MULTIPLE instances */}
+            {/* HD Ocean Creatures and Plants - Using Subcomponent to avoid hook errors */}
+            {oceanElements.map((element) => (
+                <ParallaxOceanElement
+                    key={element.id}
+                    element={element}
+                    scrollYProgress={smoothProgress}
+                />
+            ))}
+
+            {/* Layer 4: Background Mountains */}
             <motion.div
                 className="absolute inset-0 flex items-end justify-center pointer-events-none z-5"
                 style={{ y: bgY }}
@@ -132,7 +368,7 @@ const UnderwaterTransition = () => {
                 />
             </motion.div>
 
-            {/* Layer 3: Midground B - Medium Coral (50%) - MORE instances */}
+            {/* Layer 3: Midground B - Medium Coral */}
             <motion.div
                 className="absolute inset-0 flex items-center justify-around pointer-events-none z-15"
                 style={{ y: midBY }}
@@ -157,7 +393,7 @@ const UnderwaterTransition = () => {
                 />
             </motion.div>
 
-            {/* Layer 2: Midground A - Colorful Coral (80%) - MORE instances */}
+            {/* Layer 2: Midground A - Colorful Coral */}
             <motion.div
                 className="absolute inset-0 flex items-center justify-between pointer-events-none z-20 px-0"
                 style={{ y: midAY }}
@@ -193,7 +429,7 @@ const UnderwaterTransition = () => {
                 </div>
             </motion.div>
 
-            {/* Layer 1: Foreground Rocks/Kelp (Fastest - 150%) - ENHANCED */}
+            {/* Layer 1: Foreground Rocks/Kelp */}
             <motion.div
                 className="absolute inset-0 flex items-end justify-between pointer-events-none z-30"
                 style={{ y: foregroundY }}
@@ -273,6 +509,30 @@ const UnderwaterTransition = () => {
           }
           75% {
             transform: translate(-10px, -10px);
+          }
+        }
+
+        @keyframes swim {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          25% {
+            transform: translate(15px, -5px) rotate(2deg);
+          }
+          50% {
+            transform: translate(5px, -10px) rotate(-1deg);
+          }
+          75% {
+            transform: translate(-5px, -5px) rotate(1deg);
+          }
+        }
+
+        @keyframes sway {
+          0%, 100% {
+            transform: translateX(0) rotate(0deg);
+          }
+          50% {
+            transform: translateX(5px) rotate(3deg);
           }
         }
       `}</style>

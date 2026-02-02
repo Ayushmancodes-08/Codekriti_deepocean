@@ -8,16 +8,16 @@ const sponsors = [
 
 const SponsorsRibbon = () => {
     return (
-        <div className="relative w-full overflow-hidden py-14">
+        <div className="relative w-full overflow-hidden py-8 md:py-14">
             {/* The Ribbon Itself */}
-            <div className="relative w-[110%] -left-[5%] bg-[#050A14]/95 border-y-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.2)] transform -rotate-1 skew-x-12 scale-105 py-4 backdrop-blur-xl flex items-center justify-center">
+            <div className="relative w-[110%] -left-[5%] bg-[#050A14]/95 border-y-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.2)] transform -rotate-1 skew-x-12 scale-105 py-3 md:py-4 backdrop-blur-xl flex items-center justify-center">
 
                 {/* Side Gradients for fade effect */}
-                <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#050A14] via-[#050A14]/80 to-transparent z-10 pointer-events-none" />
-                <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-[#050A14] via-[#050A14]/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-20 md:w-40 bg-gradient-to-r from-[#050A14] via-[#050A14]/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-20 md:w-40 bg-gradient-to-l from-[#050A14] via-[#050A14]/80 to-transparent z-10 pointer-events-none" />
 
                 <motion.div
-                    className="flex whitespace-nowrap min-w-full gap-20 md:gap-32 pl-20 md:pl-32 items-center"
+                    className="flex whitespace-nowrap min-w-full gap-12 md:gap-32 pl-12 md:pl-32 items-center"
                     animate={{ x: ["0%", "-50%"] }}
                     transition={{
                         repeat: Infinity,

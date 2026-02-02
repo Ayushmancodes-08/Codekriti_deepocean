@@ -4,26 +4,58 @@ import { Play, Send } from 'lucide-react';
 import { usePerformanceTier } from '@/hooks/use-mobile';
 import { smoothScrollTo } from '@/lib/smoothScroll';
 import { TextReveal } from '@/components/ui/text-reveal';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 const ParallaxParticle = ({ index, left, top, delay, duration }: { index: number, left: string, top: string, delay: string, duration: string }) => {
   const { scrollY } = useScroll();
-  // Create varying parallax speeds based on index
-  const speed = (index % 3) + 1;
-  const y = useTransform(scrollY, [0, 1000], [0, speed * -100]);
+  // 1. Smooth Physics Parallax
+  const springScroll = useSpring(scrollY, { stiffness: 40, damping: 15 });
+
+  // 2. Varying speeds and directions (some move up, some down, some drift sideways)
+  const speed = (index % 4) * 0.3 + 0.1;
+  const directionY = index % 2 === 0 ? -1 : 0.5;
+  const directionX = (index % 3 - 1) * 0.5;
+
+  const y = useTransform(springScroll, [0, 1000], [0, directionY * speed * 400]);
+  const x = useTransform(springScroll, [0, 1000], [0, directionX * speed * 200]);
+
+  // 3. Ambient Animation variables
+  const floatDuration = parseFloat(duration) || 5;
+  const delaySec = parseFloat(delay) || 0;
 
   return (
     <motion.div
       style={{
-        y,
         left,
         top,
-        opacity: (index % 2 === 0) ? 0.4 : 0.2
+        y, // Physics scroll Y
+        x, // Physics scroll X
+        opacity: (index % 3 === 0) ? 0.3 : 0.5,
+        scale: (index % 5) * 0.2 + 0.8,
+        zIndex: 1
       }}
-      className="absolute w-2 h-2 rounded-full bg-primary animate-float"
+      className="absolute"
     >
-      {/* Add glow to some particles */}
-      {index % 2 === 0 && <div className="absolute inset-0 bg-primary blur-[4px]" />}
+      {/* Inner div for ambient float (Up/Down + Glow) */}
+      <motion.div
+        animate={{
+          y: [0, -30, 0],
+          scale: [1, 1.2, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{
+          duration: floatDuration,
+          delay: delaySec,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className={`rounded-full ${index % 2 === 0 ? 'bg-cyan-400' : 'bg-primary'} blur-[3px]`}
+        style={{
+          width: (index % 3 + 2) * 3 + 'px',
+          height: (index % 3 + 2) * 3 + 'px',
+          boxShadow: `0 0 ${15 + index * 2}px ${index % 2 === 0 ? 'rgba(6,182,212,0.6)' : 'rgba(255,107,53,0.6)'}`
+        }}
+      />
     </motion.div>
   );
 };
@@ -34,10 +66,10 @@ const HeroSection = () => {
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden ray-effect">
-      {/* Glowing Particles - Performance-aware */}
       <GlowingParticles className="z-10" count={performanceTier === 'low' ? 15 : 40} />
 
-      <div className="container mx-auto px-6 py-24 md:py-32 relative z-20">
+      {/* Reduced padding for mobile to minimize blank space */}
+      <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-24 md:py-32 relative z-20">
         <div
           className="text-center max-w-5xl mx-auto animate-fade-in-up"
         >
@@ -147,14 +179,16 @@ const HeroSection = () => {
 
       {/* Floating decorative elements with Parallax */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(8)].map((_, i) => (
+        {/* Increased particle count for a lively, dense atmosphere */}
+        {[...Array(20)].map((_, i) => (
           <ParallaxParticle
             key={i}
             index={i}
-            left={`${10 + i * 12}%`}
-            top={`${15 + (i % 4) * 20}%`}
-            delay={`${i * 0.4}s`}
-            duration={`${5 + (i % 3)}s`}
+            // Deterministic "random" positions based on index
+            left={`${(i * 17) % 100}%`}
+            top={`${(i * 23) % 100}%`}
+            delay={`${(i * 0.4) % 3}s`}
+            duration={`${5 + (i % 5)}s`}
           />
         ))}
       </div>

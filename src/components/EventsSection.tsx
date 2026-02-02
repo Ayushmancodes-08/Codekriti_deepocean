@@ -93,11 +93,12 @@ const EventsSection = () => {
   ];
 
   return (
-    <section id="events" ref={sectionRef} className="relative min-h-screen py-24 overflow-hidden bg-black/40">
+    // Reduced py-24 to py-12 for mobile
+    <section id="events" ref={sectionRef} className="relative min-h-screen py-12 md:py-24 overflow-hidden bg-black/40">
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
 
-        <div className={`text-center mb-16 transition-all duration-1000 transform ${isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`text-center mb-10 md:mb-16 transition-all duration-1000 transform ${isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-900/20 backdrop-blur-sm text-blue-300 text-xs font-bold tracking-widest uppercase mb-6">
             <Target className="w-3 h-3" />
             Choose Your Path
