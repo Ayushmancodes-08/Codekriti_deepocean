@@ -189,14 +189,14 @@ const InteractiveOceanLayer = () => {
                             alt=""
                             className="w-full h-auto"
                             style={{
-                                filter: element.type === 'creature' ? 'drop-shadow(0 0 10px rgba(0,150,255,0.3))' : 'none',
+                                filter: 'none',
                                 animation: element.animationDuration > 0
                                     ? `${element.type === 'creature' ? 'swim' : 'sway'} ${element.animationDuration}s ease-in-out ${element.animationDelay}s infinite alternate`
                                     : 'none'
                             }}
                             whileHover={element.type === 'creature' ? {
                                 scale: 1.05,
-                                filter: 'drop-shadow(0 0 20px rgba(0,200,255,0.6))',
+                                filter: 'brightness(1.2)',
                             } : undefined}
                         />
                     </motion.div>

@@ -7,11 +7,13 @@ import SponsorsRibbon from '../components/SponsorsRibbon';
 // Lazy loaded sections
 const AboutSection = lazy(() => import('../components/AboutSection'));
 const EventsSection = lazy(() => import('../components/EventsSection'));
-const UnderwaterTransition = lazy(() => import('../components/UnderwaterTransition'));
+// const UnderwaterTransition = lazy(() => import('../components/UnderwaterTransition'));
 const ScheduleSection = lazy(() => import('../components/ScheduleSection'));
 const FAQSection = lazy(() => import('../components/FAQSection'));
 
 import RegisterSection from '../components/RegisterSection';
+import ContactSection from '../components/ContactSection';
+import NewsletterSection from '../components/NewsletterSection';
 import Footer from '../components/Footer';
 import SmoothScroll from '../components/SmoothScroll';
 import { useScrollProgress } from '../hooks/useScrollProgress';
@@ -64,9 +66,9 @@ const Index = () => {
         <main id="main-content" className="relative z-10">
           <HeroSection />
           <SponsorsRibbon />
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+          {/* <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <UnderwaterTransition key="hero-about-transition" />
-          </Suspense>
+          </Suspense> */}
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <AboutSection />
           </Suspense>
@@ -80,6 +82,8 @@ const Index = () => {
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <FAQSection />
           </Suspense>
+          <ContactSection />
+          <NewsletterSection />
         </main>
 
         <Footer />

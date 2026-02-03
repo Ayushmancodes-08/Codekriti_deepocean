@@ -17,11 +17,22 @@ const Navbar = () => {
   const { activeSectionId } = useScrollProgress();
 
   useEffect(() => {
+    let rafId: number | null = null;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      if (rafId) return;
+
+      rafId = requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 50);
+        rafId = null;
+      });
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);

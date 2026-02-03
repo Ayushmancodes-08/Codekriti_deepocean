@@ -56,22 +56,61 @@ const CustomCursor = () => {
 
         if (isTouchDevice) return;
 
-        const addTrailParticle = (x: number, y: number) => {
-            setTrail(prev => {
-                const newTrail = [...prev, { id: Date.now() + Math.random(), x, y }];
-                if (newTrail.length > 8) newTrail.shift(); // Limit trail length
-                return newTrail;
-            });
-        };
+        let rafId: number;
+        let lastTrailTime = 0;
 
-        const updateCursorPosition = (e: MouseEvent) => {
+        const updateCursor = (e: MouseEvent) => {
+            // Update motion values directly - purely visual, no re-render
             cursorX.set(e.clientX);
             cursorY.set(e.clientY);
+
             if (!isVisible) setIsVisible(true);
 
-            // Add trail particle occasionally for bubble effect
-            if (Math.random() > 0.7) {
-                addTrailParticle(e.clientX, e.clientY);
+            // Throttle trail creation (max 20fps equivalent for trails)
+            const now = Date.now();
+            if (now - lastTrailTime > 50 && Math.random() > 0.5) {
+                setTrail(prev => {
+                    const newTrail = [...prev, { id: now, x: e.clientX, y: e.clientY }];
+                    return newTrail.slice(-8); // Keep last 8
+                });
+                lastTrailTime = now;
+            }
+
+            // Raf for hover check to avoid layout thrashing on every pixel move
+            if (!rafId) {
+                rafId = requestAnimationFrame(() => {
+                    const target = e.target as HTMLElement;
+
+                    // Simple check without complex selectors if possible
+                    // Using matches is efficient enough for throttled checks
+                    const isButton = target.matches('button, button *, .dive-in-btn, .dive-in-btn *, [role="button"], [role="button"] *');
+                    const isLink = target.matches('a, a *');
+                    const isInteractive = target.matches('input, textarea, select');
+
+                    setCursorState(prev => {
+                        let newType: CursorState['hoverType'] = 'default';
+                        let isHovering = false;
+
+                        if (isButton) {
+                            newType = 'button';
+                            isHovering = true;
+                        } else if (isLink) {
+                            newType = 'link';
+                            isHovering = true;
+                        } else if (isInteractive) {
+                            newType = 'text';
+                            isHovering = true;
+                        }
+
+                        // Only update state if it changed
+                        if (prev.hoverType !== newType || prev.isHovering !== isHovering) {
+                            return { ...prev, isHovering, hoverType: newType };
+                        }
+                        return prev;
+                    });
+
+                    rafId = 0;
+                });
             }
         };
 
@@ -82,9 +121,10 @@ const CustomCursor = () => {
             const newRipple = { id: Date.now(), x: e.clientX, y: e.clientY };
             setRipples(prev => [...prev, newRipple]);
 
+            // Auto-cleanup ripple after animation matches duration
             setTimeout(() => {
                 setRipples(prev => prev.filter(r => r.id !== newRipple.id));
-            }, 1000);
+            }, 800);
         };
 
         const handleMouseUp = () => {
@@ -94,43 +134,19 @@ const CustomCursor = () => {
         const handleMouseEnter = () => setIsVisible(true);
         const handleMouseLeave = () => setIsVisible(false);
 
-        // Detect hoverable elements
-        const handleElementHover = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-
-            // Selectors based on your actual components
-            const isButton = target.closest('button, .video-scrub-container, [role="button"], .dive-in-btn');
-            const isLink = target.closest('a, [role="link"]');
-            const isInteractive = target.closest('input, textarea, select');
-
-            // Check for text selection/hover (optional, kept minimal)
-            // const isText = target.closest('p, h1, h2, h3, h4, h5, h6');
-
-            if (isButton) {
-                setCursorState(prev => ({ ...prev, isHovering: true, hoverType: 'button' }));
-            } else if (isLink) {
-                setCursorState(prev => ({ ...prev, isHovering: true, hoverType: 'link' }));
-            } else if (isInteractive) {
-                setCursorState(prev => ({ ...prev, isHovering: true, hoverType: 'text' }));
-            } else {
-                setCursorState(prev => ({ ...prev, isHovering: false, hoverType: 'default' }));
-            }
-        };
-
-        window.addEventListener('mousemove', updateCursorPosition);
-        window.addEventListener('mousemove', handleElementHover);
+        window.addEventListener('mousemove', updateCursor, { passive: true });
         window.addEventListener('mousedown', handleMouseDown);
         window.addEventListener('mouseup', handleMouseUp);
         document.body.addEventListener('mouseenter', handleMouseEnter);
         document.body.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
-            window.removeEventListener('mousemove', updateCursorPosition);
-            window.removeEventListener('mousemove', handleElementHover);
+            window.removeEventListener('mousemove', updateCursor);
             window.removeEventListener('mousedown', handleMouseDown);
             window.removeEventListener('mouseup', handleMouseUp);
             document.body.removeEventListener('mouseenter', handleMouseEnter);
             document.body.removeEventListener('mouseleave', handleMouseLeave);
+            if (rafId) cancelAnimationFrame(rafId);
         };
     }, [isTouchDevice, isVisible, cursorX, cursorY]);
 

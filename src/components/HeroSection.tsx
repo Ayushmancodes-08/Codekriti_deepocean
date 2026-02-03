@@ -4,10 +4,9 @@ import { Play, Send } from 'lucide-react';
 import { usePerformanceTier } from '@/hooks/use-mobile';
 import { smoothScrollTo } from '@/lib/smoothScroll';
 import { TextReveal } from '@/components/ui/text-reveal';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 
-const ParallaxParticle = ({ index, left, top, delay, duration }: { index: number, left: string, top: string, delay: string, duration: string }) => {
-  const { scrollY } = useScroll();
+const ParallaxParticle = ({ index, left, top, delay, duration, scrollY }: { index: number, left: string, top: string, delay: string, duration: string, scrollY: MotionValue<number> }) => {
   // 1. Smooth Physics Parallax
   const springScroll = useSpring(scrollY, { stiffness: 40, damping: 15 });
 
@@ -36,7 +35,7 @@ const ParallaxParticle = ({ index, left, top, delay, duration }: { index: number
       }}
       className="absolute"
     >
-      {/* Inner div for ambient float (Up/Down + Glow) */}
+      {/* Inner div for ambient float (Up/Down + Glow) - Optimized shadow */}
       <motion.div
         animate={{
           y: [0, -30, 0],
@@ -53,7 +52,8 @@ const ParallaxParticle = ({ index, left, top, delay, duration }: { index: number
         style={{
           width: (index % 3 + 2) * 3 + 'px',
           height: (index % 3 + 2) * 3 + 'px',
-          boxShadow: `0 0 ${15 + index * 2}px ${index % 2 === 0 ? 'rgba(6,182,212,0.6)' : 'rgba(255,107,53,0.6)'}`
+          // Static shadow instead of dynamic if possible, or kept minimal
+          boxShadow: `0 0 ${10 + index}px ${index % 2 === 0 ? 'rgba(6,182,212,0.4)' : 'rgba(255,107,53,0.4)'}`
         }}
       />
     </motion.div>
@@ -63,6 +63,7 @@ const ParallaxParticle = ({ index, left, top, delay, duration }: { index: number
 const HeroSection = () => {
   // Get performance tier for animation optimization
   const performanceTier = usePerformanceTier();
+  const { scrollY } = useScroll(); // Use single scroll listener
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden ray-effect">
@@ -189,6 +190,7 @@ const HeroSection = () => {
             top={`${(i * 23) % 100}%`}
             delay={`${(i * 0.4) % 3}s`}
             duration={`${5 + (i % 5)}s`}
+            scrollY={scrollY}
           />
         ))}
       </div>

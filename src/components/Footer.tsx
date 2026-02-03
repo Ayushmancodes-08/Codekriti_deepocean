@@ -1,165 +1,110 @@
-import { useState } from 'react';
 import { TextHoverEffect } from './ui/text-hover-effect';
-import { Github, Twitter, Linkedin, Youtube, Mail, MapPin, Send } from 'lucide-react';
-import { subscribeNewsletter } from '@/utils/googleSheets';
-import { toast } from 'sonner';
 import { ASSETS } from '@/config/assets';
 
 const Footer = () => {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  const handleSubscribe = async () => {
-    if (!email || !email.includes('@')) {
-      toast.error("Please enter a valid email");
-      return;
-    }
-    setStatus('loading');
-    try {
-      await subscribeNewsletter(email);
-      setStatus('success');
-      toast.success("Subscribed to Abyss Daily!");
-      setEmail('');
-    } catch (e) {
-      console.error(e);
-      // Fallback for demo
-      setStatus('success');
-      toast.success("Subscribed! (Offline Mode)");
-    }
-  };
   const currentYear = new Date().getFullYear();
 
-  const footerLinks = [
-    {
-      title: 'Navigation',
-      links: [
-        { name: 'Home', href: '#hero' },
-        { name: 'About', href: '#about' },
-        { name: 'Events', href: '#events' },
-        { name: 'Register', href: '#register' },
-      ],
-    },
-    {
-      title: 'Resources',
-      links: [
-        { name: 'Rulebook', href: '#' },
-        { name: 'Schedule', href: '#' },
-        { name: 'FAQs', href: '#' },
-        { name: 'Sponsorship', href: '#' },
-      ],
-    },
-  ];
+  // Social links or just keep the T D I G for now as per design
+  // If the bottom social links are still there, they might need the icons.
+  // I will check if I should remove the bottom social links block or keep it.
+  // The screenshot showed the Copyright line. The social icons were moved up in my new design (col 1).
+  // So likely I should remove the bottom social links block.
 
-  const socialLinks = [
-    { icon: <Github size={20} />, label: "Github", href: "#" },
-    { icon: <Twitter size={20} />, label: "Twitter", href: "#" },
-    { icon: <Linkedin size={20} />, label: "LinkedIn", href: "#" },
-    { icon: <Youtube size={20} />, label: "YouTube", href: "#" },
-  ];
 
   return (
     <footer id="footer" className="relative bg-black/40 pt-20 pb-10 overflow-hidden mt-20">
       <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16 border-t border-white/5 pt-16 mt-16">
           {/* Brand Info */}
-          <div className="lg:col-span-1 flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3">
-              <img
-                src={ASSETS.LOGO}
-                alt="CodeKriti Logo"
-                className="h-12 w-12 rounded-xl object-cover shadow-lg shadow-cyan-500/20"
-              />
-              <span className="font-display font-bold text-2xl text-white tracking-wide">
-                CODEKRITI
+              <div className="p-2 bg-gradient-to-br from-cyan-500/20 to-blue-600/10 rounded-xl border border-white/10">
+                <img
+                  src={ASSETS.LOGO}
+                  alt="CodeKriti Logo"
+                  className="h-8 w-8 object-contain"
+                />
+              </div>
+              <span className="font-display font-bold text-xl text-white tracking-wide">
+                CodeKriti <span className="text-cyan-400">4.0</span>
               </span>
             </div>
-            <p className="font-body text-sm text-gray-400 leading-relaxed max-w-xs">
-              The premier deep-ocean tech festival. Exploring the frontier where
-              marine biology meets digital innovation. Join the descent in 2025.
+            <p className="font-body text-sm text-gray-400 leading-relaxed max-w-sm">
+              Dive deep into innovation at the most anticipated hackathon of the
+              year. Where technology meets the mystery of the deep ocean.
             </p>
-
-            <div className="flex flex-col gap-2 mt-4">
-              <a href="mailto:contact@codekriti.com" className="flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition-colors">
-                <Mail size={16} />
-                <span>contact@codekriti.com</span>
-              </a>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <MapPin size={16} />
-                <span>Deep Tech Campus, India</span>
-              </div>
+            {/* Socials moved here or kept at bottom? Screenshot shows T D I G buttons. */}
+            <div className="flex gap-3 mt-2">
+              {/* Simple icon buttons */}
+              {['T', 'D', 'I', 'G'].map((initial, idx) => (
+                <div key={idx} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-gray-400 hover:text-white hover:bg-cyan-500/20 hover:border-cyan-500/50 cursor-pointer transition-all">
+                  {initial}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Links Sections */}
-          {footerLinks.map((section) => (
-            <div key={section.title}>
-              <h3 className="font-display text-sm font-bold text-white uppercase tracking-widest mb-6">
-                {section.title}
-              </h3>
-              <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.name}>
-                    <a
-                      href={link.href}
-                      className="group flex items-center gap-2 font-body text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/0 group-hover:bg-cyan-500 transition-all duration-300" />
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          {/* Newsletter / Contact */}
+          {/* Quick Links */}
           <div>
-            <h3 className="font-display text-sm font-bold text-white uppercase tracking-widest mb-6">
-              Stay Updated
+            <h3 className="font-display text-lg font-bold text-white mb-6">
+              Quick Links
             </h3>
-            <p className="text-xs text-gray-400 mb-4">
-              Subscribe to get the latest updates about events and workshops.
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={status === 'loading' || status === 'success'}
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-colors w-full disabled:opacity-50"
-              />
-              <button
-                onClick={handleSubscribe}
-                disabled={status === 'loading' || status === 'success'}
-                className="bg-cyan-500 hover:bg-cyan-600 text-black font-bold p-2 rounded-lg transition-colors disabled:opacity-50"
-              >
-                {status === 'loading' ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : <Send size={18} />}
-              </button>
-            </div>
-            {status === 'success' && <p className="text-xs text-green-400 mt-2">Successfully subscribed!</p>}
-            {status === 'error' && <p className="text-xs text-red-400 mt-2">Something went wrong. Try again.</p>}
+            <ul className="space-y-4">
+              {[
+                { name: 'Home', href: '#hero' },
+                { name: 'About', href: '#about' },
+                { name: 'Events', href: '#events' },
+                { name: 'Timeline', href: '#schedule' },
+                { name: 'Contact', href: '#contact' }
+              ].map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="font-display text-lg font-bold text-white mb-6">
+              Resources
+            </h3>
+            <ul className="space-y-4">
+              {[
+                { name: 'Participant Guide', href: '#' },
+                { name: 'Rules & Guidelines', href: '#' },
+                { name: 'FAQ', href: '#' },
+                { name: 'Sponsor Us', href: '#' }
+              ].map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
         <hr className="border-t border-white/10 my-8" />
 
         {/* Footer bottom */}
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm gap-4">
-          <div className="flex gap-4">
-            {socialLinks.map(({ icon, label, href }) => (
-              <a
-                key={label}
-                href={href}
-                aria-label={label}
-                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-cyan-600 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(8,145,178,0.4)]"
-              >
-                {icon}
-              </a>
-            ))}
+        <div className="flex flex-col md:flex-row justify-between items-center text-sm gap-4 text-gray-500">
+          <div>
+            &copy; {currentYear} CodeKriti 4.0 - Deep Ocean Edition. All rights reserved.
           </div>
 
-          &copy; {currentYear} CodeKriti 4.0. All rights reserved.
+          <div className="flex items-center gap-1">
+            Made with <span className="text-red-500 animate-pulse">❤</span> by Team DeepOcean
+          </div>
         </div>
       </div>
 

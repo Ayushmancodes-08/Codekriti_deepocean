@@ -1,542 +1,319 @@
-import { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import foregroundRocks from '@/assets/foreground_rocks.png';
-import coralMidground from '@/assets/coral_midground.png';
-import underwaterMountains from '@/assets/underwater_mountains.png';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 
-interface OceanElement {
-    id: string;
-    src: string;
-    left: string;
-    top: string;
-    size: number;
-    zIndex: number;
-    parallaxSpeed: number;
-    animationDelay: number;
-    animationDuration: number;
-    flipX?: boolean;
-    rotation?: number;
-    type: 'creature' | 'environment';
-}
+// --- asset configuration ---
+const ASSETS_OCEAN = {
+    manta: '/assets/ocean/manta_ray_1769969274048.png',
+    jellyfish: '/assets/ocean/jellyfish_blue_1769969257533.png',
+    octopus: '/assets/ocean/octopus_purple_1769969223447.png',
+    blueTang: '/assets/ocean/fish_blue_tang_1769969189595.png',
+    kelp: '/assets/ocean/kelp_seaweed_tall_1769969577936.png',
+    seaGrass: '/assets/ocean/sea_grass_cluster_1769969611847.png',
+    rockMossy: '/assets/ocean/rock_mossy_single_1769969645447.png',
+    seaStones: '/assets/ocean/sea_stones_cluster_1769969544640.png',
+    octopusStone: '/assets/ocean/octopus_wrapped_stone_1769969561487.png',
+    anemone: '/assets/ocean/anemone_colorful_1769969629357.png',
+    clownfish: '/assets/ocean/fish_clownfish_1769969172414.png',
+    coralPink: '/assets/ocean/coral_pink_branching_1769969596186.png',
+    coralFan: '/assets/ocean/coral_fan_seafan_1769969707382.png',
+    fishSchool: '/assets/ocean/fish_school_1769969295035.png',
+    turtle: '/assets/ocean/sea_turtle_1769969240193.png',
+    whale: '/assets/ocean/whale_humpback_1769969206274.png',
+};
 
-// Sub-component to safely use hooks inside map
-const ParallaxOceanElement = ({ element, scrollYProgress }: { element: OceanElement; scrollYProgress: any }) => {
-    // Determine parallax range based on speed - deeper/faster elements move more
-    const rangeY = element.parallaxSpeed * 200; // Vertical movement
-    const rangeX = (element.rotation || 0) * 5; // Horizontal drift based on rotation seed
+// --- sub-components ---
 
-    // Vertical Parallax
-    const parallaxY = useTransform(
-        scrollYProgress,
-        [0, 1],
-        ["-10%", `${rangeY}%`]
-    );
-
-    // Horizontal Parallax (Drift)
-    const parallaxX = useTransform(
-        scrollYProgress,
-        [0, 1],
-        ["0%", `${rangeX}%`]
-    );
-
-    // Rotational Parallax (tumbling effect for some items)
-    const rotateParallax = useTransform(
-        scrollYProgress,
-        [0, 1],
-        [0, element.type === 'environment' ? 5 : 15] // Creatures rotate more dynamically
-    );
-
-    // Dynamic blur based on depth
-    const blurAmount = element.parallaxSpeed < 0.3 ? '1px' : '0px';
+const ParallaxLayer = ({
+    children,
+    depth, // 0 to 1
+    className = "",
+    smoothProgress
+}: {
+    children: React.ReactNode;
+    depth: number;
+    className?: string;
+    smoothProgress: MotionValue<number>;
+}) => {
+    // Parallax: Deeper layers move slower/less
+    const yRange = depth * 500;
+    const y = useTransform(smoothProgress, [0, 1], [`-${yRange * 0.3}px`, `${yRange * 0.6}px`]);
 
     return (
-        <motion.div
-            style={{
-                left: element.left,
-                top: element.top,
-                y: parallaxY,
-                x: parallaxX,
-                rotate: rotateParallax,
-                zIndex: element.zIndex,
-                width: element.size,
-                maxWidth: '60vw', // Responsive constraint for mobile
-                filter: `blur(${blurAmount})`,
-                transformOrigin: 'center center',
-                willChange: 'transform',
-            }}
-            // Mobile Optimization: Scale down slightly on small screens via CSS/Tailwind
-            className={`absolute ${element.type === 'creature' ? 'hover:scale-110 cursor-pointer' : ''} transition-transform duration-500 ease-out sm:scale-100 scale-75`}
-        >
-            <motion.div
-                // Separate flip container to avoid conflict with rotation
-                style={{ transform: `scaleX(${element.flipX ? -1 : 1})` }}
-            >
-                <motion.img
-                    src={element.src}
-                    alt=""
-                    className="w-full h-auto drop-shadow-2xl"
-                    style={{
-                        // Waxy/Glossy look
-                        filter: element.type === 'creature' ? 'drop-shadow(0 10px 15px rgba(0,20,50,0.4)) contrast(1.1) brightness(1.05)' : 'none',
-                        animation: element.animationDuration > 0
-                            ? `${element.type === 'creature' ? 'swim' : 'sway'} ${element.animationDuration}s ease-in-out ${element.animationDelay}s infinite alternate`
-                            : 'none'
-                    }}
-                />
-            </motion.div>
-        </motion.div >
+        <motion.div style={{ y }} className={`absolute inset-0 pointer-events-none ${className}`}>
+            {children}
+        </motion.div>
     );
 };
 
 const UnderwaterTransition = () => {
     const containerRef = useRef<HTMLDivElement>(null);
-
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start end", "end start"]
     });
 
-    // SMOOTH PHYSICS
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 80, // Slightly softer spring for fluid underwater feel
-        damping: 25,
+        stiffness: 60,
+        damping: 20,
         restDelta: 0.001
     });
 
-    // Parallax transforms using the SMOOTH progress
-    const foregroundY = useTransform(smoothProgress, [0, 1], ["0%", "150%"]);
-    const midAY = useTransform(smoothProgress, [0, 1], ["0%", "80%"]);
-    const midBY = useTransform(smoothProgress, [0, 1], ["0%", "50%"]);
-    const bgY = useTransform(smoothProgress, [0, 1], ["0%", "20%"]);
-
-    // God rays fade out as we scroll
-    const godRayOpacity = useTransform(smoothProgress, [0, 0.4], [1, 0]);
-
-    // Enhanced "Waxy" Background Colors
-    const bgColor = useTransform(
-        smoothProgress,
-        [0, 0.5, 1],
-        ["#172a45", "#0a192f", "#020c1b"]
-    );
-
-    // structured ocean elements for "proper" positioning
-    const oceanElements = useMemo<OceanElement[]>(() => {
-        const elements: OceanElement[] = [];
-
-        // --- 0. BASE FLOOR (Static Foundation) ---
-        // Anchors that MOVE with parallax (increased speed from 0.05 to 0.4 for visible motion)
-        elements.push(
-            {
-                id: 'base-stone-left',
-                src: '/assets/ocean/sea_stones_cluster_1769969544640.png',
-                left: '5%',
-                top: '60%', // Start higher so it has room to move down
-                size: 300,
-                zIndex: 40,
-                parallaxSpeed: 0.4, // Significant movement
-                animationDelay: 0,
-                animationDuration: 0,
-                type: 'environment'
-            },
-            {
-                id: 'base-stone-right',
-                src: '/assets/ocean/rock_mossy_single_1769969645447.png',
-                left: '65%',
-                top: '55%', // Start higher 
-                size: 350,
-                zIndex: 38,
-                parallaxSpeed: 0.5, // Even faster for depth variance
-                animationDelay: 0,
-                animationDuration: 0,
-                type: 'environment',
-                flipX: true
-            },
-            {
-                id: 'base-coral-center',
-                src: '/assets/ocean/coral_fan_seafan_1769969707382.png',
-                left: '40%',
-                top: '65%',
-                size: 250,
-                zIndex: 39,
-                parallaxSpeed: 0.45,
-                animationDelay: 2,
-                animationDuration: 12,
-                type: 'environment'
-            }
-        );
-
-        // --- 1. FOREGROUND (Fast, Close, "Hero" Elements) ---
-        // Placed in specific focal points to guide the eye
-        const foregroundItems = [
-            { src: '/assets/ocean/whale_humpback_1769969206274.png', left: '10%', top: '15%', size: 450, flipX: false },
-            { src: '/assets/ocean/manta_ray_1769969274048.png', left: '55%', top: '25%', size: 350, flipX: true },
-            { src: '/assets/ocean/sea_turtle_1769969240193.png', left: '80%', top: '45%', size: 200, flipX: true },
-            { src: '/assets/ocean/fish_school_1769969295035.png', left: '5%', top: '65%', size: 250, flipX: false },
-        ];
-
-        foregroundItems.forEach((item, i) => {
-            elements.push({
-                id: `fore-${i}`,
-                src: item.src,
-                left: item.left,
-                top: item.top,
-                size: item.size,
-                zIndex: 30,
-                parallaxSpeed: 0.6, // Fast but controlled
-                type: 'creature',
-                flipX: item.flipX,
-                rotation: (i % 2 === 0 ? 5 : -5),
-                animationDelay: i * 1.5,
-                animationDuration: 8 + i
-            });
-        });
-
-        // --- 2. MIDGROUND (Medium speed, "Filler" Ecosystem) ---
-        // Distributed in a grid-like pattern to avoid clumping
-        const midGrid = [
-            { x: '15%', y: '40%', src: '/assets/ocean/jellyfish_blue_1769969257533.png', size: 120, type: 'creature' },
-            { x: '85%', y: '15%', src: '/assets/ocean/jellyfish_blue_1769969257533.png', size: 100, type: 'creature' },
-            { x: '45%', y: '55%', src: '/assets/ocean/octopus_purple_1769969223447.png', size: 160, type: 'creature' },
-            { x: '75%', y: '60%', src: '/assets/ocean/fish_blue_tang_1769969189595.png', size: 90, type: 'creature' },
-            { x: '25%', y: '25%', src: '/assets/ocean/fish_clownfish_1769969172414.png', size: 80, type: 'creature' },
-            { x: '65%', y: '35%', src: '/assets/ocean/kelp_seaweed_tall_1769969577936.png', size: 200, type: 'environment' },
-            { x: '5%', y: '50%', src: '/assets/ocean/kelp_seaweed_tall_1769969577936.png', size: 180, type: 'environment' },
-        ];
-
-        midGrid.forEach((item, i) => {
-            elements.push({
-                id: `mid-${i}`,
-                src: item.src,
-                left: item.x,
-                top: item.y,
-                size: item.size,
-                zIndex: 20,
-                parallaxSpeed: 0.3, // Consistent mid-speed
-                type: item.type as 'creature' | 'environment',
-                animationDelay: i * 0.5,
-                animationDuration: 6 + Math.random() * 4,
-                flipX: Math.random() > 0.5,
-                rotation: Math.random() * 10 - 5
-            });
-        });
-
-        // --- 3. BACKGROUND (Slow, "Ambiance" Layer) ---
-        // Placed to fill gaps without distracting
-        const backGrid = [
-            { x: '5%', y: '10%', src: '/assets/ocean/fish_school_1769969295035.png', size: 150 },
-            { x: '80%', y: '5%', src: '/assets/ocean/fish_school_1769969295035.png', size: 150 },
-            { x: '90%', y: '80%', src: '/assets/ocean/sea_grass_cluster_1769969611847.png', size: 110 },
-            { x: '25%', y: '85%', src: '/assets/ocean/sea_grass_cluster_1769969611847.png', size: 100 },
-            { x: '50%', y: '10%', src: '/assets/ocean/coral_fan_seafan_1769969707382.png', size: 140 },
-        ];
-
-        backGrid.forEach((item, i) => {
-            elements.push({
-                id: `back-${i}`,
-                src: item.src,
-                left: item.x,
-                top: item.y,
-                size: item.size,
-                zIndex: 5,
-                parallaxSpeed: 0.1, // Slow drift
-                type: 'environment', // Treat varied schools as environment for motion
-                animationDelay: i,
-                animationDuration: 10,
-                flipX: i % 2 === 0
-            });
-        });
-
-        return elements;
-    }, []);
-
-    // Memoize bubbles
-    const bubbles = useMemo(() => Array.from({ length: 50 }, (_, i) => ({
-        id: i,
-        left: `${Math.random() * 100}%`,
-        delay: Math.random() * 8,
-        duration: 4 + Math.random() * 8,
-        size: 3 + Math.random() * 10
-    })), []);
-
-    // Floating particles
-    const particles = useMemo(() => Array.from({ length: 30 }, (_, i) => ({
-        id: i,
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        size: 1 + Math.random() * 3,
-        delay: Math.random() * 5,
-        duration: 8 + Math.random() * 10
-    })), []);
-
     return (
-        <motion.section
-            ref={containerRef}
-            className="relative w-full overflow-hidden"
-            style={{
-                backgroundColor: bgColor,
-                minHeight: '140vh'
-            }}
-        >
-            {/* 1. WAXY AQUATIC OVERLAY: Creates the 'dense water' feel */}
-            <div className="absolute inset-0 z-30 pointer-events-none mix-blend-overlay">
-                <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-blue-600/20 to-indigo-900/40 backdrop-blur-[1px]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_70%)]" />
+        <section ref={containerRef} className="relative w-full h-[160vh] overflow-hidden bg-[#000814]">
+
+            {/* --- 1. Top Wave Transition (Seamless Entry) --- */}
+            <div className="absolute top-0 left-0 w-full h-48 z-20 pointer-events-none">
+                <div className="w-full h-full bg-gradient-to-b from-background to-transparent" />
+                {/* Decorative Wave SVG */}
+                <svg className="absolute -top-1 left-0 w-full h-full text-[#000814] fill-current opacity-90 transform rotate-180" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z" />
+                </svg>
             </div>
 
-            {/* Darker overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-950/40 via-blue-900/60 to-slate-900/80 pointer-events-none z-5" />
+            {/* --- 2. Deep Sea Background --- */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#0f2e4a_0%,#051829_40%,#000814_100%)] z-0" />
 
-            {/* God Rays Overlay */}
+            {/* God Rays (Subtle & Ambient) */}
             <motion.div
-                className="absolute inset-0 pointer-events-none z-10"
-                style={{ opacity: godRayOpacity }}
-            >
-                <div className="absolute top-0 left-[15%] w-24 h-full bg-gradient-to-b from-cyan-300/30 via-cyan-400/10 to-transparent blur-2xl transform -skew-x-12" />
-                <div className="absolute top-0 left-[35%] w-32 h-full bg-gradient-to-b from-blue-300/25 via-blue-400/8 to-transparent blur-2xl transform skew-x-6" />
-                <div className="absolute top-0 left-1/2 w-28 h-full bg-gradient-to-b from-cyan-200/20 via-cyan-300/8 to-transparent blur-2xl transform -skew-x-6" />
-                <div className="absolute top-0 right-[35%] w-36 h-full bg-gradient-to-b from-blue-200/25 via-blue-300/10 to-transparent blur-2xl transform skew-x-12" />
-                <div className="absolute top-0 right-[15%] w-24 h-full bg-gradient-to-b from-cyan-300/30 via-cyan-400/10 to-transparent blur-2xl transform -skew-x-12" />
-            </motion.div>
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 z-0 bg-[linear-gradient(110deg,transparent_40%,rgba(6,182,212,0.05)_45%,transparent_50%)]"
+            />
+            {/* Floating Dust Particles (Seamless Loop) */}
+            <motion.div
+                className="absolute inset-0 z-10 opacity-30"
+                style={{
+                    backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'1\' fill=\'white\'/%3E%3C/svg%3E")',
+                    backgroundSize: '200px 200px'
+                }}
+                animate={{ backgroundPosition: ['0px 0px', '100px 100px'] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
 
-            {/* Floating Particles */}
-            <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
-                {particles.map((particle) => (
-                    <div
-                        key={`particle-${particle.id}`}
-                        className="absolute rounded-full bg-cyan-300/40"
+
+            {/* --- LAYER 1: Farthest / Slowest (Depth 0.2) --- */}
+            <ParallaxLayer depth={0.2} smoothProgress={smoothProgress} className="z-10 mix-blend-screen opacity-50">
+                {/* Whale Silhouette (Very Deep) */}
+                <motion.img
+                    src={ASSETS_OCEAN.whale}
+                    alt="Whale Background"
+                    className="absolute top-[10%] left-[-20%] w-[800px] blur-sm opacity-20 rotate-12"
+                    animate={{ x: ['100vw', '-50vw'] }}
+                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                />
+
+                {/* Distant School (Seamless flow) */}
+                <motion.img
+                    src={ASSETS_OCEAN.fishSchool}
+                    alt="Distant School"
+                    className="absolute top-1/3 right-0 w-96 opacity-30 grayscale blur-[2px]"
+                    animate={{ x: [0, -100] }}
+                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                />
+            </ParallaxLayer>
+
+
+            {/* --- LAYER 2: Mid-Distance Environment (Depth 0.5) --- */}
+            <ParallaxLayer depth={0.5} smoothProgress={smoothProgress} className="z-20">
+                {/* Rock Formation Left */}
+                <div className="absolute top-[40%] left-[-5%] w-96 opacity-70">
+                    <motion.img
+                        src={ASSETS_OCEAN.seaStones}
+                        alt="Rocks"
+                        className="w-full drop-shadow-2xl"
+                    />
+                    {/* Vegetation on Rocks */}
+                    <motion.img
+                        src={ASSETS_OCEAN.seaGrass}
+                        alt="SeaGrass"
+                        className="absolute -top-20 left-10 w-48 opacity-80"
+                        animate={{ skewX: [-2, 2, -2] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                </div>
+
+                {/* Rock Formation Right */}
+                <div className="absolute top-[50%] right-[-10%] w-[500px] opacity-80">
+                    <motion.img
+                        src={ASSETS_OCEAN.rockMossy}
+                        alt="Mossy Rock"
+                        className="w-full brightness-75"
+                    />
+                    {/* Octopus Hiding */}
+                    <motion.img
+                        src={ASSETS_OCEAN.octopusStone}
+                        alt="Hiding Octopus"
+                        className="absolute top-10 right-20 w-48"
+                        style={{ filter: 'brightness(0.8)' }}
+                    />
+                </div>
+
+                {/* Central Mid-layer Fish */}
+                <motion.img
+                    src={ASSETS_OCEAN.fishSchool}
+                    alt="Fish School Mid"
+                    className="absolute bottom-1/3 left-1/4 w-[600px] opacity-80"
+                    animate={{ x: [-50, 50, -50], y: [0, 20, 0] }}
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                />
+            </ParallaxLayer>
+
+
+            {/* --- LAYER 3: Main Subject Creatures (Depth 0.8) --- */}
+            <ParallaxLayer depth={0.8} smoothProgress={smoothProgress} className="z-30">
+
+                {/* Manta Ray - Hero (Seamless glide across) */}
+                <motion.div
+                    className="absolute top-[20%] w-full"
+                    initial={{ x: '-100%' }}
+                    animate={{ x: '100%' }}
+                    transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+                >
+                    <motion.img
+                        src={ASSETS_OCEAN.manta}
+                        alt="Manta Ray"
+                        className="w-[300px] md:w-[600px] drop-shadow-2xl"
+                        animate={{ y: [0, 40, 0], rotateZ: [-2, 2, -2] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                </motion.div>
+
+                {/* Jellyfish Cluster - Drifting Upwards (Anti-gravity) */}
+                <motion.div className="absolute top-[40%] left-[20%]">
+                    <motion.img
+                        src={ASSETS_OCEAN.jellyfish}
+                        alt="Jellyfish Main"
+                        className="w-32 md:w-48 drop-shadow-[0_0_25px_rgba(6,182,212,0.4)]"
+                        animate={{ y: [0, -30, 0], rotate: [-5, 5, -5] }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                </motion.div>
+
+                {/* Turtle - Cruising Diagonal */}
+                <motion.div
+                    className="absolute bottom-[30%] right-[10%]"
+                    animate={{ x: [0, -50, 0], y: [0, -20, 0] }}
+                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+                >
+                    <motion.img
+                        src={ASSETS_OCEAN.turtle}
+                        alt="Turtle"
+                        className="w-48 md:w-80 opacity-95"
+                        animate={{ rotate: [0, 5, 0] }}
+                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                </motion.div>
+
+                {/* Blue Tang - Quick Darting */}
+                <motion.img
+                    src={ASSETS_OCEAN.blueTang}
+                    alt="Dory"
+                    className="absolute top-[60%] left-[40%]"
+                    style={{ width: '100px' }}
+                    animate={{
+                        x: [0, 200, 400],
+                        y: [0, -50, 20],
+                        opacity: [1, 1, 0] // Fade out as it leaves
+                    }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "easeOut" }}
+                />
+            </ParallaxLayer>
+
+
+            {/* --- LAYER 4: Foreground Vegetation & Detail (Depth 1.2) --- */}
+            <ParallaxLayer depth={1.2} smoothProgress={smoothProgress} className="z-40 pointer-events-none">
+
+                {/* Large Kelp Forest - Left */}
+                <div className="absolute bottom-[-10%] left-[-5%] flex items-end">
+                    <motion.img
+                        src={ASSETS_OCEAN.kelp}
+                        alt="Kelp L1"
+                        className="w-64 md:w-96 blur-[1px] brightness-75"
+                        style={{ transformOrigin: 'bottom center' }}
+                        animate={{ rotate: [-3, 3, -3] }}
+                        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.img
+                        src={ASSETS_OCEAN.kelp}
+                        alt="Kelp L2"
+                        className="w-48 md:w-80 -ml-20 mb-10 blur-[2px] brightness-50"
+                        style={{ transformOrigin: 'bottom center' }}
+                        animate={{ rotate: [2, -4, 2] }}
+                        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                    />
+                </div>
+
+                {/* Coral Reef & Anemone - Right */}
+                <div className="absolute bottom-0 right-0 flex flex-col items-end">
+                    {/* Pink Coral */}
+                    <motion.img
+                        src={ASSETS_OCEAN.coralPink}
+                        alt="Coral FG"
+                        className="w-64 md:w-[400px] -mb-10 mr-10 drop-shadow-2xl"
+                        animate={{ scale: [1, 1.02, 1] }} // Breathing effect
+                        transition={{ duration: 5, repeat: Infinity }}
+                    />
+
+                    {/* Sea Grass */}
+                    <div className="absolute bottom-0 right-20">
+                        <motion.img
+                            src={ASSETS_OCEAN.seaGrass}
+                            alt="Sea Grass FG"
+                            className="w-64 blur-[0.5px]"
+                            style={{ transformOrigin: 'bottom center' }}
+                            animate={{ skewX: [4, -4, 4] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                    </div>
+
+                    {/* Anemone Cluster */}
+                    <div className="absolute bottom-10 right-[30%] w-48 md:w-72">
+                        <motion.img
+                            src={ASSETS_OCEAN.anemone}
+                            alt="Anemone"
+                            className="w-full relative z-10"
+                        />
+                        <motion.img
+                            src={ASSETS_OCEAN.clownfish}
+                            alt="Nemo"
+                            className="absolute -top-8 right-10 w-20 z-0"
+                            animate={{
+                                x: [0, 20, 0],
+                                y: [0, -10, 0],
+                                rotate: [0, 10, 0]
+                            }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                    </div>
+                </div>
+
+                {/* Foreground Particles - Rising fast */}
+                {[...Array(8)].map((_, i) => (
+                    <motion.div
+                        key={`fg-particle-${i}`}
+                        className="absolute rounded-full bg-white/10 backdrop-blur-sm"
                         style={{
-                            left: particle.left,
-                            top: particle.top,
-                            width: particle.size,
-                            height: particle.size,
-                            animation: `float ${particle.duration}s ease-in-out ${particle.delay}s infinite alternate`,
-                            boxShadow: '0 0 8px rgba(103, 232, 249, 0.6)'
+                            left: `${Math.random() * 100}%`,
+                            top: '120%',
+                            width: Math.random() * 15 + 5,
+                            height: Math.random() * 15 + 5,
+                        }}
+                        animate={{ y: '-150vh' }}
+                        transition={{
+                            duration: Math.random() * 5 + 8,
+                            repeat: Infinity,
+                            delay: Math.random() * 10,
+                            ease: "linear"
                         }}
                     />
                 ))}
-            </div>
 
-            {/* Rising Bubbles */}
-            <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
-                {bubbles.map((bubble) => (
-                    <div
-                        key={`bubble-${bubble.id}`}
-                        className="absolute rounded-full bg-white/40 backdrop-blur-sm border border-white/20"
-                        style={{
-                            left: bubble.left,
-                            width: bubble.size,
-                            height: bubble.size,
-                            animation: `floatUp ${bubble.duration}s linear ${bubble.delay}s infinite`,
-                            boxShadow: '0 0 15px rgba(255,255,255,0.4), inset 0 0 5px rgba(255,255,255,0.3)'
-                        }}
-                    />
-                ))}
-            </div>
+            </ParallaxLayer>
 
-            {/* HD Ocean Creatures and Plants - Using Subcomponent to avoid hook errors */}
-            {oceanElements.map((element) => (
-                <ParallaxOceanElement
-                    key={element.id}
-                    element={element}
-                    scrollYProgress={smoothProgress}
-                />
-            ))}
+            {/* Bottom Gradient Fade to next section (Seamless) */}
+            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-background via-background/80 to-transparent z-50" />
 
-            {/* Layer 4: Background Mountains */}
-            <motion.div
-                className="absolute inset-0 flex items-end justify-center pointer-events-none z-5"
-                style={{ y: bgY }}
-            >
-                <img
-                    src={underwaterMountains}
-                    alt=""
-                    className="w-full max-w-none h-auto opacity-50 blur-[3px]"
-                    style={{ transform: 'translateY(30%) scale(1.3)' }}
-                />
-            </motion.div>
-
-            {/* Extra Background Layer */}
-            <motion.div
-                className="absolute inset-0 flex items-end justify-start pointer-events-none z-6"
-                style={{ y: useTransform(scrollYProgress, [0, 1], ["0%", "15%"]) }}
-            >
-                <img
-                    src={underwaterMountains}
-                    alt=""
-                    className="w-3/4 h-auto opacity-30 blur-[4px]"
-                    style={{ transform: 'translateY(40%) translateX(-20%)' }}
-                />
-            </motion.div>
-
-            {/* Layer 3: Midground B - Medium Coral */}
-            <motion.div
-                className="absolute inset-0 flex items-center justify-around pointer-events-none z-15"
-                style={{ y: midBY }}
-            >
-                <img
-                    src={coralMidground}
-                    alt=""
-                    className="w-72 md:w-96 lg:w-[28rem] h-auto opacity-80"
-                    style={{ transform: 'translateX(-40%) translateY(20%)' }}
-                />
-                <img
-                    src={coralMidground}
-                    alt=""
-                    className="w-64 md:w-80 lg:w-96 h-auto opacity-75"
-                    style={{ transform: 'translateY(-15%)' }}
-                />
-                <img
-                    src={coralMidground}
-                    alt=""
-                    className="w-72 md:w-96 lg:w-[28rem] h-auto opacity-80"
-                    style={{ transform: 'translateX(40%) translateY(20%) scaleX(-1)' }}
-                />
-            </motion.div>
-
-            {/* Layer 2: Midground A - Colorful Coral */}
-            <motion.div
-                className="absolute inset-0 flex items-center justify-between pointer-events-none z-20 px-0"
-                style={{ y: midAY }}
-            >
-                <div className="flex flex-col gap-32">
-                    <img
-                        src={coralMidground}
-                        alt=""
-                        className="w-64 md:w-80 lg:w-[28rem] h-auto opacity-95"
-                        style={{ transform: 'translateX(-10%)' }}
-                    />
-                    <img
-                        src={coralMidground}
-                        alt=""
-                        className="w-56 md:w-72 lg:w-96 h-auto opacity-90"
-                        style={{ transform: 'translateX(20%) scaleX(-1)' }}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-32">
-                    <img
-                        src={coralMidground}
-                        alt=""
-                        className="w-56 md:w-72 lg:w-96 h-auto opacity-90"
-                        style={{ transform: 'translateX(-20%)' }}
-                    />
-                    <img
-                        src={coralMidground}
-                        alt=""
-                        className="w-64 md:w-80 lg:w-[28rem] h-auto opacity-95"
-                        style={{ transform: 'translateX(10%) scaleX(-1)' }}
-                    />
-                </div>
-            </motion.div>
-
-            {/* Layer 1: Foreground Rocks/Kelp */}
-            <motion.div
-                className="absolute inset-0 flex items-end justify-between pointer-events-none z-30"
-                style={{ y: foregroundY }}
-            >
-                <div className="relative">
-                    <img
-                        src={foregroundRocks}
-                        alt=""
-                        className="w-96 md:w-[28rem] lg:w-[40rem] h-auto opacity-90 blur-[1px]"
-                        style={{ transform: 'translateY(15%) translateX(-15%)' }}
-                    />
-                    <img
-                        src={foregroundRocks}
-                        alt=""
-                        className="absolute bottom-0 left-20 w-80 md:w-96 lg:w-[32rem] h-auto opacity-70 blur-sm"
-                        style={{ transform: 'translateY(20%) scaleX(-1)' }}
-                    />
-                </div>
-
-                <div className="relative">
-                    <img
-                        src={foregroundRocks}
-                        alt=""
-                        className="w-96 md:w-[28rem] lg:w-[40rem] h-auto opacity-90 blur-[1px]"
-                        style={{ transform: 'translateY(15%) translateX(15%) scaleX(-1)' }}
-                    />
-                    <img
-                        src={foregroundRocks}
-                        alt=""
-                        className="absolute bottom-0 right-20 w-80 md:w-96 lg:w-[32rem] h-auto opacity-70 blur-sm"
-                        style={{ transform: 'translateY(20%)' }}
-                    />
-                </div>
-            </motion.div>
-
-            {/* Additional decorative elements */}
-            <div className="absolute inset-0 pointer-events-none z-25">
-                {/* Bioluminescent spots */}
-                <div className="absolute top-[20%] left-[15%] w-2 h-2 rounded-full bg-cyan-400 blur-sm animate-pulse" />
-                <div className="absolute top-[35%] right-[25%] w-3 h-3 rounded-full bg-blue-400 blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
-                <div className="absolute top-[50%] left-[30%] w-2 h-2 rounded-full bg-cyan-300 blur-sm animate-pulse" style={{ animationDelay: '2s' }} />
-                <div className="absolute top-[65%] right-[40%] w-3 h-3 rounded-full bg-blue-300 blur-sm animate-pulse" style={{ animationDelay: '1.5s' }} />
-                <div className="absolute top-[75%] left-[50%] w-2 h-2 rounded-full bg-cyan-400 blur-sm animate-pulse" style={{ animationDelay: '0.5s' }} />
-            </div>
-
-            {/* CSS Animations */}
-            <style>{`
-        @keyframes floatUp {
-          0% {
-            transform: translateY(100vh) scale(0.5);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.6;
-          }
-          50% {
-            opacity: 0.9;
-          }
-          90% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: translateY(-10vh) scale(1.2);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(10px, -10px);
-          }
-          50% {
-            transform: translate(-5px, -20px);
-          }
-          75% {
-            transform: translate(-10px, -10px);
-          }
-        }
-
-        @keyframes swim {
-          0%, 100% {
-            transform: translate(0, 0) rotate(0deg);
-          }
-          25% {
-            transform: translate(15px, -5px) rotate(2deg);
-          }
-          50% {
-            transform: translate(5px, -10px) rotate(-1deg);
-          }
-          75% {
-            transform: translate(-5px, -5px) rotate(1deg);
-          }
-        }
-
-        @keyframes sway {
-          0%, 100% {
-            transform: translateX(0) rotate(0deg);
-          }
-          50% {
-            transform: translateX(5px) rotate(3deg);
-          }
-        }
-      `}</style>
-        </motion.section>
+        </section>
     );
 };
 
