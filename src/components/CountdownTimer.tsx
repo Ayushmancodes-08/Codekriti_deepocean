@@ -31,9 +31,10 @@ const CountdownTimer = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft((current) => {
-        setPrevTimeLeft(current);
-        return calculateTimeLeft();
+      const nextTime = calculateTimeLeft();
+      setTimeLeft(prev => {
+        setPrevTimeLeft(prev);
+        return nextTime;
       });
     }, 1000);
 
