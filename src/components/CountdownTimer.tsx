@@ -1,40 +1,34 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface TimeLeft {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
 
-const TARGET_DATE = new Date('2026-03-06T10:00:00');
 
-const calculateTimeLeft = (): TimeLeft => {
+const TARGET_DATE = new Date('2026-03-06T17:00:00');
+
+const calculateTimeLeft = () => {
   const difference = TARGET_DATE.getTime() - new Date().getTime();
-
-  if (difference <= 0) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-  }
+  const isExpired = difference <= 0;
+  const absDiff = Math.abs(difference);
 
   return {
-    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-    minutes: Math.floor((difference / 1000 / 60) % 60),
-    seconds: Math.floor((difference / 1000) % 60),
+    isExpired,
+    days: Math.floor(absDiff / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((absDiff / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((absDiff / 1000 / 60) % 60),
+    seconds: Math.floor((absDiff / 1000) % 60),
   };
 };
 
 const CountdownTimer = () => {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
-  const [prevTimeLeft, setPrevTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
+  const [state, setState] = useState(calculateTimeLeft());
+  const [prevState, setPrevState] = useState(calculateTimeLeft());
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const nextTime = calculateTimeLeft();
-      setTimeLeft(prev => {
-        setPrevTimeLeft(prev);
-        return nextTime;
+      const nextState = calculateTimeLeft();
+      setState(prev => {
+        setPrevState(prev);
+        return nextState;
       });
     }, 1000);
 
@@ -42,28 +36,39 @@ const CountdownTimer = () => {
   }, []);
 
   const timeUnits = [
-    { label: 'Days', value: timeLeft.days, prev: prevTimeLeft.days },
-    { label: 'Hours', value: timeLeft.hours, prev: prevTimeLeft.hours },
-    { label: 'Minutes', value: timeLeft.minutes, prev: prevTimeLeft.minutes },
-    { label: 'Seconds', value: timeLeft.seconds, prev: prevTimeLeft.seconds },
+    { label: state.isExpired ? 'Days Since' : 'Days', value: state.days, prev: prevState.days },
+    { label: state.isExpired ? 'Hours Since' : 'Hours', value: state.hours, prev: prevState.hours },
+    { label: state.isExpired ? 'Mins Since' : 'Minutes', value: state.minutes, prev: prevState.minutes },
+    { label: state.isExpired ? 'Secs Since' : 'Seconds', value: state.seconds, prev: prevState.seconds },
   ];
 
   return (
-    <div className="flex items-center justify-center gap-4 md:gap-12">
-      {timeUnits.map((unit, index) => (
-        <div key={unit.label} className="relative flex flex-col items-center">
-          <FlipCard value={unit.value} prevValue={unit.prev} />
-          <span className="mt-6 font-display text-xs md:text-sm uppercase tracking-[0.2em] text-cyan-400/80 font-bold">
-            {unit.label}
-          </span>
-          {index < timeUnits.length - 1 && (
-            <div className="absolute -right-2 md:-right-6 top-[35%] -translate-y-1/2 hidden sm:flex flex-col gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-            </div>
-          )}
-        </div>
-      ))}
+    <div className="flex flex-col items-center gap-8">
+      {state.isExpired && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-4 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest animate-pulse"
+        >
+          Event is Live
+        </motion.div>
+      )}
+      <div className="flex items-center justify-center gap-4 md:gap-12">
+        {timeUnits.map((unit, index) => (
+          <div key={unit.label} className="relative flex flex-col items-center">
+            <FlipCard value={unit.value} prevValue={unit.prev} />
+            <span className="mt-6 font-display text-[10px] md:text-sm uppercase tracking-[0.2em] text-cyan-400/80 font-bold whitespace-nowrap text-center">
+              {unit.label}
+            </span>
+            {index < timeUnits.length - 1 && (
+              <div className="absolute -right-2 md:-right-6 top-[35%] -translate-y-1/2 hidden sm:flex flex-col gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -2,8 +2,11 @@
     "compilerOptions": {
         "allowJs": true,
         "lib": [
-            "deno.window"
+            "deno.window",
+            "deno.ns",
+            "esnext"
         ],
         "strict": true
-    }
+    },
+    "importMap": "import_map.json"
 }

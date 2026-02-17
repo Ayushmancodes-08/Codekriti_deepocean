@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
-import { Copy, ExternalLink, CheckCircle, XCircle, Search, RefreshCw, Key, Lock, Image as ImageIcon, CreditCard } from "lucide-react";
+import { CheckCircle, XCircle, Search, RefreshCw, Lock, Image as ImageIcon, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Types
@@ -236,8 +236,8 @@ const AdminDashboard = () => {
                                             <div className="flex items-center gap-3 mb-1">
                                                 <h3 className="text-xl font-bold text-white group-hover:text-[#00D9FF] transition-colors">{reg.team_name}</h3>
                                                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${reg.status === 'success' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                        reg.status === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                                            'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                                    reg.status === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                                        'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
                                                     }`}>
                                                     {reg.status}
                                                 </span>

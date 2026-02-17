@@ -1,7 +1,8 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import nodemailer from "npm:nodemailer@6.9.13";
+/// <reference path="../deno-types.d.ts" />
+// @ts-ignore: Standard TS cannot resolve JSR/Supabase aliases
+import { createClient } from "supabase";
+// @ts-ignore: Standard TS cannot resolve JSR/Supabase aliases
+import nodemailer from "nodemailer";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -10,7 +11,7 @@ const corsHeaders = {
 
 const LOGO_URL = "https://your-project-domain.com/logo-full.png"; // TODO: Replace with your actual public image URL after deployment
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders });
     }
@@ -21,7 +22,8 @@ serve(async (req: Request) => {
             Deno.env.get('SUPABASE_ANON_KEY') ?? ''
         );
 
-        const { action, payload } = await req.json();
+        const body = await req.json() as { action: string, payload: any };
+        const { action, payload } = body;
 
         // --- ACTION: REGISTER ---
         if (action === 'REGISTER') {
