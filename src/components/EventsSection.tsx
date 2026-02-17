@@ -43,51 +43,55 @@ const EventsSection = () => {
 
   const events = [
     {
-      id: 'algotocode',
-      title: 'Algo-to-Code',
-      date: 'March 15, 2026',
+      id: 'algo-to-code',
+      title: 'Algo to Code',
+      date: 'March 6, 2026',
       time: '10:00 AM',
-      venue: 'Lab Complex 1',
+      venue: 'PMEC ACADEMIC BLOCK - Lab Complex 1',
       teamSize: 'Individual',
       image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2670&auto=format&fit=crop',
-      description: 'Transform algorithms into elegant code. Solve complex algorithmic challenges and optimize your solutions.',
-      prize: '₹25,000',
+      description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
+      prize: '₹30',
+      category: 'Intra-College',
       icon: <Code className="w-5 h-5 text-cyan-400" />
     },
     {
       id: 'techmaze',
-      title: 'TechMaze',
-      date: 'March 15, 2026',
+      title: 'Tech Maze',
+      date: 'March 6, 2026',
       time: '02:00 PM',
-      venue: 'Central Courtyard',
+      venue: 'PMEC ACADEMIC BLOCK - Central Courtyard',
       teamSize: 'Team of 3',
       image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2670&auto=format&fit=crop',
-      description: 'Navigate through complex technological puzzles and logical labyrinths in a treasure hunt format.',
-      prize: '₹15,000',
+      description: 'Technical fun event with quizzes, puzzles, and rapid-fire challenges.',
+      prize: '₹90',
+      category: 'Intra-College',
       icon: <Puzzle className="w-5 h-5 text-cyan-400" />
     },
     {
-      id: 'designathon',
-      title: 'Designathon',
-      date: 'March 16, 2026',
+      id: 'innovation-challenge',
+      title: 'Innovation Challenge',
+      date: 'March 6, 2026',
       time: '09:00 AM',
-      venue: 'Design Studio',
-      teamSize: '1-2 Members',
+      venue: 'PMEC ACADEMIC BLOCK - Design Studio',
+      teamSize: '2-3 Members',
       image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2664&auto=format&fit=crop',
-      description: 'Craft beautiful, intuitive interfaces. 24-hour UI/UX challenge to solve real-world problems.',
-      prize: '₹20,000',
+      description: 'Non-coding ideation event. Pitch your ideas and showcase innovation.',
+      prize: '₹60',
+      category: 'Intra-College',
       icon: <Lightbulb className="w-5 h-5 text-cyan-400" />
     },
     {
       id: 'devxtreme',
       title: 'DevXtreme',
-      date: 'March 14-16, 2026',
-      time: '48 Hours',
-      venue: 'Main Auditorium',
-      teamSize: 'Team of 2-4',
+      date: 'March 7, 2026',
+      time: '18 Hours',
+      venue: 'PMEC ACADEMIC BLOCK - Main Auditorium',
+      teamSize: 'Team of 3-5',
       image: ASSETS.DEVXTREME_POSTER,
-      description: '48 hours of pure creation. Build the next big thing from AI agents to Blockchain dApps.',
-      prize: '₹50,000',
+      description: 'Overnight hackathon working on real-world problem statements.',
+      prize: '₹400 / ₹500',
+      category: 'Inter-College',
       icon: <Rocket className="w-5 h-5 text-cyan-400" />
     }
   ];
@@ -116,16 +120,16 @@ const EventsSection = () => {
         <div className="max-w-6xl mx-auto">
 
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8 transition-all duration-1000 delay-200 transform ${isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 transition-all duration-1000 delay-200 transform ${isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
           >
             {events.map((event) => (
               <div
                 key={event.id}
-                className="group relative bg-black/40 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]"
+                className={`group relative bg-black/40 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 flex flex-col hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]`}
               >
-                {/* Image Container - Left Side on Desktop */}
-                <div className="relative h-56 md:h-auto md:w-2/5 overflow-hidden bg-gray-900">
-                  <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black via-transparent to-transparent z-10" />
+                {/* Image Container */}
+                <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-900">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
                   <img
                     src={event.image}
                     alt={event.title}
@@ -138,42 +142,45 @@ const EventsSection = () => {
                   </div>
                 </div>
 
-                {/* Content - Right Side */}
-                <div className="p-5 md:p-6 md:w-3/5 flex flex-col justify-between">
+                {/* Content - Bottom */}
+                <div className="p-4 md:p-5 flex flex-col justify-between flex-grow">
                   <div>
-                    <h3 className="font-display text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                    <h3 className="font-display text-lg md:text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
                       {event.title}
                     </h3>
-                    <p className="text-sm text-gray-400 mb-4 md:mb-6 line-clamp-2">
+                    <p className="text-xs md:text-sm text-gray-400 mb-3 md:mb-4 line-clamp-2">
                       {event.description}
                     </p>
 
-                    <div className="space-y-2 mb-6">
-                      <div className="flex items-center text-sm text-gray-300">
-                        <Calendar className="w-4 h-4 mr-3 text-cyan-500 shrink-0" />
-                        {event.date} • {event.time}
+                    <div className="space-y-1.5 mb-4">
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Calendar className="w-3.5 h-3.5 mr-2 text-cyan-500 shrink-0" />
+                        <span className="truncate">{event.date} • {event.time}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-300">
-                        <Target className="w-4 h-4 mr-3 text-cyan-500 shrink-0" />
-                        {event.venue}
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Target className="w-3.5 h-3.5 mr-2 text-cyan-500 shrink-0" />
+                        <span className="truncate">{event.venue}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-300">
-                        <Users className="w-4 h-4 mr-3 text-cyan-500 shrink-0" />
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Users className="w-3.5 h-3.5 mr-2 text-cyan-500 shrink-0" />
                         {event.teamSize}
                       </div>
-                      <div className="flex items-center text-sm text-gray-300">
-                        <Trophy className="w-4 h-4 mr-3 text-yellow-500 shrink-0" />
-                        Prize: <span className="text-yellow-400 font-bold ml-1">{event.prize}</span>
+                      <div className="flex items-center text-xs md:text-sm text-gray-300">
+                        <Trophy className="w-3.5 h-3.5 mr-2 text-yellow-500 shrink-0" />
+                        Reg. Fee: <span className="text-yellow-400 font-bold ml-1">{event.prize}</span>
+                        <span className="ml-auto text-[10px] font-bold text-cyan-500 uppercase tracking-wider bg-cyan-950/30 px-2 py-0.5 rounded border border-cyan-500/20">
+                          {event.category}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <button
                     onClick={() => handleRegisterClick(event.id)}
-                    className="w-full py-3 md:py-3 rounded-xl bg-white/5 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-500/50 text-white font-bold transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:scale-[1.02] active:scale-95 touch-manipulation"
+                    className="w-full py-2 md:py-2.5 rounded-lg bg-white/5 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-500/50 text-white text-sm md:text-base font-bold transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:scale-[1.02] active:scale-95 touch-manipulation"
                   >
                     Register Now
-                    <Rocket className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    <Rocket className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
                   </button>
                 </div>
               </div>

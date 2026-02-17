@@ -12,7 +12,7 @@ interface OceanInputProps {
 const OceanInput = ({ label, icon: Icon, error, children }: OceanInputProps) => {
     return (
         <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <label className="flex items-center gap-2 text-sm md:text-base font-medium text-gray-300">
                 <Icon className="w-4 h-4 text-[#00D9FF]" />
                 {label}
             </label>

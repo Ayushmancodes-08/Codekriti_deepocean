@@ -93,9 +93,14 @@ const BrickBreaker = () => {
 
     const resetBallAndPaddle = () => {
         ballPos.current = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 30 };
-        // Increase speed based on level - Adjusted for mobile responsiveness (faster)
-        const baseSpeed = 4.5 + (levelRef.current - 1) * 0.7;
-        ballDir.current = { dx: baseSpeed, dy: -baseSpeed };
+        // Constant  base speed for all devices
+        const BALL_SPEED = 3.5 + (levelRef.current - 1) * 0.3;
+        // Random angle between -45deg and -135deg (upward)
+        const angle = (-Math.PI / 4) - (Math.random() * Math.PI / 2);
+        ballDir.current = {
+            dx: Math.cos(angle) * BALL_SPEED,
+            dy: Math.sin(angle) * BALL_SPEED
+        };
         paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
     };
 
@@ -175,24 +180,43 @@ const BrickBreaker = () => {
         ctx.closePath();
 
         // Collision Logic
+        // Constant ball speed for consistency across devices
+        const BALL_SPEED = 3.5 + (levelRef.current - 1) * 0.3;
+        const MIN_VERTICAL_SPEED = 1.5; // Prevent horizontal traps
+
         // Walls
         if (ballPos.current.x + ballDir.current.dx > CANVAS_WIDTH - BALL_RADIUS || ballPos.current.x + ballDir.current.dx < BALL_RADIUS) {
             ballDir.current.dx = -ballDir.current.dx;
+            // Normalize to maintain constant speed
+            const speed = Math.sqrt(ballDir.current.dx ** 2 + ballDir.current.dy ** 2);
+            ballDir.current.dx = (ballDir.current.dx / speed) * BALL_SPEED;
+            ballDir.current.dy = (ballDir.current.dy / speed) * BALL_SPEED;
         }
         if (ballPos.current.y + ballDir.current.dy < BALL_RADIUS) {
             ballDir.current.dy = -ballDir.current.dy;
+            // Normalize to maintain constant speed
+            const speed = Math.sqrt(ballDir.current.dx ** 2 + ballDir.current.dy ** 2);
+            ballDir.current.dx = (ballDir.current.dx / speed) * BALL_SPEED;
+            ballDir.current.dy = (ballDir.current.dy / speed) * BALL_SPEED;
         } else if (ballPos.current.y + ballDir.current.dy > CANVAS_HEIGHT - BALL_RADIUS - 10) { // Bottom area check
             // Paddle Collision
             if (ballPos.current.x > paddleX.current && ballPos.current.x < paddleX.current + PADDLE_WIDTH) {
-                // Hit paddle
-                ballDir.current.dy = -ballDir.current.dy;
-                // Add fun English: speed up slightly on hit to make it challenging
-                ballDir.current.dx *= 1.05;
-                ballDir.current.dy *= 1.05;
-                // Clamp speed
-                const MAX_SPEED = 6 + levelRef.current; // Higher max speed for higher levels
-                ballDir.current.dx = Math.min(Math.max(ballDir.current.dx, -MAX_SPEED), MAX_SPEED);
-                ballDir.current.dy = Math.min(Math.max(ballDir.current.dy, -MAX_SPEED), MAX_SPEED);
+                // Hit paddle - calculate angle based on hit position
+                const hitPos = (ballPos.current.x - paddleX.current) / PADDLE_WIDTH; // 0 to 1
+                const bounceAngle = (hitPos - 0.5) * (Math.PI / 3); // -60deg to +60deg variation
+
+                ballDir.current.dy = -Math.abs(ballDir.current.dy); // Always bounce upward
+                ballDir.current.dx = Math.sin(bounceAngle) * BALL_SPEED;
+                ballDir.current.dy = -Math.cos(bounceAngle) * BALL_SPEED;
+
+                // Ensure minimum vertical speed to prevent horizontal traps
+                if (Math.abs(ballDir.current.dy) < MIN_VERTICAL_SPEED) {
+                    const sign = ballDir.current.dy < 0 ? -1 : 1;
+                    ballDir.current.dy = sign * MIN_VERTICAL_SPEED;
+                    // Recalculate dx to maintain constant speed
+                    const remainingSpeed = Math.sqrt(BALL_SPEED ** 2 - ballDir.current.dy ** 2);
+                    ballDir.current.dx = (ballDir.current.dx > 0 ? 1 : -1) * remainingSpeed;
+                }
             } else if (ballPos.current.y + ballDir.current.dy > CANVAS_HEIGHT - BALL_RADIUS) {
                 // Ball lost logic
                 livesRef.current -= 1;
@@ -203,11 +227,7 @@ const BrickBreaker = () => {
                     return;
                 } else {
                     // Reset ball but keep progress
-                    ballPos.current = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 30 };
-                    // Reset speed based on level
-                    const baseSpeed = 3 + (levelRef.current - 1) * 0.5;
-                    ballDir.current = { dx: baseSpeed, dy: -baseSpeed };
-                    paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
+                    resetBallAndPaddle();
                 }
             }
         }
@@ -220,6 +240,12 @@ const BrickBreaker = () => {
                     if (ballPos.current.x > b.x && ballPos.current.x < b.x + BRICK_WIDTH && ballPos.current.y > b.y && ballPos.current.y < b.y + BRICK_HEIGHT) {
                         ballDir.current.dy = -ballDir.current.dy;
                         b.status = 0;
+
+                        // Normalize speed after brick collision
+                        const speed = Math.sqrt(ballDir.current.dx ** 2 + ballDir.current.dy ** 2);
+                        ballDir.current.dx = (ballDir.current.dx / speed) * BALL_SPEED;
+                        ballDir.current.dy = (ballDir.current.dy / speed) * BALL_SPEED;
+
                         setScore((s) => {
                             const newScore = s + 10 * levelRef.current; // More points for higher levels
                             setHighScore(prev => {

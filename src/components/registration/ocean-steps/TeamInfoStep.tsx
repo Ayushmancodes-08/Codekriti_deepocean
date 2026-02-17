@@ -2,18 +2,21 @@ import { useFormContext } from 'react-hook-form';
 import { Users, User, Mail, Phone, School, BookOpen, Calendar } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, type RegistrationFormData } from '@/types/registration';
 import OceanInput from '../OceanInput';
+import { capitalizeName, formatPhoneNumber, preventNonNumeric } from '@/utils/formUtils';
 
 const TeamInfoStep = () => {
     const { register, formState: { errors } } = useFormContext<RegistrationFormData>();
 
     return (
-        <div className="space-y-8">
-            <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00D9FF] to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#00D9FF]/30">
-                    <Users className="w-8 h-8 text-white" />
+        <div className="space-y-6">
+            <div className="flex items-center gap-3 border-b border-[#00D9FF]/20 pb-4">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00D9FF] to-blue-500 flex items-center justify-center shadow-lg shadow-[#00D9FF]/20">
+                    <Users className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Team Information</h3>
-                <p className="text-gray-400">Set up your squad</p>
+                <div>
+                    <h3 className="text-lg font-bold text-white leading-tight">Team Details</h3>
+                    <p className="text-[#00D9FF]/60 text-xs">Manage your squad info</p>
+                </div>
             </div>
 
             {/* Team Name */}
@@ -25,29 +28,34 @@ const TeamInfoStep = () => {
                 <input
                     {...register('teamName' as any)}
                     type="text"
-                    placeholder="Enter your team name"
-                    className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500"
+                    placeholder="Enter unique team name"
+                    className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 text-sm"
                 />
             </OceanInput>
 
             {/* Team Leader Section */}
-            <div className="p-6 bg-gradient-to-br from-[#00D9FF]/10 to-blue-500/10 border border-[#00D9FF]/30 rounded-xl">
-                <h4 className="text-xl font-bold text-[#00D9FF] mb-6 flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Team Leader Details
-                </h4>
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 text-[#00D9FF]/80">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-semibold uppercase tracking-wider">Team Leader</span>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-4">
                     <OceanInput
                         label="Full Name"
                         icon={User}
                         error={(errors as any).teamLeader?.name?.message}
                     >
                         <input
-                            {...register('teamLeader.name' as any)}
+                            {...register('teamLeader.name')}
+                            onBlur={(e) => {
+                                const formatted = capitalizeName(e.target.value);
+                                e.target.value = formatted;
+                                register('teamLeader.name').onChange(e);
+                            }}
                             type="text"
-                            placeholder="Leader's full name"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500"
+                            placeholder="Leader Name"
+                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
                         />
                     </OceanInput>
 
@@ -57,10 +65,10 @@ const TeamInfoStep = () => {
                         error={(errors as any).teamLeader?.email?.message}
                     >
                         <input
-                            {...register('teamLeader.email' as any)}
+                            {...register('teamLeader.email')}
                             type="email"
-                            placeholder="leader@example.com"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500"
+                            placeholder="Leader Email"
+                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
                         />
                     </OceanInput>
 
@@ -70,10 +78,19 @@ const TeamInfoStep = () => {
                         error={(errors as any).teamLeader?.phone?.message}
                     >
                         <input
-                            {...register('teamLeader.phone' as any)}
+                            {...register('teamLeader.phone')}
+                            onKeyDown={preventNonNumeric}
+                            onBlur={(e) => {
+                                const formatted = formatPhoneNumber(e.target.value);
+                                if (formatted) {
+                                    e.target.value = formatted;
+                                    register('teamLeader.phone').onChange(e);
+                                }
+                            }}
+                            maxLength={13}
                             type="tel"
-                            placeholder="+91 XXXXX XXXXX"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500"
+                            placeholder="Phone Number"
+                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
                         />
                     </OceanInput>
 
@@ -83,52 +100,59 @@ const TeamInfoStep = () => {
                         error={(errors as any).teamLeader?.college?.message}
                     >
                         <input
-                            {...register('teamLeader.college' as any)}
+                            {...register('teamLeader.college')}
+                            onBlur={(e) => {
+                                const formatted = capitalizeName(e.target.value);
+                                e.target.value = formatted;
+                                register('teamLeader.college').onChange(e);
+                            }}
                             type="text"
-                            placeholder="Institution name"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500"
+                            placeholder="College Name"
+                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
                         />
                     </OceanInput>
 
-                    <OceanInput
-                        label="Branch"
-                        icon={BookOpen}
-                        error={(errors as any).teamLeader?.branch?.message}
-                    >
-                        <select
-                            {...register('teamLeader.branch' as any)}
-                            className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all"
+                    <div className="grid grid-cols-2 gap-3">
+                        <OceanInput
+                            label="Branch"
+                            icon={BookOpen}
+                            error={(errors as any).teamLeader?.branch?.message}
                         >
-                            <option value="" className="bg-[#1A1A2E]">
-                                Select branch
-                            </option>
-                            {BRANCHES.map((branch) => (
-                                <option key={branch} value={branch} className="bg-[#1A1A2E]">
-                                    {branch}
-                                </option>
-                            ))}
-                        </select>
-                    </OceanInput>
+                            <div className="relative">
+                                <select
+                                    {...register('teamLeader.branch')}
+                                    className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-2 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all min-h-[44px] text-[16px] appearance-none"
+                                >
+                                    <option value="" className="bg-[#1A1A2E]">Branch</option>
+                                    {BRANCHES.map((branch) => (
+                                        <option key={branch} value={branch} className="bg-[#1A1A2E]">
+                                            {branch}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </OceanInput>
 
-                    <OceanInput
-                        label="Year"
-                        icon={Calendar}
-                        error={(errors as any).teamLeader?.yearOfStudy?.message}
-                    >
-                        <select
-                            {...register('teamLeader.yearOfStudy' as any)}
-                            className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all"
+                        <OceanInput
+                            label="Year"
+                            icon={Calendar}
+                            error={(errors as any).teamLeader?.yearOfStudy?.message}
                         >
-                            <option value="" className="bg-[#1A1A2E]">
-                                Select year
-                            </option>
-                            {YEARS_OF_STUDY.map((year) => (
-                                <option key={year} value={year} className="bg-[#1A1A2E]">
-                                    {year}
-                                </option>
-                            ))}
-                        </select>
-                    </OceanInput>
+                            <div className="relative">
+                                <select
+                                    {...register('teamLeader.yearOfStudy')}
+                                    className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-2 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all min-h-[44px] text-[16px] appearance-none"
+                                >
+                                    <option value="" className="bg-[#1A1A2E]">Year</option>
+                                    {YEARS_OF_STUDY.map((year) => (
+                                        <option key={year} value={year} className="bg-[#1A1A2E]">
+                                            {year}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </OceanInput>
+                    </div>
                 </div>
             </div>
         </div>

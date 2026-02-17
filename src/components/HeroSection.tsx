@@ -84,17 +84,17 @@ const HeroSection = () => {
 
           {/* Main Title */}
           <h1
-            className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white mb-6 md:mb-8 leading-[0.9] text-center w-full animate-fade-in-up opacity-0 fill-mode-forwards tracking-tighter drop-shadow-[0_4px_30px_rgba(0,217,255,0.25)]"
+            className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white mb-6 md:mb-8 leading-[0.9] text-center w-full animate-fade-in-up opacity-0 fill-mode-forwards tracking-tighter drop-shadow-[0_4px_30px_rgba(0,217,255,0.25)]"
             style={{ animationDelay: '0.5s' }}
           >
             CODEKRITI
-            <span className="block mt-1 md:mt-4 text-7xl sm:text-8xl md:text-9xl text-center text-transparent bg-clip-text bg-gradient-to-b from-cyan-200 via-cyan-400 to-blue-600 drop-shadow-[0_0_30px_rgba(6,182,212,0.6)] font-display italic transform -rotate-2">
+            <span className="block mt-1 md:mt-4 text-5xl sm:text-7xl md:text-9xl text-center text-transparent bg-clip-text bg-gradient-to-b from-cyan-200 via-cyan-400 to-blue-600 drop-shadow-[0_0_30px_rgba(6,182,212,0.6)] font-display italic transform -rotate-2">
               4.0
             </span>
           </h1>
 
           {/* Description */}
-          <div className="font-body text-lg md:text-xl text-blue-100/90 max-w-2xl mx-auto mb-10 md:mb-12 text-center px-6 leading-relaxed drop-shadow-md animate-fade-in-up opacity-0 fill-mode-forwards" style={{ animationDelay: '0.7s' }}>
+          <div className="font-body text-base md:text-xl text-blue-100/90 max-w-2xl mx-auto mb-10 md:mb-12 text-center px-4 leading-relaxed drop-shadow-md animate-fade-in-up opacity-0 fill-mode-forwards" style={{ animationDelay: '0.7s' }}>
             <TextReveal
               text="The pinnacle of innovation returns. Dive into the abyss of technology and creation where only the bravest master the digital depths."
               className="inline-block"
@@ -124,8 +124,8 @@ const HeroSection = () => {
             {/* Dive In Button - Primary CTA */}
             <button
               type="button"
-              onClick={() => smoothScrollTo('events', { duration: 1200, easing: 'easeInOutQuart' })}
-              className="dive-in-btn group w-full sm:w-auto px-12 py-4 md:py-5 rounded-full text-white font-display font-bold text-lg md:text-xl uppercase tracking-wider flex items-center justify-center gap-3 cursor-pointer">
+              onClick={() => smoothScrollTo('about', { duration: 350, easing: 'easeInOutQuart' })}
+              className="dive-in-btn group w-full sm:w-auto px-12 py-3.5 md:py-5 rounded-full text-white font-display font-bold text-base md:text-xl uppercase tracking-wider flex items-center justify-center gap-3 cursor-pointer min-h-[44px]">
               <span>Dive In</span>
               <Send className="w-5 h-5 md:w-6 md:h-6 text-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
             </button>
@@ -133,8 +133,8 @@ const HeroSection = () => {
             {/* Explore Events Button - Secondary CTA */}
             <button
               type="button"
-              onClick={() => smoothScrollTo('events', { duration: 1200, easing: 'easeInOutQuart' })}
-              className="group relative w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-white font-display font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-105"
+              onClick={() => smoothScrollTo('events', { duration: 350, easing: 'easeInOutQuart' })}
+              className="group relative w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-white font-display font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-105 min-h-[44px]"
               style={{
                 background: 'rgba(6, 182, 212, 0.1)',
                 border: '2px solid rgba(6, 182, 212, 0.5)',
@@ -157,25 +157,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div
-          className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer animate-fade-in opacity-0 fill-mode-forwards"
-          style={{ animationDelay: '2s' }}
-          onClick={() => smoothScrollTo('events', { duration: 1000 })}
-        >
-          <div
-            className="flex flex-col items-center gap-2 animate-bounce-slow"
-          >
-            <span className="font-body text-xs text-foreground/50 uppercase tracking-widest">
-              Scroll to Dive
-            </span>
-            <div className="w-6 h-10 rounded-full border-2 border-primary/50 flex justify-center pt-2">
-              <div
-                className="w-1.5 h-1.5 rounded-full bg-primary animate-scroll-dot"
-              />
-            </div>
-          </div>
-        </div>
+
       </div>
 
       {/* Floating decorative elements with Parallax */}

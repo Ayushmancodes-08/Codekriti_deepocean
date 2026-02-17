@@ -1,186 +1,218 @@
-import { useFormContext, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2, User, Mail, Phone, School, BookOpen, Calendar } from 'lucide-react';
+import { useFormContext, useFieldArray, useWatch } from 'react-hook-form';
+import { Plus, Trash2, User } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, type RegistrationFormData } from '@/types/registration';
-import OceanInput from '../OceanInput';
-import { motion } from 'framer-motion';
+import { capitalizeName, formatPhoneNumber, preventNonNumeric } from '@/utils/formUtils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 
 interface TeamMembersStepProps {
     squadSize: number;
 }
 
+// Extract only the team registration part of the union type
+type TeamFormData = Extract<RegistrationFormData, { registrationType: 'team' }>;
+
 const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
-    const { register, control, formState: { errors } } = useFormContext<RegistrationFormData>();
+    // Explicitly type the context as TeamFormData to avoid "property does not exist" errors on union
+    const { register, control, setValue, formState: { errors } } = useFormContext<TeamFormData>();
+
+    // Watch leader's college to sync with members
+    const leaderCollege = useWatch({
+        control,
+        name: 'teamLeader.college'
+    });
+
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'teamMembers' as any,
+        name: 'teamMembers',
     });
+
+    // Auto-update existing members when leader's college changes
+    useEffect(() => {
+        if (leaderCollege) {
+            fields.forEach((_, index) => {
+                setValue(`teamMembers.${index}.college`, leaderCollege);
+            });
+        }
+    }, [leaderCollege, fields.length, setValue]); // Dependencies: updates when leader changes or members added
 
     const requiredMembers = squadSize - 1;
     const canAddMore = fields.length < requiredMembers;
 
     return (
-        <div className="space-y-6">
-            <div className="text-center">
-                <h3 className="text-2xl font-bold text-white mb-2">Team Members</h3>
-                <p className="text-gray-400">Add {requiredMembers} team member{requiredMembers > 1 ? 's' : ''} (excluding leader)</p>
+        <div className="h-full flex flex-col">
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00D9FF] to-blue-500 flex items-center justify-center shadow-lg shadow-[#00D9FF]/20">
+                        <div className="flex -space-x-1">
+                            <User className="w-4 h-4 text-white" />
+                            <User className="w-4 h-4 text-white/70" />
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-white leading-tight">Team Members</h3>
+                        <p className="text-[#00D9FF]/60 text-xs">Add {requiredMembers} members (excluding yourself)</p>
+                    </div>
+                </div>
             </div>
 
-            {/* Add Member Button */}
-            {canAddMore && (
-                <button
-                    type="button"
-                    onClick={() =>
-                        append({
-                            name: '',
-                            email: '',
-                            phone: '',
-                            college: '',
-                            branch: '' as any,
-                            yearOfStudy: '' as any,
-                        })
-                    }
-                    className="w-full py-4 bg-gradient-to-r from-[#00D9FF]/10 to-blue-500/10 hover:from-[#00D9FF]/20 hover:to-blue-500/20 border-2 border-dashed border-[#00D9FF] text-[#00D9FF] rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
-                >
-                    <Plus className="w-5 h-5" />
-                    Add Team Member ({fields.length + 1}/{requiredMembers})
-                </button>
-            )}
+            {/* Scrollable Members List */}
+            <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar space-y-3 -mx-2 px-2 pb-4">
+                <AnimatePresence>
+                    {fields.map((field, index) => (
+                        <motion.div
+                            key={field.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            className="bg-[#1A1A2E]/50 border border-[#00D9FF]/20 rounded-xl p-4 relative group hover:border-[#00D9FF]/50 transition-colors"
+                        >
+                            <div className="flex justify-between items-start mb-3">
+                                <span className="text-[#00D9FF] font-bold text-sm bg-[#00D9FF]/10 px-2 py-1 rounded">Member {index + 1}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => remove(index)}
+                                    className="text-gray-500 hover:text-red-400 p-1 transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
 
-            {/* Members List */}
-            <div className="space-y-6">
-                {fields.map((field, index) => (
-                    <motion.div
-                        key={field.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-6 bg-[#1A1A2E]/50 border border-[#00D9FF]/20 rounded-xl"
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {/* Name */}
+                                <div className="space-y-1">
+                                    <input
+                                        {...register(`teamMembers.${index}.name`)}
+                                        onBlur={(e) => {
+                                            const formatted = capitalizeName(e.target.value);
+                                            e.target.value = formatted;
+                                            register(`teamMembers.${index}.name`).onChange(e);
+                                        }}
+                                        placeholder="Full Name"
+                                        className="w-full bg-[#0a192f] border border-[#00D9FF]/30 text-white px-3 py-2.5 rounded text-[16px] focus:border-[#00D9FF] outline-none min-h-[44px]"
+                                    />
+                                    {errors.teamMembers?.[index]?.name && (
+                                        <p className="text-red-400 text-[10px]">{errors.teamMembers[index]?.name?.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Email */}
+                                <div className="space-y-1">
+                                    <input
+                                        {...register(`teamMembers.${index}.email`)}
+                                        placeholder="Email Address"
+                                        className="w-full bg-[#0a192f] border border-[#00D9FF]/30 text-white px-3 py-2.5 rounded text-[16px] focus:border-[#00D9FF] outline-none min-h-[44px]"
+                                    />
+                                    {errors.teamMembers?.[index]?.email && (
+                                        <p className="text-red-400 text-[10px]">{errors.teamMembers[index]?.email?.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Phone */}
+                                <div className="space-y-1">
+                                    <input
+                                        {...register(`teamMembers.${index}.phone`)}
+                                        onKeyDown={preventNonNumeric}
+                                        onBlur={(e) => {
+                                            const formatted = formatPhoneNumber(e.target.value);
+                                            if (formatted) {
+                                                e.target.value = formatted;
+                                                register(`teamMembers.${index}.phone`).onChange(e);
+                                            }
+                                        }}
+                                        maxLength={13}
+                                        placeholder="Phone"
+                                        className="w-full bg-[#0a192f] border border-[#00D9FF]/30 text-white px-3 py-2.5 rounded text-[16px] focus:border-[#00D9FF] outline-none min-h-[44px]"
+                                    />
+                                    {errors.teamMembers?.[index]?.phone && (
+                                        <p className="text-red-400 text-[10px]">{errors.teamMembers[index]?.phone?.message}</p>
+                                    )}
+                                </div>
+
+                                {/* College (Read-only, synced with leader) */}
+                                <div className="space-y-1">
+                                    <input
+                                        {...register(`teamMembers.${index}.college`)}
+                                        readOnly
+                                        placeholder="College (Same as Leader)"
+                                        className="w-full bg-[#0a192f]/50 border border-[#00D9FF]/10 text-white/50 px-3 py-2.5 rounded text-[16px] outline-none min-h-[44px] cursor-not-allowed"
+                                        title="Team members must be from the same college as the leader"
+                                    />
+                                    {errors.teamMembers?.[index]?.college && (
+                                        <p className="text-red-400 text-[10px]">{errors.teamMembers[index]?.college?.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Branch */}
+                                <div className="space-y-1">
+                                    <select
+                                        {...register(`teamMembers.${index}.branch`)}
+                                        className="w-full bg-[#1A1A2E] border border-[#00D9FF]/30 text-white px-3 py-2.5 rounded text-[16px] focus:border-[#00D9FF] outline-none min-h-[44px]"
+                                    >
+                                        <option value="">Branch</option>
+                                        {BRANCHES.map(b => (
+                                            <option key={b} value={b}>{b}</option>
+                                        ))}
+                                    </select>
+                                    {errors.teamMembers?.[index]?.branch && (
+                                        <p className="text-red-400 text-[10px]">{errors.teamMembers[index]?.branch?.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Year */}
+                                <div className="space-y-1">
+                                    <select
+                                        {...register(`teamMembers.${index}.yearOfStudy`)}
+                                        className="w-full bg-[#1A1A2E] border border-[#00D9FF]/30 text-white px-3 py-2.5 rounded text-[16px] focus:border-[#00D9FF] outline-none min-h-[44px]"
+                                    >
+                                        <option value="">Year</option>
+                                        {YEARS_OF_STUDY.map(y => (
+                                            <option key={y} value={y}>{y}</option>
+                                        ))}
+                                    </select>
+                                    {errors.teamMembers?.[index]?.yearOfStudy && (
+                                        <p className="text-red-400 text-[10px]">{errors.teamMembers[index]?.yearOfStudy?.message}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+
+                {fields.length === 0 && (
+                    <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-[#00D9FF]/20 rounded-xl bg-[#0a192f]/30">
+                        <User className="w-10 h-10 text-gray-600 mb-2" />
+                        <p className="text-gray-400 text-sm">Add team members to proceed</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Add Button - Fixed at bottom of section */}
+            <div className="pt-4 mt-auto border-t border-[#00D9FF]/10">
+                {canAddMore ? (
+                    <button
+                        type="button"
+                        onClick={() =>
+                            append({
+                                name: '',
+                                email: '',
+                                phone: '',
+                                college: leaderCollege || '', // Auto-fill with leader's college
+                                branch: '' as any,
+                                yearOfStudy: '' as any,
+                            })
+                        }
+                        className="w-full py-3 bg-[#00D9FF]/10 hover:bg-[#00D9FF]/20 border border-[#00D9FF]/50 text-[#00D9FF] rounded-xl font-bold flex items-center justify-center gap-2 transition-all uppercase tracking-wide text-sm shadow-[0_0_15px_rgba(0,217,255,0.1)]"
                     >
-                        <div className="flex items-center justify-between mb-6">
-                            <h4 className="text-lg font-bold text-[#00D9FF] flex items-center gap-2">
-                                <User className="w-5 h-5" />
-                                Member {index + 1}
-                            </h4>
-                            <button
-                                type="button"
-                                onClick={() => remove(index)}
-                                className="text-cyan-400 hover:text-[#00D9FF] hover:bg-[#00D9FF]/10 p-2 rounded-lg transition-all"
-                            >
-                                <Trash2 className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <OceanInput
-                                label="Name"
-                                icon={User}
-                                error={(errors as any).teamMembers?.[index]?.name?.message}
-                            >
-                                <input
-                                    {...register(`teamMembers.${index}.name` as any)}
-                                    type="text"
-                                    placeholder="Member's full name"
-                                    className="w-full bg-[#0a192f] border-2 border-[#00D9FF]/30 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 text-sm"
-                                />
-                            </OceanInput>
-
-                            <OceanInput
-                                label="Email"
-                                icon={Mail}
-                                error={(errors as any).teamMembers?.[index]?.email?.message}
-                            >
-                                <input
-                                    {...register(`teamMembers.${index}.email` as any)}
-                                    type="email"
-                                    placeholder="member@example.com"
-                                    className="w-full bg-[#0a192f] border-2 border-[#00D9FF]/30 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 text-sm"
-                                />
-                            </OceanInput>
-
-                            <OceanInput
-                                label="Phone"
-                                icon={Phone}
-                                error={(errors as any).teamMembers?.[index]?.phone?.message}
-                            >
-                                <input
-                                    {...register(`teamMembers.${index}.phone` as any)}
-                                    type="tel"
-                                    placeholder="+91 XXXXX XXXXX"
-                                    className="w-full bg-[#0a192f] border-2 border-[#00D9FF]/30 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 text-sm"
-                                />
-                            </OceanInput>
-
-                            <OceanInput
-                                label="College"
-                                icon={School}
-                                error={(errors as any).teamMembers?.[index]?.college?.message}
-                            >
-                                <input
-                                    {...register(`teamMembers.${index}.college` as any)}
-                                    type="text"
-                                    placeholder="Institution name"
-                                    className="w-full bg-[#0a192f] border-2 border-[#00D9FF]/30 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 text-sm"
-                                />
-                            </OceanInput>
-
-                            <OceanInput
-                                label="Branch"
-                                icon={BookOpen}
-                                error={(errors as any).teamMembers?.[index]?.branch?.message}
-                            >
-                                <select
-                                    {...register(`teamMembers.${index}.branch` as any)}
-                                    className="w-full bg-[#1A1A2E] border-2 border-[#00D9FF]/30 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all text-sm"
-                                >
-                                    <option value="" className="bg-[#1A1A2E]">
-                                        Select branch
-                                    </option>
-                                    {BRANCHES.map((branch) => (
-                                        <option key={branch} value={branch} className="bg-[#1A1A2E]">
-                                            {branch}
-                                        </option>
-                                    ))}
-                                </select>
-                            </OceanInput>
-
-                            <OceanInput
-                                label="Year"
-                                icon={Calendar}
-                                error={(errors as any).teamMembers?.[index]?.yearOfStudy?.message}
-                            >
-                                <select
-                                    {...register(`teamMembers.${index}.yearOfStudy` as any)}
-                                    className="w-full bg-[#1A1A2E] border-2 border-[#00D9FF]/30 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all text-sm"
-                                >
-                                    <option value="" className="bg-[#1A1A2E]">
-                                        Select year
-                                    </option>
-                                    {YEARS_OF_STUDY.map((year) => (
-                                        <option key={year} value={year} className="bg-[#1A1A2E]">
-                                            {year}
-                                        </option>
-                                    ))}
-                                </select>
-                            </OceanInput>
-                        </div>
-                    </motion.div>
-                ))}
+                        <Plus className="w-4 h-4" />
+                        Add Member ({fields.length}/{requiredMembers})
+                    </button>
+                ) : (
+                    <div className="w-full py-3 bg-[#00D9FF]/5 border border-[#00D9FF]/20 text-[#00D9FF]/50 rounded-xl font-medium flex items-center justify-center gap-2 text-sm cursor-not-allowed">
+                        Squad Full ({fields.length}/{requiredMembers})
+                    </div>
+                )}
             </div>
-
-            {fields.length === 0 && (
-                <div className="text-center py-12 border-2 border-dashed border-[#00D9FF]/20 rounded-xl">
-                    <User className="w-12 h-12 mx-auto mb-4 text-gray-600" />
-                    <p className="text-gray-500">Click "Add Team Member" to start adding squad members</p>
-                </div>
-            )}
-
-            {fields.length < requiredMembers && fields.length > 0 && (
-                <div className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl flex items-center gap-3">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                    <p className="text-cyan-400 text-sm font-medium">
-                        You need to add {requiredMembers - fields.length} more member{requiredMembers - fields.length > 1 ? 's' : ''}
-                    </p>
-                </div>
-            )}
         </div>
     );
 };

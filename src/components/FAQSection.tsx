@@ -1,27 +1,47 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus, HelpCircle } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 const faqs = [
     {
-        question: "How big can my team be?",
-        answer: "Teams can range from 2 to 4 members. Solo divers are welcome to find a crew in our Discord lounge!"
+        question: "What is CodeKriti 4.0?",
+        answer: "CodeKriti 4.0 is a 24-hour national-level hackathon where innovators dive into the 'Digital Abyss' to solve real-world problems. It's a test of endurance, creativity, and coding skills."
     },
     {
-        question: "Is this event beginner-friendly?",
-        answer: "Absolutely! The ocean is vast enough for everyone. We have mentorship tracks specifically designed for first-time hackers."
+        question: "When and where is it happening?",
+        answer: "The event is scheduled for March 6-7, 2026, at the PMEC Academic Block (Deep Sea Arena). Mark your calendars!"
     },
     {
-        question: "How much does it cost?",
-        answer: "CodeKriti 4.0 is completely free for all admitted participants. We provide meals, swag, and a place to rest."
+        question: "Who can participate?",
+        answer: "It's open to all college students! Whether you're a freshie or a final year veteran, if you can code (or design/pitch), you're welcome aboard."
+    },
+    {
+        question: "What is the team size?",
+        answer: "Teams must have between 2 to 4 members. Solo participation isn't allowed, but you can find teammates in our community Discord."
+    },
+    {
+        question: "Is there a registration fee?",
+        answer: "Zero. CodeKriti 4.0 is completely free for all admitted teams. We believe talent shouldn't have a price tag."
+    },
+    {
+        question: "Will food and accommodation be provided?",
+        answer: "Yes! We cover all meals, snacks, and drinks during the hackathon. Resting areas will also be available for those quick power naps."
+    },
+    {
+        question: "What are the themes/tracks?",
+        answer: "We focus on Open Innovation with a special spotlight on 'Ocean Tech' & 'Digital Depths', but you're free to build on EdTech, FinTech, HealthTech, or any domain."
     },
     {
         question: "What should I bring?",
-        answer: "Bring your laptop, charger, toiletries for an overnight stay, and your ID. We'll handle the food, drinks, and Wi-Fi."
+        answer: "Your laptop, chargers, extension cords (recommended), toiletries for the overnight stay, and your college ID card."
     },
     {
-        question: "Can I start working on my project beforehand?",
-        answer: "No. To ensure fairness, all projects must be built during the 24-hour hackathon period. You can bring ideas, not code."
+        question: "Can I use pre-built templates?",
+        answer: "No. All major code must be written during the 24-hour period. You can use standard libraries, frameworks, and APIs, but no pre-made projects."
+    },
+    {
+        question: "Will there be prizes?",
+        answer: "Oh yes. We have a prize pool of over ₹1 Lakh+ including cash prizes, swags, licenses, and intern opportunities."
     }
 ];
 
@@ -29,43 +49,35 @@ const FAQSection = () => {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
-        <section className="relative py-24 min-h-screen flex items-center justify-center overflow-hidden">
-            {/* Reusing Video Background - Scene 4 (adjust index if needed, assuming 3 is abstract/scene-4) 
-                 Actually, VideoBackground prop 'activeIndex' controls which video is shown.
-                 If we want Scene 4 specifically, we might need to modify VideoBackground usage or just overlay it here.
-                 For now, let's use a dark overlay + simple video loop if available, or just transparency if the main VideoBackground covers it?
-                 Main VideoBackground covers the whole page usually. 
-                 But section-specific background was requested. 
-                 Let's place a dedicated absolute video container.
-             */}
-
+        <section className="relative py-20 min-h-[50vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-black/80 z-10" />
-                {/* Placeholder for Scene 4 if we had the specific file path, otherwise using a dark gradient fallback which matches the theme beautifully */}
+                <div className="absolute inset-0 bg-black/90 z-10" />
                 <div className="absolute inset-0 bg-gradient-to-b from-black via-cyan-950/20 to-black z-0" />
             </div>
 
-            <div className="container mx-auto px-4 relative z-10 max-w-4xl">
-                <div className="text-center mb-16">
-                    <span className="text-cyan-400 font-bold tracking-widest uppercase text-sm mb-2">Knowledge Base</span>
-                    <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6 text-rough-blue">
-                        Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Questions</span>
+            <div className="container mx-auto px-4 relative z-10 max-w-6xl">
+                <div className="text-center mb-12">
+                    <span className="text-cyan-400 font-bold tracking-widest uppercase text-sm mb-2 opacity-80">Knowledge Base</span>
+                    <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
+                        Freq. Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Questions</span>
                     </h2>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {faqs.map((faq, index) => (
-                        <div key={index} className="group">
+                        <div key={index} className="group h-fit">
                             <button
                                 onClick={() => setOpenIndex(active => active === index ? null : index)}
-                                className={`w-full text-left p-6 rounded-2xl glass-card transition-all duration-300 flex items-center justify-between
-                                    ${openIndex === index ? 'bg-cyan-950/30 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.15)]' : 'hover:bg-white/5 border-white/10'}`}
+                                className={`w-full text-left p-4 rounded-xl glass-card transition-all duration-300 flex items-center justify-between border
+                                    ${openIndex === index
+                                        ? 'bg-cyan-950/30 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
+                                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'}`}
                             >
-                                <span className={`font-display font-bold text-lg md:text-xl transition-colors ${openIndex === index ? 'text-cyan-400' : 'text-white'}`}>
+                                <span className={`font-display font-medium text-base md:text-lg transition-colors pr-4 ${openIndex === index ? 'text-cyan-400' : 'text-foreground/90'}`}>
                                     {faq.question}
                                 </span>
-                                <span className={`p-2 rounded-full transition-all duration-300 ${openIndex === index ? 'bg-cyan-500 text-black rotate-180' : 'bg-white/10 text-white group-hover:bg-white/20'}`}>
-                                    {openIndex === index ? <Minus size={20} /> : <Plus size={20} />}
+                                <span className={`p-1 rounded-full transition-all duration-300 flex-shrink-0 ${openIndex === index ? 'bg-cyan-500 text-black rotate-180' : 'bg-white/10 text-white group-hover:bg-white/20'}`}>
+                                    {openIndex === index ? <Minus size={16} /> : <Plus size={16} />}
                                 </span>
                             </button>
 
@@ -75,10 +87,10 @@ const FAQSection = () => {
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
+                                        transition={{ duration: 0.2 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="p-6 pt-2 text-blue-100/80 leading-relaxed text-lg border-l-2 border-cyan-500/30 ml-6 my-2">
+                                        <div className="p-4 pt-2 text-foreground/70 text-sm md:text-base leading-relaxed border-l-2 border-cyan-500/30 ml-4 my-2">
                                             {faq.answer}
                                         </div>
                                     </motion.div>
@@ -86,14 +98,6 @@ const FAQSection = () => {
                             </AnimatePresence>
                         </div>
                     ))}
-                </div>
-
-                {/* Decorative Elements */}
-                <div className="mt-12 text-center">
-                    <p className="text-white/40">Still have questions?</p>
-                    <a href="mailto:support@codekriti.com" className="text-cyan-400 hover:text-cyan-300 font-bold mt-2 inline-flex items-center gap-2 transition-colors">
-                        <HelpCircle size={18} /> Contact Support
-                    </a>
                 </div>
             </div>
         </section>

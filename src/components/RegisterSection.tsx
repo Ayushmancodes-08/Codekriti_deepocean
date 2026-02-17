@@ -62,7 +62,7 @@ const RegisterSection = () => {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="font-body text-base md:text-lg text-foreground/70 mb-8 max-w-2xl mx-auto"
             >
-              Registration closes March 10, 2025. Don't miss your chance to be part of history.
+              Registration closes March 5, 2026. Don't miss your chance to be part of history.
             </motion.p>
 
             {/* REGISTER NOW Button */}
@@ -123,9 +123,9 @@ const RegisterSection = () => {
           className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           {[
-            { label: 'Venue', value: 'Deep Sea Arena, Digital City' },
-            { label: 'Dates', value: 'March 14-16, 2026' },
-            { label: 'Contact', value: 'dive@codekriti.com' },
+            { label: 'Venue', value: 'PMEC ACADEMIC BLOCK' },
+            { label: 'Dates', value: 'March 6-7, 2026' },
+            { label: 'Contact', value: 'codingclubpmec@gmail.com' },
           ].map((item) => (
             <div key={item.label} className="glass-card rounded-2xl p-6 border border-white/5 text-center">
               <div className="text-[10px] text-primary/50 uppercase tracking-[0.2em] font-bold mb-1">{item.label}</div>

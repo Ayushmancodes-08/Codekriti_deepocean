@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 
 const sponsors = [
-    "Google", "Microsoft", "GitHub", "DigitalOcean",
-    "Polygon", "Devfolio", "Replit", "Auth0",
-    "Vercel", "MongoDB", "Figma", "Notion"
+    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme",
+    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme",
+    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme"
 ];
 
 const SponsorsRibbon = () => {

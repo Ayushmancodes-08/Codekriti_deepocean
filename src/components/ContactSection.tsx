@@ -58,7 +58,7 @@ const ContactSection = () => {
                                 </div>
                                 <div>
                                     <h4 className="font-body text-sm text-gray-400 uppercase tracking-wider mb-1">Email</h4>
-                                    <p className="font-display text-lg font-bold text-white select-all">codekriti@college.edu</p>
+                                    <p className="font-display text-lg font-bold text-white select-all">codingclubpmec@gmail.com</p>
                                     <p className="text-sm text-gray-500 mt-1">Mon-Fri, 9am - 5pm</p>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@ const ContactSection = () => {
                                 </div>
                                 <div>
                                     <h4 className="font-body text-sm text-gray-400 uppercase tracking-wider mb-1">Phone</h4>
-                                    <p className="font-display text-lg font-bold text-white select-all">+91 98765 43210</p>
+                                    <p className="font-display text-lg font-bold text-white select-all">+91 91782 63327</p>
                                     <p className="text-sm text-gray-500 mt-1">Available for urgent queries</p>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@ const ContactSection = () => {
                                 </div>
                                 <div>
                                     <h4 className="font-body text-sm text-gray-400 uppercase tracking-wider mb-1">Location</h4>
-                                    <p className="font-display text-lg font-bold text-white">Tech Campus, Innovation Hub</p>
+                                    <p className="font-display text-lg font-bold text-white">PMEC ACADEMIC BLOCK</p>
                                     <p className="text-sm text-gray-500 mt-1">Main Block, 2nd Floor</p>
                                 </div>
                             </div>

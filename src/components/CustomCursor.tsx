@@ -154,16 +154,16 @@ const CustomCursor = () => {
     if (isTouchDevice) return null;
 
     const getCursorSize = () => {
-        if (cursorState.isClicking) return 12;
-        if (cursorState.hoverType === 'button') return 64;
-        if (cursorState.hoverType === 'link') return 48;
-        return 20;
+        if (cursorState.isClicking) return 20; // Slightly larger click
+        if (cursorState.hoverType === 'button') return 80; // Larger hover
+        if (cursorState.hoverType === 'link') return 60;
+        return 40; // Larger default (was 20)
     };
 
     const getCursorColor = () => {
-        if (cursorState.hoverType === 'button') return 'rgba(0, 217, 255, 0.4)'; // #00D9FF (Cyan)
-        if (cursorState.hoverType === 'link') return 'rgba(0, 217, 255, 0.2)';   // Cyan but lighter
-        return 'rgba(255, 255, 255, 0.1)';
+        if (cursorState.hoverType === 'button') return 'rgba(0, 217, 255, 0.3)'; // More visible
+        if (cursorState.hoverType === 'link') return 'rgba(0, 217, 255, 0.2)';
+        return 'rgba(6, 182, 212, 0.15)'; // Cyan tint instead of white
     };
 
     const getBorderColor = () => {
@@ -272,39 +272,24 @@ const CustomCursor = () => {
                 </motion.div>
             </motion.div>
 
-            {/* Center dot */}
-            <motion.div
-                className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"
-                style={{
-                    x: cursorXSpring,
-                    y: cursorYSpring,
-                }}
-                animate={{
-                    width: 6,
-                    height: 6,
-                    marginLeft: -3,
-                    marginTop: -3,
-                    opacity: isVisible && !cursorState.isHovering ? 1 : 0,
-                }}
-                transition={{
-                    type: 'spring',
-                    damping: 30,
-                    stiffness: 400,
-                }}
-            />
+            {/* Center dot - REMOVED to let system cursor take over */}
+            {/* We removed the center dot so the user sees their normal OS cursor for precision */}
 
-            {/* Hide default cursor globally */}
+            {/* Hide default cursor globally - REMOVED */}
             <style>{`
-        * {
-          cursor: none !important;
-        }
-        /* Restore cursor for touch devices just in case */
-        @media (hover: none) and (pointer: coarse) {
-            * {
-                cursor: auto !important;
-            }
-        }
-      `}</style>
+                /* We are NOT hiding the cursor anymore */
+                /* * { cursor: none !important; } */
+                
+                /* Instead, let's just make the body have a default cursor */
+                body {
+                    cursor: default;
+                }
+                
+                /* Add pointer cursor for interactive elements clearly */
+                a, button, input, textarea, select, [role="button"] {
+                    cursor: pointer;
+                }
+            `}</style>
         </>
     );
 };

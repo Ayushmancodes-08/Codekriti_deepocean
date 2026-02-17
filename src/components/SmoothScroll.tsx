@@ -1,21 +1,17 @@
-// PERFORMANCE: Imports commented out since Lenis is disabled
-// import { useEffect } from 'react';
-// import Lenis from 'lenis';
+import { useEffect } from 'react';
+import Lenis from 'lenis';
 
 const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
-    // PERFORMANCE: Disabled Lenis smooth scroll for better performance
-    // Using native browser scrolling instead
-    /*
     useEffect(() => {
-        // Initialize Lenis with optimized Webflow-like settings
+        // Initialize Lenis with optimized storytelling settings
         const lenis = new Lenis({
-            duration: 0.8,    // Faster, snappier (was 1.2)
+            duration: 0.5,    // Snappier instant feel
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Smooth easeOutExpo
             orientation: 'vertical',
             gestureOrientation: 'vertical',
             smoothWheel: true,
-            wheelMultiplier: 1.5,  // More responsive wheel (was 1)
-            touchMultiplier: 2.5,  // Better touch responsiveness (was 2)
+            wheelMultiplier: 1.2,  // Responsive but not too fast
+            touchMultiplier: 2.0,  // Good touch responsiveness
             infinite: false,
         });
 
@@ -26,6 +22,9 @@ const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
             rafId = requestAnimationFrame(raf);
         }
         rafId = requestAnimationFrame(raf);
+
+        // Expose lenis globally so modals can stop/start it
+        (window as any).__lenis = lenis;
 
         // Initial check for hash on page load
         if (window.location.hash) {
@@ -54,10 +53,10 @@ const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
         return () => {
             cancelAnimationFrame(rafId);
             lenis.destroy();
+            (window as any).__lenis = null;
             document.removeEventListener('click', handleScrollTo);
         };
     }, []);
-    */
 
     return <>{children}</>;
 };

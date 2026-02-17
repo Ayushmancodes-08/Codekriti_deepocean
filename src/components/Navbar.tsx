@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useScrollProgress } from '@/hooks/useScrollProgress';
 import { Menu, X } from 'lucide-react';
 import { ASSETS } from '@/config/assets';
+import { smoothScrollTo } from '@/lib/smoothScroll';
 
 const navItems = [
   { name: 'Home', href: '#hero', id: 'hero' },
   { name: 'About', href: '#about', id: 'about' },
   { name: 'Events', href: '#events', id: 'events' },
-  { name: 'Schedule', href: '#schedule', id: 'schedule' },
   { name: 'Register', href: '#register', id: 'register' },
 ];
 
@@ -42,10 +42,10 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out transform ${scrolled ? 'glass-card py-3' : 'py-6 translate-y-0 opacity-100'
+      className={`fixed top-0 left-0 right-0 z-40 modal-open:hidden transition-all duration-500 ease-out transform ${scrolled ? 'glass-card py-2 md:py-3' : 'py-4 md:py-6 translate-y-0 opacity-100' // Adjusted padding for mobile
         }`}
     >
-      <nav className="container mx-auto px-6 flex items-center justify-between relative z-50">
+      <nav className="container mx-auto px-4 md:px-6 flex items-center justify-between relative z-50 h-[56px] md:h-auto"> {/* Enforce 56px height on mobile */}
         {/* Logo */}
         <a
           href="#hero"
@@ -56,12 +56,12 @@ const Navbar = () => {
             <img
               src={ASSETS.LOGO}
               alt="CodeKriti Logo"
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
+              className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:border-cyan-400"
             />
-            <div className="absolute inset-0 rounded-full bg-primary/20 blur-lg -z-10" />
+            <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-lg -z-10 animate-pulse" />
           </div>
           <div className="flex flex-col -gap-1">
-            <span className="font-display font-bold text-lg md:text-xl text-foreground text-glow leading-none">
+            <span className="font-display font-bold text-base md:text-xl text-foreground text-glow leading-none"> {/* Smaller text on mobile */}
               CODEKRITI
             </span>
             <span className="font-display text-[8px] md:text-[10px] text-primary tracking-[0.2em] font-medium">
@@ -95,28 +95,7 @@ const Navbar = () => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              const eventsSection = document.getElementById('events');
-              if (eventsSection) {
-                // ... same scroll logic ...
-                const start = window.scrollY;
-                const target = eventsSection.getBoundingClientRect().top + window.scrollY;
-                const distance = target - start;
-                const duration = 1000;
-                const startTime = performance.now();
-
-                const animate = (currentTime: number) => {
-                  const elapsed = currentTime - startTime;
-                  const progress = Math.min(elapsed / duration, 1);
-                  const ease = progress < 0.5
-                    ? 8 * progress * progress * progress * progress
-                    : 1 - Math.pow(-2 * progress + 2, 4) / 2;
-
-                  window.scrollTo(0, start + distance * ease);
-
-                  if (elapsed < duration) requestAnimationFrame(animate);
-                };
-                requestAnimationFrame(animate);
-              }
+              smoothScrollTo('events', { duration: 350 });
             }}
             className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95"
             aria-label="Dive In"
@@ -143,9 +122,9 @@ const Navbar = () => {
               key={item.name}
               href={item.href}
               onClick={handleLinkClick}
-              className={`px-6 py-3 border-b border-white/5 font-display font-medium tracking-wide transition-colors duration-200 
+              className={`px-4 py-4 border-b border-white/5 font-display font-medium text-base tracking-wide transition-colors duration-200 
                 ${activeSectionId === item.id
-                  ? 'text-cyan-400 bg-cyan-950/20 border-l-4 border-l-cyan-400 pl-5'
+                  ? 'text-cyan-400 bg-cyan-950/20 border-l-4 border-l-cyan-400 pl-3'
                   : 'text-white/80 hover:text-white hover:bg-white/5 border-l-4 border-l-transparent'
                 }`}
             >
@@ -153,33 +132,13 @@ const Navbar = () => {
             </a>
           ))}
 
-          <div className="p-6">
+          <div className="p-4">
             <button
               onClick={() => {
                 handleLinkClick();
-                const eventsSection = document.getElementById('events');
-                if (eventsSection) {
-                  const start = window.scrollY;
-                  const target = eventsSection.getBoundingClientRect().top + window.scrollY;
-                  const distance = target - start;
-                  const duration = 1000;
-                  const startTime = performance.now();
-
-                  const animate = (currentTime: number) => {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const ease = progress < 0.5
-                      ? 8 * progress * progress * progress * progress
-                      : 1 - Math.pow(-2 * progress + 2, 4) / 2;
-
-                    window.scrollTo(0, start + distance * ease);
-
-                    if (elapsed < duration) requestAnimationFrame(animate);
-                  };
-                  requestAnimationFrame(animate);
-                }
+                smoothScrollTo('events', { duration: 350 });
               }}
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold uppercase tracking-wider shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform"
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold uppercase tracking-wider shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform h-[44px]" // Ensure 44px height
             >
               Dive In
             </button>

@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Lock } from 'lucide-react';
-import { broadcastMessage } from '@/utils/googleSheets';
+
 import { toast } from 'sonner';
+
+// Placeholder for broadcast functionality
+const broadcastMessage = async (subject: string, message: string, password: string) => {
+    console.log("Broadcast simulated:", { subject, message, password });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return { status: 'success' };
+};
 
 const BroadcastModal = () => {
     const [isOpen, setIsOpen] = useState(false);

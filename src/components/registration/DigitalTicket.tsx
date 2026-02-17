@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { useRef, useState } from 'react';
+import { ASSETS } from '@/config/assets';
 
 interface DigitalTicketProps {
     data: {
@@ -63,7 +64,10 @@ const DigitalTicket = ({ data, onClose }: DigitalTicketProps) => {
 
                     {/* Header */}
                     <div className="bg-[#00F3FF]/10 p-6 border-b border-[#00F3FF]/20 flex justify-between items-center">
-                        <span className="font-display font-bold text-[#00F3FF] tracking-widest text-lg">VOYAGE PASS</span>
+                        <div className="flex items-center gap-3">
+                            <img src={ASSETS.LOGO_WHITE_TEXT_TRANSPARENT} alt="Codekriti" className="h-8 w-auto" />
+                            <span className="font-display font-bold text-[#00F3FF] tracking-widest text-lg border-l border-[#00F3FF]/30 pl-3">VOYAGE PASS</span>
+                        </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
                             <span className="text-xs text-green-400 font-mono">ACCESS GRANTED</span>
@@ -96,6 +100,17 @@ const DigitalTicket = ({ data, onClose }: DigitalTicketProps) => {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
+                                    <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Location</p>
+                                    <p className="font-body text-white font-medium">PMEC Academic Block</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Launch Date</p>
+                                    <p className="font-mono text-white tracking-widest">{data.date}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
                                     <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Captain</p>
                                     <p className="font-body text-white">{data.name}</p>
                                 </div>
@@ -103,11 +118,6 @@ const DigitalTicket = ({ data, onClose }: DigitalTicketProps) => {
                                     <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Squad</p>
                                     <p className="font-body text-white">{data.teamName}</p>
                                 </div>
-                            </div>
-
-                            <div>
-                                <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Launch Date</p>
-                                <p className="font-mono text-white tracking-widest">{data.date}</p>
                             </div>
                         </div>
                     </div>

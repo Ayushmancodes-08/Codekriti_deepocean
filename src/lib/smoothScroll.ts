@@ -45,7 +45,7 @@ export const smoothScrollTo = (
     options: SmoothScrollOptions = {}
 ): void => {
     const {
-        duration = 1000,
+        duration = 350,
         easing = 'easeInOutQuart',
         offset = 0,
         onComplete,

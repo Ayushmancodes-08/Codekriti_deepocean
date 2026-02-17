@@ -19,26 +19,26 @@ export default {
         body: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        // Responsive typography scaling
-        'h1': ['clamp(2rem, 5vw, 3rem)', { lineHeight: '1.2', fontWeight: '700' }],
-        'h2': ['clamp(1.5rem, 4vw, 2.25rem)', { lineHeight: '1.3', fontWeight: '700' }],
-        'h3': ['clamp(1.25rem, 3vw, 1.75rem)', { lineHeight: '1.4', fontWeight: '600' }],
-        'body': ['clamp(0.875rem, 1vw, 1rem)', { lineHeight: '1.6', fontWeight: '400' }],
+        // Responsive typography scaling per Requirement 2
+        'h1': ['clamp(1.5rem, 5vw, 3rem)', { lineHeight: '1.2', fontWeight: '700' }], // Mobile: ~24px, Desktop: ~48px
+        'h2': ['clamp(1.25rem, 4vw, 2.5rem)', { lineHeight: '1.3', fontWeight: '700' }], // Mobile: ~20px, Desktop: ~40px
+        'h3': ['clamp(1.125rem, 3vw, 2rem)', { lineHeight: '1.4', fontWeight: '600' }], // Mobile: ~18px, Desktop: ~32px
+        'h4': ['clamp(1rem, 2.5vw, 1.75rem)', { lineHeight: '1.4', fontWeight: '600' }], // Mobile: ~16px, Desktop: ~28px
+        'h5': ['clamp(0.875rem, 2vw, 1.5rem)', { lineHeight: '1.5', fontWeight: '600' }], // Mobile: ~14px, Desktop: ~24px
+        'h6': ['clamp(0.75rem, 1.5vw, 1.25rem)', { lineHeight: '1.5', fontWeight: '600' }], // Mobile: ~12px, Desktop: ~20px
+        'body': ['clamp(0.875rem, 1vw, 1.125rem)', { lineHeight: '1.6', fontWeight: '400' }], // Mobile: 14px, Desktop: 18px
         'small': ['clamp(0.75rem, 0.9vw, 0.875rem)', { lineHeight: '1.5', fontWeight: '400' }],
       },
       spacing: {
-        // Design system spacing scale: 8px, 16px, 24px, 32px, 48px, 64px
+        // Design system spacing scale: 8px, 12px, 16px, 20px, 24px, 32px, 48px, 64px
         'xs': '0.5rem',    // 8px
-        'sm': '1rem',      // 16px
-        'md': '1.5rem',    // 24px
-        'lg': '2rem',      // 32px
-        'xl': '3rem',      // 48px
-        'xxl': '4rem',     // 64px
-      },
-      borderRadius: {
-        'sm': '0.25rem',   // 4px
-        'md': '0.5rem',    // 8px
-        'lg': '1rem',      // 16px
+        'sm': '0.75rem',   // 12px
+        'md': '1rem',      // 16px
+        'lg': '1.25rem',   // 20px
+        'xl': '1.5rem',    // 24px
+        '2xl': '2rem',     // 32px
+        '3xl': '3rem',     // 48px
+        '4xl': '4rem',     // 64px
       },
       colors: {
         border: "hsl(var(--border))",
@@ -281,5 +281,10 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addVariant }: any) {
+      addVariant('modal-open', 'body.modal-open &');
+    }
+  ],
 } satisfies Config;

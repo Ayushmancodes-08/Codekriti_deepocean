@@ -4,7 +4,8 @@ const CLOUD_BASE = "https://res.cloudinary.com/dlanrr3jl";
 
 export const ASSETS = {
     // Images
-    LOGO: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794944/logo_p0xnxq.jpg`,
+    LOGO: '/logo_bg.jpeg', // Black Background Logo
+    LOGO_WHITE_TEXT_TRANSPARENT: '/logo_bg.jpeg', // Used everywhere now
     DEVXTREME_POSTER: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794944/devx_y2lkjc.jpg`,
     SEA_BG: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794945/sea_yyeaix.jpg`,
     ROCK_TEXTURE: `${CLOUD_BASE}/image/upload/f_auto,q_auto/v1769794945/sea_yyeaix.jpg`,

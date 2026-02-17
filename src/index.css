@@ -89,22 +89,28 @@
     --sidebar-ring: 190 100% 50%;
   }
 
-  /* Responsive Typography */
-  @media (max-width: 640px) {
+  /* Responsive Typography - Requirement 2 */
+  @media (max-width: 639px) {
+
+    /* Mobile < 640px */
     :root {
       font-size: 14px;
     }
   }
 
-  @media (min-width: 641px) and (max-width: 1024px) {
+  @media (min-width: 640px) and (max-width: 1024px) {
+
+    /* Tablet 640px - 1024px */
     :root {
-      font-size: 15px;
+      font-size: 16px;
     }
   }
 
   @media (min-width: 1025px) {
+
+    /* Desktop > 1024px */
     :root {
-      font-size: 16px;
+      font-size: 18px;
     }
   }
 }
@@ -271,12 +277,12 @@ button {
 
   /* Glass Morphism */
   .glass-card {
-    @apply bg-card/70 backdrop-blur-md border border-border/50 rounded-lg;
+    @apply bg-card/80 backdrop-blur-md border border-border/50 rounded-lg;
     box-shadow: var(--shadow-lg);
   }
 
   .glass-card-sm {
-    @apply bg-card/70 backdrop-blur-md border border-border/50 rounded-md;
+    @apply bg-card/80 backdrop-blur-md border border-border/50 rounded-md;
     box-shadow: var(--shadow-md);
   }
 

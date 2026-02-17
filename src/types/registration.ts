@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 // Event configuration
+// Event configuration
 export const EVENTS = [
     {
         id: 'algo-to-code',
@@ -8,27 +9,35 @@ export const EVENTS = [
         minTeamSize: 1,
         maxTeamSize: 1,
         description: 'Competitive programming challenge',
+        entryFee: '₹30',
+        category: 'Intra-College',
     },
     {
-        id: 'designathon',
-        name: 'Designathon',
-        minTeamSize: 1,
-        maxTeamSize: 1,
-        description: 'UI/UX design competition',
+        id: 'innovation-challenge',
+        name: 'Innovation Challenge',
+        minTeamSize: 2,
+        maxTeamSize: 3,
+        description: 'Idea Pitch & Innovation',
+        entryFee: '₹60',
+        category: 'Intra-College',
     },
     {
         id: 'techmaze',
-        name: 'TechMaze',
+        name: 'Tech Maze',
         minTeamSize: 3,
-        maxTeamSize: 4,
-        description: 'Technical treasure hunt',
+        maxTeamSize: 3,
+        description: 'Fun Technical Event',
+        entryFee: '₹90',
+        category: 'Intra-College',
     },
     {
-        id: 'devxtreme-hackathon',
-        name: 'DevXtreme Hackathon',
+        id: 'devxtreme',
+        name: 'DevXtreme',
         minTeamSize: 3,
-        maxTeamSize: 6,
-        description: '48-hour coding marathon',
+        maxTeamSize: 5,
+        description: 'Overnight Hackathon',
+        entryFee: '₹400 (PMEC) / ₹500 (Outside)',
+        category: 'Inter-College',
     },
 ] as const;
 
@@ -77,16 +86,20 @@ export const registrationSchema = z.discriminatedUnion('registrationType', [
         squadSize: z.literal(1),
         participant: participantSchema,
         subscribe: z.boolean().optional(),
+        transactionId: z.string().optional(),
+        screenshotUrl: z.string().optional(),
     }),
     // Team registration
     z.object({
         registrationType: z.literal('team'),
         eventId: z.string(),
-        squadSize: z.number().min(2).max(6),
+        squadSize: z.number().min(2).max(5),
         teamName: z.string().min(2, 'Team name required').max(50, 'Team name too long'),
         teamLeader: participantSchema,
         teamMembers: z.array(teamMemberSchema).min(1, 'At least one team member required'),
         subscribe: z.boolean().optional(),
+        transactionId: z.string().optional(),
+        screenshotUrl: z.string().optional(),
     }),
 ]);
 

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { EVENTS } from '@/types/registration';
-import { Zap, Users, Trophy } from 'lucide-react';
+import { Zap, Code, Lightbulb, Puzzle } from 'lucide-react';
 
 interface EventSelectionStepProps {
     selectedEvent: string | null;
@@ -9,10 +9,10 @@ interface EventSelectionStepProps {
 }
 
 const EVENT_ICONS = {
-    'algo-to-code': Trophy,
-    'designathon': Zap,
-    'techmaze': Users,
-    'devxtreme-hackathon': Trophy,
+    'algo-to-code': Code,
+    'innovation-challenge': Lightbulb,
+    'techmaze': Puzzle,
+    'devxtreme': Zap,
 };
 
 const EventSelectionStep = ({ selectedEvent, squadSize, onSelect }: EventSelectionStepProps) => {

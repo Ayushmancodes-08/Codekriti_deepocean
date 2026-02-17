@@ -6,14 +6,12 @@ import HeroSection from '../components/HeroSection';
 import SponsorsRibbon from '../components/SponsorsRibbon';
 // Lazy loaded sections
 const AboutSection = lazy(() => import('../components/AboutSection'));
-const EventsSection = lazy(() => import('../components/EventsSection'));
-// const UnderwaterTransition = lazy(() => import('../components/UnderwaterTransition'));
-const ScheduleSection = lazy(() => import('../components/ScheduleSection'));
+const HorizontalTimelineEvents = lazy(() => import('../components/HorizontalTimelineEvents'));
+// const VerticalTimelineEvents = lazy(() => import('../components/VerticalTimelineEvents'));
 const FAQSection = lazy(() => import('../components/FAQSection'));
 
 import RegisterSection from '../components/RegisterSection';
 import ContactSection from '../components/ContactSection';
-import NewsletterSection from '../components/NewsletterSection';
 import Footer from '../components/Footer';
 import SmoothScroll from '../components/SmoothScroll';
 import { useScrollProgress } from '../hooks/useScrollProgress';
@@ -69,21 +67,20 @@ const Index = () => {
           {/* <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <UnderwaterTransition key="hero-about-transition" />
           </Suspense> */}
+          <div id="about">
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+              <AboutSection />
+            </Suspense>
+          </div>
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
-            <AboutSection />
+            <HorizontalTimelineEvents />
           </Suspense>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
-            <EventsSection />
-          </Suspense>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
-            <ScheduleSection />
-          </Suspense>
+
           <RegisterSection />
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <FAQSection />
           </Suspense>
           <ContactSection />
-          <NewsletterSection />
         </main>
 
         <Footer />
