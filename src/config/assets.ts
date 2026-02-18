@@ -14,11 +14,11 @@ export const ASSETS = {
     // Videos (Optimized)
     // so_0: start offset 0 (ensure it starts from beginning)
     VIDEOS: [
-        `${CLOUD_BASE}/video/upload/q_auto,vc_auto/v1769794991/scene1_wrfmca.mp4`,
-        `${CLOUD_BASE}/video/upload/q_auto,vc_auto/v1769794987/scene2_k3ev3u.mp4`,
-        `${CLOUD_BASE}/video/upload/q_auto,vc_auto/v1769794990/scene3_zx3drx.mp4`,
-        `${CLOUD_BASE}/video/upload/q_auto,vc_auto/v1769795005/scene4_obyxpp.mp4`,
-        `${CLOUD_BASE}/video/upload/q_auto,vc_auto/v1769795001/scene5_aujiwv.mp4`,
+        `${CLOUD_BASE}/video/upload/q_auto:eco,vc_auto/v1769794991/scene1_wrfmca.mp4`,
+        `${CLOUD_BASE}/video/upload/q_auto:eco,vc_auto/v1769794987/scene2_k3ev3u.mp4`,
+        `${CLOUD_BASE}/video/upload/q_auto:eco,vc_auto/v1769794990/scene3_zx3drx.mp4`,
+        `${CLOUD_BASE}/video/upload/q_auto:eco,vc_auto/v1769795005/scene4_obyxpp.mp4`,
+        `${CLOUD_BASE}/video/upload/q_auto:eco,vc_auto/v1769795001/scene5_aujiwv.mp4`,
     ],
 
     // Generated Video Posters (Fallback)

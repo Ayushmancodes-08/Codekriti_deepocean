@@ -118,15 +118,25 @@ const AdminDashboard = () => {
             toast.dismiss(toastId);
             toast.success("Registration Rejected");
 
-            // Optimistic Update
-            if (filter === 'pending') {
-                setRegistrations(prev => prev.filter(r => r.id !== id));
-            } else {
-                fetchRegistrations();
-            }
+            // Robust State Update
+            setRegistrations(prev => {
+                // First, mark it as rejected in the local state
+                const updated = prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r);
+
+                // Then, if we are filtering by pending, remove it
+                if (filter === 'pending') {
+                    return updated.filter(r => r.id !== id);
+                }
+                return updated;
+            });
+
+            // Force fetch to ensure sync (background update)
+            fetchRegistrations();
+
         } catch (error: any) {
+            console.error("Reject Error:", error);
             toast.dismiss(toastId);
-            toast.error("Failed to reject: " + error.message);
+            toast.error("Failed to reject: " + (error.message || "Unknown error"));
         }
     };
 

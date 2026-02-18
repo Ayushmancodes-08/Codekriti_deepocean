@@ -194,6 +194,7 @@ const ScheduleSection = () => {
                         ref={shipRef}
                         src={submarineShip}
                         alt="Voyage Ship"
+                        loading="lazy"
                         className="absolute left-[10vw] top-1/2 -translate-y-1/2 w-32 sm:w-40 md:w-52 lg:w-64 z-40 pointer-events-none drop-shadow-[0_0_30px_rgba(6,182,212,0.8)]"
                         style={{ willChange: 'transform' }}
                     />

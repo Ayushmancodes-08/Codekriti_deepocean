@@ -1,5 +1,6 @@
-import { createClient } from "jsr:@supabase/supabase-js@2";
-import nodemailer from "npm:nodemailer@6.9.13";
+/// <reference path="../deno.d.ts" />
+import { createClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -238,15 +239,17 @@ Deno.serve(async (req: Request) => {
                 Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
             );
 
-            const { error } = await supabaseAdmin
+            const { data, error } = await supabaseAdmin
                 .from('registrations')
                 .update({ status: 'rejected' })
-                .eq('id', id);
+                .eq('id', id)
+                .select();
 
             if (error) throw error;
+            if (!data || data.length === 0) throw new Error("Registration not found or already rejected");
 
             return new Response(
-                JSON.stringify({ status: 'success', message: 'Registration Rejected' }),
+                JSON.stringify({ status: 'success', message: 'Registration Rejected', data }),
                 { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }

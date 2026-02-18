@@ -45,6 +45,7 @@ const Footer = () => {
                 <img
                   src={ASSETS.LOGO}
                   alt="CodeKriti Logo"
+                  loading="lazy"
                   className="h-10 w-10 rounded-full object-cover shadow-[0_0_10px_rgba(6,182,212,0.3)]"
                 />
               </div>

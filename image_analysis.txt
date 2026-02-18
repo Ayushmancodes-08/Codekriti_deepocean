@@ -1,0 +1,191 @@
+﻿[Image Optimization] Starting image optimization...
+[Image Optimization] Configuration: {
+  "maxSizeKB": 100,
+  "sizes": [
+    480,
+    768,
+    1024,
+    1440
+  ],
+  "quality": {
+    "webp": 80,
+    "jpeg": 85,
+    "png": 90
+  },
+  "inputDirs": [
+    "public/assets",
+    "src/assets"
+  ],
+  "outputDir": "public/images/optimized"
+}
+[Image Optimization] Found 27 image(s) to optimize
+[Image Optimization] anemone_colorful_1769969629357.png: 1140.81KB
+node : [Image 
+Optimization Error] 
+Image anemone_colorful
+_1769969629357.png is 
+1140.81KB (max: 100KB)
+At line:1 char:1
++ node scripts/optimiz
+e-images.js 2>&1 | 
+Out-File -FilePath 
+image_analy ...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ([Image Opt   
+ imiza...KB (max:     
+100KB):String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+[Image Optimization] coral_fan_seafan_1769969707382.png: 1582.64KB
+[Image Optimization 
+Error] Image coral_fan
+_seafan_1769969707382.
+png is 1582.64KB 
+(max: 100KB)
+[Image Optimization] coral_pink_branching_1769969596186.png: 1363.09KB
+[Image Optimization 
+Error] Image coral_pin
+k_branching_1769969596
+186.png is 1363.09KB 
+(max: 100KB)
+[Image Optimization] fish_blue_tang_1769969189595.png: 1015.96KB
+[Image Optimization 
+Error] Image fish_blue
+_tang_1769969189595.pn
+g is 1015.96KB (max: 
+100KB)
+[Image Optimization] fish_clownfish_1769969172414.png: 759.62KB
+[Image Optimization 
+Error] Image fish_clow
+nfish_1769969172414.pn
+g is 759.62KB (max: 
+100KB)
+[Image Optimization] fish_school_1769969295035.png: 515.36KB
+[Image Optimization 
+Error] Image fish_scho
+ol_1769969295035.png 
+is 515.36KB (max: 
+100KB)
+[Image Optimization] jellyfish_blue_1769969257533.png: 1022.75KB
+[Image Optimization 
+Error] Image jellyfish
+_blue_1769969257533.pn
+g is 1022.75KB (max: 
+100KB)
+[Image Optimization] kelp_seaweed_tall_1769969577936.png: 824.51KB
+[Image Optimization 
+Error] Image kelp_seaw
+eed_tall_1769969577936
+.png is 824.51KB 
+(max: 100KB)
+[Image Optimization] manta_ray_1769969274048.png: 655.18KB
+[Image Optimization 
+Error] Image manta_ray
+_1769969274048.png is 
+655.18KB (max: 100KB)
+[Image Optimization] octopus_purple_1769969223447.png: 1013.44KB
+[Image Optimization 
+Error] Image octopus_p
+urple_1769969223447.pn
+g is 1013.44KB (max: 
+100KB)
+[Image Optimization] octopus_wrapped_stone_1769969561487.png: 1220.15KB
+[Image Optimization 
+Error] Image octopus_w
+rapped_stone_176996956
+1487.png is 1220.15KB 
+(max: 100KB)
+[Image Optimization] rock_mossy_single_1769969645447.png: 1100.20KB
+[Image Optimization 
+Error] Image rock_moss
+y_single_1769969645447
+.png is 1100.2KB 
+(max: 100KB)
+[Image Optimization] sea_grass_cluster_1769969611847.png: 991.78KB
+[Image Optimization 
+Error] Image sea_grass
+_cluster_1769969611847
+.png is 991.78KB 
+(max: 100KB)
+[Image Optimization] sea_stones_cluster_1769969544640.png: 1215.87KB
+[Image Optimization 
+Error] Image sea_stone
+s_cluster_176996954464
+0.png is 1215.87KB 
+(max: 100KB)
+[Image Optimization] sea_turtle_1769969240193.png: 989.77KB
+[Image Optimization 
+Error] Image sea_turtl
+e_1769969240193.png 
+is 989.77KB (max: 
+100KB)
+[Image Optimization] uploaded_media_0_1770063820264.png: 67.04KB
+[Image Optimization] uploaded_media_1770063523352.png: 96.53KB
+[Image Optimization] uploaded_media_1_1770063820264.png: 11.59KB
+[Image Optimization] whale_humpback_1769969206274.png: 912.63KB
+[Image Optimization 
+Error] Image whale_hum
+pback_1769969206274.pn
+g is 912.63KB (max: 
+100KB)
+[Image Optimization] void_ship.png: 691.22KB
+[Image Optimization 
+Error] Image 
+void_ship.png is 
+691.22KB (max: 100KB)
+[Image Optimization] coral_midground.png: 864.86KB
+[Image Optimization 
+Error] Image 
+coral_midground.png 
+is 864.86KB (max: 
+100KB)
+[Image Optimization] foreground_rocks.png: 790.73KB
+[Image Optimization 
+Error] Image 
+foreground_rocks.png 
+is 790.73KB (max: 
+100KB)
+[Image Optimization] ocean_background.png: 558.16KB
+[Image Optimization 
+Error] Image 
+ocean_background.png 
+is 558.16KB (max: 
+100KB)
+[Image Optimization] sea_creatures.png: 866.05KB
+[Image Optimization 
+Error] Image 
+sea_creatures.png is 
+866.05KB (max: 100KB)
+[Image Optimization] submarine_ship.png: 232.82KB
+[Image Optimization 
+Error] Image 
+submarine_ship.png is 
+232.82KB (max: 100KB)
+[Image Optimization] underwater_mountains.png: 335.33KB
+[Image Optimization 
+Error] Image underwate
+r_mountains.png is 
+335.33KB (max: 100KB)
+[Image Optimization] void_ship.png: 691.22KB
+[Image Optimization 
+Error] Image 
+void_ship.png is 
+691.22KB (max: 100KB)
+[Image Optimization] Validation complete: 3/27 images within size limits
+[Image Optimization] Image optimization complete!
+[Image Optimization] 
+[Image Optimization] To implement actual optimization:
+[Image Optimization] 1. Install sharp: npm install --save-dev sharp
+[Image Optimization] 2. Uncomment the sharp implementation in this script
+[Image Optimization] 3. Run: node scripts/optimize-images.js
+[Image Optimization] 
+[Image Optimization] Or use external tools:
+[Image Optimization] - ImageMagick: convert input.jpg -quality 85 output.jpg
+[Image Optimization] - Squoosh CLI: squoosh-cli --webp auto input.jpg
+[Image Optimization] - ImageOptim: imageoptim --quality high input.jpg

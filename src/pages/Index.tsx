@@ -10,9 +10,9 @@ const HorizontalTimelineEvents = lazy(() => import('../components/HorizontalTime
 // const VerticalTimelineEvents = lazy(() => import('../components/VerticalTimelineEvents'));
 const FAQSection = lazy(() => import('../components/FAQSection'));
 
-import RegisterSection from '../components/RegisterSection';
-import ContactSection from '../components/ContactSection';
-import Footer from '../components/Footer';
+const RegisterSection = lazy(() => import('../components/RegisterSection'));
+const ContactSection = lazy(() => import('../components/ContactSection'));
+const Footer = lazy(() => import('../components/Footer'));
 import SmoothScroll from '../components/SmoothScroll';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { logPerformanceReport } from '../lib/lazyLoad';
@@ -76,14 +76,20 @@ const Index = () => {
             <HorizontalTimelineEvents />
           </Suspense>
 
-          <RegisterSection />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <RegisterSection />
+          </Suspense>
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <FAQSection />
           </Suspense>
-          <ContactSection />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <ContactSection />
+          </Suspense>
         </main>
 
-        <Footer />
+        <Suspense fallback={<div className="min-h-[200px] flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+          <Footer />
+        </Suspense>
 
         {/* Global Progress Bar */}
         <div
