@@ -162,6 +162,7 @@ const BrickBreaker = () => {
 
         if (activeBricks === 0 && gameState === 'playing') {
             nextLevel();
+            reqRef.current = requestAnimationFrame(draw);
             return; // Skip rest of draw frame to avoid glitches
         }
 

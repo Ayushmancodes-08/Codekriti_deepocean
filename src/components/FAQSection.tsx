@@ -5,43 +5,43 @@ import { Plus, Minus } from 'lucide-react';
 const faqs = [
     {
         question: "What is CodeKriti 4.0?",
-        answer: "CodeKriti 4.0 is a 24-hour national-level hackathon where innovators dive into the 'Digital Abyss' to solve real-world problems. It's a test of endurance, creativity, and coding skills."
+        answer: "CodeKriti 4.0 is a two-day tech battlefield where ideas turn into prototypes, logic turns into code, and teams compete to dominate. Hackathons, coding wars, pitch battles — all in one arena."
     },
     {
-        question: "When and where is it happening?",
-        answer: "The event is scheduled for March 6-7, 2026, at the PMEC Academic Block (Deep Sea Arena). Mark your calendars!"
+        question: "When & Where?",
+        answer: "Two high-voltage days at PMEC. From morning coding clashes to overnight hackathon grind — it's non-stop."
     },
     {
         question: "Who can participate?",
-        answer: "It's open to all college students! Whether you're a freshie or a final year veteran, if you can code (or design/pitch), you're welcome aboard."
+        answer: "Undergraduate students ready to compete. Hackathon welcomes teams from other colleges. Other events are exclusive to PMEC."
     },
     {
         question: "What is the team size?",
-        answer: "Teams must have between 2 to 4 members. Solo participation isn't allowed, but you can find teammates in our community Discord."
+        answer: "Hackathon: 3–5 members. Innovation Challenge: 2–3 members. Tech Maze: 3 members. Algo to Code: Solo — just you vs the problems."
     },
     {
         question: "Is there a registration fee?",
-        answer: "Zero. CodeKriti 4.0 is completely free for all admitted teams. We believe talent shouldn't have a price tag."
+        answer: "Yes. Small investment. Serious competition. ₹30–₹90 for intra-college events. ₹400–₹500 for the hackathon."
     },
     {
         question: "Will food and accommodation be provided?",
-        answer: "Yes! We cover all meals, snacks, and drinks during the hackathon. Resting areas will also be available for those quick power naps."
+        answer: "Hackathon participants get dinner and breakfast. Work. Code. Repeat."
     },
     {
         question: "What are the themes/tracks?",
-        answer: "We focus on Open Innovation with a special spotlight on 'Ocean Tech' & 'Digital Depths', but you're free to build on EdTech, FinTech, HealthTech, or any domain."
+        answer: "Real-world problem statements under a defined theme. No random coding — build solutions that actually matter."
     },
     {
         question: "What should I bring?",
-        answer: "Your laptop, chargers, extension cords (recommended), toiletries for the overnight stay, and your college ID card."
+        answer: "Laptop. Charger. College ID. And the mindset to compete, not just participate."
     },
     {
         question: "Can I use pre-built templates?",
-        answer: "No. All major code must be written during the 24-hour period. You can use standard libraries, frameworks, and APIs, but no pre-made projects."
+        answer: "Libraries? Yes. Copy-paste projects? No chance. Originality wins here."
     },
     {
         question: "Will there be prizes?",
-        answer: "Oh yes. We have a prize pool of over ₹1 Lakh+ including cash prizes, swags, licenses, and intern opportunities."
+        answer: "Yes. Cash prizes across all events. Up to ₹10,000+ in the hackathon alone. Win money. Win recognition. Win respect."
     }
 ];
 

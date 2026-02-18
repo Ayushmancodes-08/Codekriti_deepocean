@@ -187,7 +187,6 @@ Deno.serve(async (req: Request) => {
                                     Get ready, <strong>${leaderName}</strong>! Your spot for <strong>${event}</strong> is secured.
                                 </p>
                                 
-                                <!-- Ticket Box: Oceanic Glow & Responsive QR -->
                                 <div style="background: rgba(100, 255, 218, 0.05); padding: 30px; border-radius: 12px; display: inline-block; border: 1px solid #64ffda; box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);">
                                     <div style="background: #ffffff; padding: 10px; border-radius: 8px; display: inline-block;">
                                         <img src="${qrImageUrl}" alt="Your Ticket QR" style="width: 100%; max-width: 250px; height: auto; display: block; margin: 0 auto;" />
@@ -250,6 +249,157 @@ Deno.serve(async (req: Request) => {
 
             return new Response(
                 JSON.stringify({ status: 'success', message: 'Registration Rejected', data }),
+                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
+        // --- ACTION: CHECKIN ---
+        if (action === 'CHECKIN') {
+            const { id } = payload;
+            const supabaseAdmin = createClient(
+                Deno.env.get('SUPABASE_URL') ?? '',
+                Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+            );
+
+            // 1. Get Registration Details
+            const { data, error } = await supabaseAdmin
+                .from('registrations')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error || !data) {
+                return new Response(
+                    JSON.stringify({
+                        status: 'error',
+                        data: { id, message: 'Ticket not found.' }
+                    }),
+                    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                );
+            }
+
+            // 2. Validation Checks
+            if (data.status !== 'success') {
+                return new Response(
+                    JSON.stringify({
+                        status: 'error',
+                        data: {
+                            id,
+                            team_name: data.team_name,
+                            leader_name: data.leader_name,
+                            event_id: data.event_id,
+                            status: 'Pending/Rejected',
+                            message: `Status is ${data.status}`
+                        }
+                    }),
+                    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                );
+            }
+
+            if (data.check_in_status) {
+                return new Response(
+                    JSON.stringify({
+                        status: 'warning',
+                        data: {
+                            id,
+                            team_name: data.team_name,
+                            leader_name: data.leader_name,
+                            event_id: data.event_id,
+                            check_in_status: true,
+                            status: 'Already Checked In',
+                            message: 'Ticket already used.'
+                        }
+                    }),
+                    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                );
+            }
+
+            // 3. Update Check-In Status
+            const { error: updateError } = await supabaseAdmin
+                .from('registrations')
+                .update({ check_in_status: true })
+                .eq('id', id);
+
+            if (updateError) throw updateError;
+
+            return new Response(
+                JSON.stringify({
+                    status: 'success',
+                    data: {
+                        id,
+                        team_name: data.team_name,
+                        leader_name: data.leader_name,
+                        event_id: data.event_id,
+                        check_in_status: true,
+                        status: 'Verified',
+                        message: 'Welcome to the event!'
+                    }
+                }),
+                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
+        // --- ACTION: CONTACT ---
+        if (action === 'CONTACT') {
+            const { name, email, message } = payload;
+
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: Deno.env.get('SMTP_USER'),
+                    pass: Deno.env.get('SMTP_PASS'),
+                },
+            });
+
+            // Send to both Admin (SMTP_USER) and the specific user requested
+            const recipients = [Deno.env.get('SMTP_USER'), 'patraayushman21@gmail.com'];
+
+            const mailOptions = {
+                from: '"CodeKriti Contact" <' + Deno.env.get('SMTP_USER') + '>',
+                to: recipients.join(','),
+                replyTo: email,
+                subject: `🌊 New Message from ${name} | CodeKriti Contact`,
+                html: `
+                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a192f; margin: 0; padding: 20px 0;">
+                        <!-- Outer Wrapper with subtle oceanic gradient -->
+                        <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0a192f 0%, #112240 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554;">
+                            
+                            <!-- Header -->
+                            <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
+                                <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
+                                <h1 style="color: #ccd6f6; margin-top: 15px; font-size: 24px; letter-spacing: 1px;">New Inquiry</h1>
+                            </div>
+
+                            <!-- Body -->
+                            <div style="padding: 40px 30px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                                    <div style="width: 40px; height: 40px; background: rgba(100, 255, 218, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #64ffda; font-weight: bold; font-size: 18px;">
+                                        ${name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p style="margin: 0; color: #64ffda; font-weight: bold; font-size: 18px;">${name}</p>
+                                        <p style="margin: 2px 0 0; color: #8892b0; font-size: 14px;"><a href="mailto:${email}" style="color: #8892b0; text-decoration: none;">${email}</a></p>
+                                    </div>
+                                </div>
+
+                                <div style="background-color: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); position: relative;">
+                                    <span style="position: absolute; top: -10px; left: 20px; background: #0a192f; padding: 0 10px; color: #64ffda; font-size: 12px; font-weight: bold; letter-spacing: 1px;">MESSAGE</span>
+                                    <p style="font-size: 16px; line-height: 1.6; color: #e6f1ff; white-space: pre-wrap; margin: 0;">${message}</p>
+                                </div>
+
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #233554; text-align: center;">
+                                    <p style="color: #8892b0; font-size: 12px; margin: 0;">Sent via CodeKriti 4.0 Contact Form</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+            };
+
+            await transporter.sendMail(mailOptions);
+
+            return new Response(
+                JSON.stringify({ status: 'success', message: 'Message sent successfully' }),
                 { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }

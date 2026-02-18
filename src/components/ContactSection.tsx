@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '../utils/supabaseClient';
 
 const ContactSection = () => {
     const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ const ContactSection = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || !formData.email || !formData.message) {
             toast.error("Please fill in all fields");
@@ -18,12 +19,30 @@ const ContactSection = () => {
         }
 
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
+        setIsSubmitting(true);
+
+        try {
+            const { error } = await supabase.functions.invoke('register-team', {
+                body: {
+                    action: 'CONTACT',
+                    payload: {
+                        name: formData.name,
+                        email: formData.email,
+                        message: formData.message
+                    }
+                }
+            });
+
+            if (error) throw error;
+
             toast.success("Message sent successfully!");
             setFormData({ name: '', email: '', message: '' });
-        }, 1500);
+        } catch (error: any) {
+            console.error("Contact Error:", error);
+            toast.error("Failed to send message. Please try again or email us directly.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -77,7 +96,12 @@ const ContactSection = () => {
                             </div>
                         </div>
 
-                        <div className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300">
+                        <a
+                            href="https://www.google.com/maps/search/?api=1&query=Parala+Maharaja+Engineering+College"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300 block cursor-pointer"
+                        >
                             <div className="flex items-start gap-5">
                                 <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0 group-hover:scale-110 transition-transform">
                                     <MapPin size={24} />
@@ -86,9 +110,12 @@ const ContactSection = () => {
                                     <h4 className="font-body text-sm text-gray-400 uppercase tracking-wider mb-1">Location</h4>
                                     <p className="font-display text-lg font-bold text-white">PMEC ACADEMIC BLOCK</p>
                                     <p className="text-sm text-gray-500 mt-1">Main Block, 2nd Floor</p>
+                                    <p className="text-xs text-cyan-400 mt-2 flex items-center gap-1 group-hover:underline">
+                                        View on Google Maps
+                                    </p>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
 
                     {/* Form - Right Column */}

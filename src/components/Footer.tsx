@@ -147,7 +147,7 @@ const Footer = () => {
           </div>
 
           <div className="flex items-center gap-1 text-xs sm:text-sm">
-            Made with <span className="text-red-500 animate-pulse">❤</span> by Team DeepOcean
+            Made with <span className="text-red-500 animate-pulse">❤</span> by CDD Web Team
             {/* Admin Trigger (Lock Icon) - Subtle & Right Side */}
             <button
               onClick={() => {
