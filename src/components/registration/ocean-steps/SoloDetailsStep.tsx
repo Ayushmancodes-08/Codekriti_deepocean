@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 import { User, Mail, Phone, School, BookOpen, Calendar } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, type RegistrationFormData } from '@/types/registration';
 import OceanInput from '../OceanInput';
-import { capitalizeName, formatPhoneNumber, preventNonNumeric } from '@/utils/formUtils';
+import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
 
 const SoloDetailsStep = () => {
     const { register, formState: { errors } } = useFormContext<RegistrationFormData>();
@@ -56,22 +56,13 @@ const SoloDetailsStep = () => {
                 >
                     <input
                         {...register('participant.phone')}
-                        onChange={() => {
-                            // Real-time formatting as user types? Maybe too aggressive.
-                            // Let's just limit length/chars here and format on blur.
-                        }}
-                        onBlur={(e) => {
-                            const formatted = formatPhoneNumber(e.target.value);
-                            // setValue('participant.phone', formatted); // react-hook-form way?
-                            // Or just simulate change
-                            if (formatted) {
-                                e.target.value = formatted;
-                                register('participant.phone').onChange(e);
-                            }
-                        }}
                         onKeyDown={preventNonNumeric}
+                        onChange={(e) => {
+                            const formatted = formatStrictPhone(e.target.value);
+                            e.target.value = formatted;
+                            register('participant.phone').onChange(e);
+                        }}
                         type="tel"
-                        maxLength={13}
                         placeholder="+91 XXXXX XXXXX"
                         className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
                     />

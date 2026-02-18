@@ -1,21 +1,34 @@
 import { useFormContext } from 'react-hook-form';
-import { Users, User, Mail, Phone, School, BookOpen, Calendar } from 'lucide-react';
-import { BRANCHES, YEARS_OF_STUDY, type RegistrationFormData } from '@/types/registration';
+import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield } from 'lucide-react';
+import { BRANCHES, YEARS_OF_STUDY, EVENTS, type RegistrationFormData } from '@/types/registration';
 import OceanInput from '../OceanInput';
-import { capitalizeName, formatPhoneNumber, preventNonNumeric } from '@/utils/formUtils';
+import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
+import { motion } from 'framer-motion';
 
 const TeamInfoStep = () => {
-    const { register, formState: { errors } } = useFormContext<RegistrationFormData>();
+    const { register, watch, setValue, formState: { errors } } = useFormContext<RegistrationFormData>();
+
+    const eventId = watch('eventId');
+    const currentSquadSize = watch('squadSize');
+    const event = EVENTS.find(e => e.id === eventId);
+
+    const hasSizeRange = event && event.minTeamSize !== event.maxTeamSize;
+    const sizeOptions = hasSizeRange
+        ? Array.from(
+            { length: (event.maxTeamSize - event.minTeamSize) + 1 },
+            (_, i) => event.minTeamSize + i
+        )
+        : [];
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center gap-3 border-b border-[#00D9FF]/20 pb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00D9FF] to-blue-500 flex items-center justify-center shadow-lg shadow-[#00D9FF]/20">
-                    <Users className="w-5 h-5 text-white" />
+        <div className="space-y-4 pb-8">
+            <div className="flex items-center gap-3 border-b border-[#00D9FF]/10 pb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00D9FF]/20 to-blue-600/20 border border-[#00D9FF]/30 flex items-center justify-center shadow-[0_0_15px_rgba(0,217,255,0.1)]">
+                    <Users className="w-5 h-5 text-[#00D9FF]" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold text-white leading-tight">Team Details</h3>
-                    <p className="text-[#00D9FF]/60 text-xs">Manage your squad info</p>
+                    <h3 className="text-sm font-bold text-white uppercase tracking-widest">SQUAD PROFILE</h3>
+                    <p className="text-[#00D9FF]/50 text-[10px] font-medium uppercase tracking-tighter">Configure your operative base</p>
                 </div>
             </div>
 
@@ -33,8 +46,43 @@ const TeamInfoStep = () => {
                 />
             </OceanInput>
 
+            {/* Dynamic Squad Size Selector - Compact Version */}
+            {hasSizeRange && (
+                <div className="p-3 rounded-xl bg-white/5 border border-[#00D9FF]/20 space-y-2">
+                    <div className="flex items-center gap-2 text-[#00D9FF]/80">
+                        <Shield className="w-3.5 h-3.5" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">Squad Magnitude</span>
+                    </div>
+                    <div className="flex gap-2">
+                        {sizeOptions.map((size) => (
+                            <button
+                                key={size}
+                                type="button"
+                                onClick={() => setValue('squadSize', size as any)}
+                                className={`flex-1 py-1.5 rounded-lg border transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden ${currentSquadSize === size
+                                    ? 'bg-[#00D9FF]/10 border-[#00D9FF] text-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.1)]'
+                                    : 'bg-transparent border-white/10 text-gray-500 hover:border-white/20'
+                                    }`}
+                            >
+                                <span className={`text-sm font-black transition-transform ${currentSquadSize === size ? 'scale-110' : ''}`}>
+                                    {size}
+                                </span>
+                                <span className="text-[7px] font-black uppercase tracking-tighter opacity-60">Ops</span>
+
+                                {currentSquadSize === size && (
+                                    <motion.div
+                                        layoutId="active-size"
+                                        className="absolute inset-0 bg-[#00D9FF]/5 rounded-lg pointer-events-none"
+                                    />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Team Leader Section */}
-            <div className="space-y-4">
+            <div className="space-y-3">
                 <div className="flex items-center gap-2 text-[#00D9FF]/80">
                     <User className="w-4 h-4" />
                     <span className="text-sm font-semibold uppercase tracking-wider">Team Leader</span>
@@ -80,14 +128,11 @@ const TeamInfoStep = () => {
                         <input
                             {...register('teamLeader.phone')}
                             onKeyDown={preventNonNumeric}
-                            onBlur={(e) => {
-                                const formatted = formatPhoneNumber(e.target.value);
-                                if (formatted) {
-                                    e.target.value = formatted;
-                                    register('teamLeader.phone').onChange(e);
-                                }
+                            onChange={(e) => {
+                                const formatted = formatStrictPhone(e.target.value);
+                                e.target.value = formatted;
+                                register('teamLeader.phone').onChange(e);
                             }}
-                            maxLength={13}
                             type="tel"
                             placeholder="Phone Number"
                             className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"

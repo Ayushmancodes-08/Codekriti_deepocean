@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Search, RefreshCw, Lock, Image as ImageIcon, CreditCard } from "lucide-react";
+import { CheckCircle, XCircle, Search, RefreshCw, Lock, Image as ImageIcon, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Types
@@ -18,6 +18,14 @@ interface Registration {
     payment_screenshot_url: string;
     screenshot_url?: string;
     amount: number;
+    members?: {
+        name: string;
+        email: string;
+        phone: string;
+        college: string;
+        branch: string;
+        year: string;
+    }[];
 }
 
 const AdminDashboard = () => {
@@ -29,6 +37,7 @@ const AdminDashboard = () => {
     const [filter, setFilter] = useState("pending");
     const [search, setSearch] = useState("");
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -80,20 +89,44 @@ const AdminDashboard = () => {
             if (error) throw error;
             toast.dismiss(toastId);
             toast.success("Approved & Email Sent!");
-            fetchRegistrations();
+
+            // Optimistic Update
+            if (filter === 'pending') {
+                setRegistrations(prev => prev.filter(r => r.id !== reg.id));
+            } else {
+                fetchRegistrations();
+            }
         } catch (error: any) {
             toast.dismiss(toastId);
             toast.error("Error: " + error.message);
         }
     };
 
-    const handleReject = async (id: string) => {
-        if (!confirm("Reject this registration?")) return;
-        const { error } = await supabase.from('registrations').update({ status: 'rejected' }).eq('id', id);
-        if (error) toast.error("Failed");
-        else {
-            toast.success("Rejected");
-            fetchRegistrations();
+    const handleReject = async (id: string, name: string) => {
+        if (!confirm(`Reject registration for ${name}?`)) return;
+        const toastId = toast.loading("Processing rejection...");
+        try {
+            const { error } = await supabase.functions.invoke('register-team', {
+                body: {
+                    action: 'REJECT',
+                    payload: { id }
+                }
+            });
+
+            if (error) throw error;
+
+            toast.dismiss(toastId);
+            toast.success("Registration Rejected");
+
+            // Optimistic Update
+            if (filter === 'pending') {
+                setRegistrations(prev => prev.filter(r => r.id !== id));
+            } else {
+                fetchRegistrations();
+            }
+        } catch (error: any) {
+            toast.dismiss(toastId);
+            toast.error("Failed to reject: " + error.message);
         }
     };
 
@@ -265,6 +298,55 @@ const AdminDashboard = () => {
                                             <p className="text-xs text-slate-500 mt-1">{new Date(reg.created_at).toLocaleString()}</p>
                                         </div>
                                     </div>
+
+                                    {/* Team Members Toggle */}
+                                    {reg.members && reg.members.length > 0 && (
+                                        <div className="mt-4">
+                                            <button
+                                                onClick={() => setExpandedId(expandedId === reg.id ? null : reg.id)}
+                                                className="flex items-center gap-2 text-xs font-bold text-[#00D9FF] hover:text-[#00D9FF]/80 transition-colors uppercase tracking-wider"
+                                            >
+                                                {expandedId === reg.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                                {expandedId === reg.id ? 'Hide Team Details' : `View Team Members (${reg.members.length})`}
+                                            </button>
+
+                                            <AnimatePresence>
+                                                {expandedId === reg.id && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto' }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="mt-3 bg-[#0a192f]/30 rounded-xl border border-white/5 overflow-hidden">
+                                                            <div className="overflow-x-auto">
+                                                                <table className="w-full text-left text-sm text-slate-400">
+                                                                    <thead className="bg-white/5 text-xs text-slate-300 uppercase tracking-wider">
+                                                                        <tr>
+                                                                            <th className="px-4 py-3 font-medium">Name</th>
+                                                                            <th className="px-4 py-3 font-medium">Email</th>
+                                                                            <th className="px-4 py-3 font-medium">Phone</th>
+                                                                            <th className="px-4 py-3 font-medium">College</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody className="divide-y divide-white/5">
+                                                                        {reg.members.map((member, i) => (
+                                                                            <tr key={i} className="hover:bg-white/5 transition-colors">
+                                                                                <td className="px-4 py-3 font-medium text-white">{member.name}</td>
+                                                                                <td className="px-4 py-3">{member.email}</td>
+                                                                                <td className="px-4 py-3 font-mono text-xs">{member.phone}</td>
+                                                                                <td className="px-4 py-3 text-xs">{member.college}</td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Right: Media & Actions */}
@@ -279,7 +361,7 @@ const AdminDashboard = () => {
                                                 <CheckCircle className="w-4 h-4" /> Approve
                                             </button>
                                             <button
-                                                onClick={() => handleReject(reg.id)}
+                                                onClick={() => handleReject(reg.id, reg.team_name)}
                                                 className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 py-2.5 px-4 rounded-xl transition-all"
                                             >
                                                 <XCircle className="w-5 h-5" />
@@ -326,8 +408,8 @@ const AdminDashboard = () => {
                         </div>
                     )}
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 };
 

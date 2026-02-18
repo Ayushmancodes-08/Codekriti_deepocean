@@ -24,7 +24,7 @@ export const EVENTS = [
     {
         id: 'techmaze',
         name: 'Tech Maze',
-        minTeamSize: 3,
+        minTeamSize: 2,
         maxTeamSize: 3,
         description: 'Fun Technical Event',
         entryFee: '₹90',
@@ -33,7 +33,7 @@ export const EVENTS = [
     {
         id: 'devxtreme',
         name: 'DevXtreme',
-        minTeamSize: 3,
+        minTeamSize: 4,
         maxTeamSize: 5,
         description: 'Overnight Hackathon',
         entryFee: '₹400 (PMEC) / ₹500 (Outside)',
@@ -61,7 +61,7 @@ export const YEARS_OF_STUDY = ['1st Year', '2nd Year', '3rd Year', '4th Year', '
 const participantSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
-    phone: z.string().regex(/^\+?[\d\s-()]{10,}$/, 'Invalid phone number'),
+    phone: z.string().regex(/^(\+91\s\d{5}\s\d{5}|\d{5}\s\d{5}|\d{10}|\+91\d{10})$/, 'Invalid phone number'),
     college: z.string().min(2, 'College name required'),
     branch: z.enum(BRANCHES, { errorMap: () => ({ message: 'Branch is required' }) }),
     yearOfStudy: z.enum(YEARS_OF_STUDY, { errorMap: () => ({ message: 'Year is required' }) }),
@@ -71,7 +71,7 @@ const participantSchema = z.object({
 const teamMemberSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
-    phone: z.string().regex(/^\+?[\d\s-()]{10,}$/, 'Invalid phone number'),
+    phone: z.string().regex(/^(\+91\s\d{5}\s\d{5}|\d{5}\s\d{5}|\d{10}|\+91\d{10})$/, 'Invalid phone number'),
     college: z.string().min(2, 'College name required'),
     branch: z.enum(BRANCHES, { errorMap: () => ({ message: 'Branch is required' }) }),
     yearOfStudy: z.enum(YEARS_OF_STUDY, { errorMap: () => ({ message: 'Year is required' }) }),
@@ -86,7 +86,7 @@ export const registrationSchema = z.discriminatedUnion('registrationType', [
         squadSize: z.literal(1),
         participant: participantSchema,
         subscribe: z.boolean().optional(),
-        transactionId: z.string().optional(),
+        transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
         screenshotUrl: z.string().optional(),
     }),
     // Team registration
@@ -98,7 +98,7 @@ export const registrationSchema = z.discriminatedUnion('registrationType', [
         teamLeader: participantSchema,
         teamMembers: z.array(teamMemberSchema).min(1, 'At least one team member required'),
         subscribe: z.boolean().optional(),
-        transactionId: z.string().optional(),
+        transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
         screenshotUrl: z.string().optional(),
     }),
 ]);

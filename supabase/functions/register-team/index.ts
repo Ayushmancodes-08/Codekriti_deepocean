@@ -1,15 +1,12 @@
-/// <reference path="../deno-types.d.ts" />
-// @ts-ignore: Standard TS cannot resolve JSR/Supabase aliases
-import { createClient } from "supabase";
-// @ts-ignore: Standard TS cannot resolve JSR/Supabase aliases
-import nodemailer from "nodemailer";
+import { createClient } from "jsr:@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer@6.9.13";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LOGO_URL = "https://your-project-domain.com/logo-full.png"; // TODO: Replace with your actual public image URL after deployment
+const LOGO_URL = "https://codekriti.vercel.app/logo_bg.jpeg"; // Updated to Vercel deployment URL
 
 Deno.serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
@@ -229,6 +226,27 @@ Deno.serve(async (req: Request) => {
 
             return new Response(
                 JSON.stringify({ status: 'success', message: 'Approved and Email Sent' }),
+                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
+        // --- ACTION: REJECT ---
+        if (action === 'REJECT') {
+            const { id } = payload;
+            const supabaseAdmin = createClient(
+                Deno.env.get('SUPABASE_URL') ?? '',
+                Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+            );
+
+            const { error } = await supabaseAdmin
+                .from('registrations')
+                .update({ status: 'rejected' })
+                .eq('id', id);
+
+            if (error) throw error;
+
+            return new Response(
+                JSON.stringify({ status: 'success', message: 'Registration Rejected' }),
                 { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }

@@ -11,24 +11,29 @@ interface OceanInputProps {
 
 const OceanInput = ({ label, icon: Icon, error, children }: OceanInputProps) => {
     return (
-        <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm md:text-base font-medium text-gray-300">
-                <Icon className="w-4 h-4 text-[#00D9FF]" />
+        <div className="space-y-1.5 group">
+            <label className="flex items-center gap-2 text-[11px] uppercase font-bold text-gray-400 ml-1 tracking-wider transition-colors group-focus-within:text-[#00D9FF]">
+                <Icon className="w-3.5 h-3.5 text-[#00D9FF]/70 group-focus-within:text-[#00D9FF] group-focus-within:animate-pulse" />
                 {label}
             </label>
 
-            {children}
+            <div className="relative">
+                {children}
+                <div className="absolute inset-0 rounded-lg pointer-events-none border border-[#00D9FF]/0 group-focus-within:border-[#00D9FF]/30 transition-all duration-300 shadow-[inset_0_0_10px_rgba(0,217,255,0)] group-focus-within:shadow-[inset_0_0_10px_rgba(0,217,255,0.1)]" />
+            </div>
 
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
                 {error && (
                     <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        className="text-cyan-400 text-xs flex items-center gap-2 bg-cyan-500/10 px-3 py-2 rounded-lg border border-cyan-500/30"
+                        initial={{ opacity: 0, height: 0, y: -10 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -10 }}
+                        className="overflow-hidden"
                     >
-                        <div className="w-1 h-1 bg-cyan-400 rounded-full" />
-                        <span>{error}</span>
+                        <div className="text-red-400 text-[10px] flex items-center gap-1.5 bg-red-500/5 px-2 py-1 rounded border border-red-500/20 mt-1">
+                            <div className="w-1 h-1 bg-red-400 rounded-full animate-pulse" />
+                            <span>{error}</span>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
