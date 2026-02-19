@@ -21,6 +21,8 @@ export interface RegistrationData {
     subscribe: boolean;
     transactionId?: string; // Standardize
     file?: File; // For direct upload
+    problemStatement?: string;
+    solution?: string;
 }
 
 interface RegistrationResponse {

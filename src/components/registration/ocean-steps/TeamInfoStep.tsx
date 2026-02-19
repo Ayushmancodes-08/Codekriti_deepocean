@@ -200,6 +200,45 @@ const TeamInfoStep = () => {
                     </div>
                 </div>
             </div>
+
+            {/* DevXtreme Specific Fields */}
+            {eventId === 'devxtreme' && (
+                <div className="space-y-4 pt-4 border-t border-[#00D9FF]/10">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                            <BookOpen className="w-4 h-4 text-orange-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Project Proposal</h3>
+                            <p className="text-orange-400/50 text-[10px] font-medium uppercase">Shortlisting Required</p>
+                        </div>
+                    </div>
+
+                    <OceanInput
+                        label="Problem Statement"
+                        icon={BookOpen}
+                        error={(errors as any).problemStatement?.message}
+                    >
+                        <textarea
+                            {...register('problemStatement' as any)}
+                            placeholder="Describe the problem you are solving..."
+                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[100px] text-sm resize-y"
+                        />
+                    </OceanInput>
+
+                    <OceanInput
+                        label="Proposed Solution"
+                        icon={Shield}
+                        error={(errors as any).solution?.message}
+                    >
+                        <textarea
+                            {...register('solution' as any)}
+                            placeholder="Describe your technical solution..."
+                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[120px] text-sm resize-y"
+                        />
+                    </OceanInput>
+                </div>
+            )}
         </div>
     );
 };

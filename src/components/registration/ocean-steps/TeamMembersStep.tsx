@@ -18,6 +18,7 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const leaderCollege = useWatch({ control, name: 'teamLeader.college' });
+    const teamMembers = useWatch({ control, name: 'teamMembers' });
     const { fields, append, remove } = useFieldArray({ control, name: 'teamMembers' });
 
     useEffect(() => {
@@ -75,7 +76,11 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
             <div className="flex-grow overflow-y-auto pr-1 custom-scrollbar space-y-3 pb-4">
                 {slots.map((field, index) => {
                     const isFilled = !!field;
-                    const memberName = isFilled ? fields[index]?.name : '';
+
+                    const memberValues = teamMembers?.[index];
+                    const memberName = memberValues?.name;
+                    // Check if ALL details are filled to show "Online"
+                    const isDetailsComplete = memberValues?.name && memberValues?.email && memberValues?.phone && memberValues?.branch && memberValues?.yearOfStudy;
 
                     return (
                         <motion.div
@@ -117,8 +122,17 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
                                     <div className="flex items-center gap-2">
                                         <div className="flex flex-col items-end mr-2">
                                             <div className="flex items-center gap-1.5">
-                                                <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Online</span>
-                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_#22c55e]" />
+                                                {isDetailsComplete ? (
+                                                    <>
+                                                        <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Online</span>
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_#22c55e]" />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className="text-[8px] font-black text-yellow-500 uppercase tracking-widest">Pending</span>
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-yellow-500/50 animate-pulse" />
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">

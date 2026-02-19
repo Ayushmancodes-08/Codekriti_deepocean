@@ -11,7 +11,7 @@ import TeamInfoStep from './ocean-steps/TeamInfoStep';
 import TeamMembersStep from './ocean-steps/TeamMembersStep';
 import RegistrationSummary from './ocean-steps/RegistrationSummary';
 import PaymentUploadStep from './ocean-steps/PaymentUploadStep';
-import { submitRegistration, uploadScreenshot } from '@/utils/supabaseClient'; // Updated Import
+import { submitRegistration, uploadScreenshot } from '@/utils/supabaseClient';
 
 interface OceanRegistrationModalProps {
     isOpen: boolean;
@@ -152,31 +152,56 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
             }
 
             // Structure data for Supabase
-            const dbData = {
-                teamName: data.registrationType === 'team' ? data.teamName : 'Solo - ' + data.participant.name,
-                leaderName: data.registrationType === 'team' ? data.teamLeader.name : data.participant.name,
-                email: data.registrationType === 'team' ? data.teamLeader.email : data.participant.email,
-                phone: data.registrationType === 'team' ? data.teamLeader.phone : data.participant.phone,
-                members: data.registrationType === 'team' ? data.teamMembers.map(m => ({
-                    name: m.name,
-                    email: m.email,
-                    phone: m.phone,
-                    college: m.college,
-                    branch: m.branch,
-                    year: m.yearOfStudy
-                })) : [],
-                year: data.registrationType === 'team' ? data.teamLeader.yearOfStudy : data.participant.yearOfStudy,
-                branch: data.registrationType === 'team' ? data.teamLeader.branch : data.participant.branch,
-                college: data.registrationType === 'team' ? data.teamLeader.college : data.participant.college,
-                event: sheetEventName,
-                subscribe: !!data.subscribe,
-                transactionId: data.transactionId
-            };
+            let dbData: any;
+            if (data.registrationType === 'team') {
+                dbData = {
+                    teamName: data.teamName,
+                    leaderName: data.teamLeader.name,
+                    email: data.teamLeader.email,
+                    phone: data.teamLeader.phone,
+                    college: data.teamLeader.college,
+                    branch: data.teamLeader.branch,
+                    year: data.teamLeader.yearOfStudy,
+                    members: data.teamMembers.map(m => ({
+                        name: m.name,
+                        email: m.email,
+                        phone: m.phone,
+                        college: m.college,
+                        branch: m.branch,
+                        year: m.yearOfStudy
+                    })),
+                    squadSize: data.squadSize,
+                    event: sheetEventName,
+                    subscribe: data.subscribe || false,
+                    transactionId: data.transactionId,
+                    problemStatement: data.problemStatement,
+                    solution: data.solution,
+                };
+            } else {
+                dbData = {
+                    teamName: 'Solo - ' + data.participant.name,
+                    leaderName: data.participant.name,
+                    email: data.participant.email,
+                    phone: data.participant.phone,
+                    college: data.participant.college,
+                    branch: data.participant.branch,
+                    year: data.participant.yearOfStudy,
+                    members: [],
+                    squadSize: 1,
+                    event: sheetEventName,
+                    subscribe: data.subscribe || false,
+                    transactionId: data.transactionId,
+                };
+            }
 
             const response = await submitRegistration(dbData, screenshotUrl);
 
             if (response.status === 'success') {
-                toast.success('Thank you for registering!!!', {
+                const successMessage = data.eventId === 'devxtreme'
+                    ? "Will get to you if we shortlist you."
+                    : 'Thank you for registering!!!';
+
+                toast.success(successMessage, {
                     icon: <CheckCircle2 className="w-5 h-5 text-[#00D9FF]" />,
                     className: "bg-[#0a192f] border border-[#00D9FF]/30 text-white",
                     duration: 5000

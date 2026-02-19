@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Search, RefreshCw, Lock, Image as ImageIcon, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle, XCircle, Search, RefreshCw, Lock, Image as ImageIcon, CreditCard, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Types
@@ -18,6 +18,8 @@ interface Registration {
     payment_screenshot_url: string;
     screenshot_url?: string;
     amount: number;
+    problem_statement?: string;
+    solution?: string;
     members?: {
         name: string;
         email: string;
@@ -308,6 +310,33 @@ const AdminDashboard = () => {
                                             <p className="text-xs text-slate-500 mt-1">{new Date(reg.created_at).toLocaleString()}</p>
                                         </div>
                                     </div>
+
+                                    {/* DevXtreme Proposal Section */}
+                                    {(reg.problem_statement || reg.solution) && (
+                                        <div className="mt-4 bg-[#0a192f]/30 p-4 rounded-xl border border-orange-500/20">
+                                            <h4 className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <BookOpen className="w-3.5 h-3.5" /> Project Proposal
+                                            </h4>
+
+                                            {reg.problem_statement && (
+                                                <div className="mb-3">
+                                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Problem Statement</p>
+                                                    <p className="text-sm text-slate-300 bg-[#112240] p-3 rounded-lg border border-white/5">
+                                                        {reg.problem_statement}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {reg.solution && (
+                                                <div>
+                                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Proposed Solution</p>
+                                                    <p className="text-sm text-slate-300 bg-[#112240] p-3 rounded-lg border border-white/5">
+                                                        {reg.solution}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     {/* Team Members Toggle */}
                                     {reg.members && reg.members.length > 0 && (

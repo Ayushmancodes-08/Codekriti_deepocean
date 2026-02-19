@@ -33,7 +33,7 @@ export const EVENTS = [
     {
         id: 'devxtreme',
         name: 'DevXtreme',
-        minTeamSize: 4,
+        minTeamSize: 3,
         maxTeamSize: 5,
         description: 'Overnight Hackathon',
         entryFee: '₹400 (PMEC) / ₹500 (Outside)',
@@ -100,8 +100,27 @@ export const registrationSchema = z.discriminatedUnion('registrationType', [
         subscribe: z.boolean().optional(),
         transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
         screenshotUrl: z.string().optional(),
+        problemStatement: z.string().optional(),
+        solution: z.string().optional(),
     }),
-]);
+]).superRefine((data, ctx) => {
+    if (data.registrationType === 'team' && data.eventId === 'devxtreme') {
+        if (!data.problemStatement || data.problemStatement.length < 10) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Problem Statement is required and must be detailed",
+                path: ["problemStatement"]
+            });
+        }
+        if (!data.solution || data.solution.length < 10) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Solution description is required and must be detailed",
+                path: ["solution"]
+            });
+        }
+    }
+});
 
 export type RegistrationFormData = z.infer<typeof registrationSchema>;
 export type ParticipantData = z.infer<typeof participantSchema>;
