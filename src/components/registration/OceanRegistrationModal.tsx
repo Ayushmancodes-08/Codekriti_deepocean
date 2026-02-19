@@ -247,7 +247,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                     >
                         {/* Background Effects */}
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                            <div className="absolute inset-0 opacity-10 bg-[url('/assets/rock-texture.jpg')] bg-cover mix-blend-overlay" />
+                            <div className="absolute inset-0 opacity-10 bg-[url('/src/assets/rock-texture.jpg')] bg-cover mix-blend-overlay" />
 
                             {/* Animated Radial Glows */}
                             <motion.div
