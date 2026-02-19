@@ -16,7 +16,7 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
   const [canLoadOthers, setCanLoadOthers] = useState(false);
 
   // Disable static fallback completely as per user request
-  const useStaticFallback = false;
+
 
   // Visibility detection
   useEffect(() => {

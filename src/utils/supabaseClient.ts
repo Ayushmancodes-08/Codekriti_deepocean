@@ -35,7 +35,7 @@ interface RegistrationResponse {
 // 1. Storage Upload Helper
 export const uploadScreenshot = async (file: File, path: string): Promise<string | null> => {
     try {
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
             .from('payment-screenshots')
             .upload(path, file, {
                 cacheControl: '3600',

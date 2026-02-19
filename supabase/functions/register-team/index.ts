@@ -9,6 +9,19 @@ const corsHeaders = {
 
 const LOGO_URL = "https://codekriti.vercel.app/logo_bg.jpeg"; // Updated to Vercel deployment URL
 
+// Helper to create transporter
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        host: Deno.env.get('SMTP_HOST') || "smtp.titan.email", // Default to Titan if not set
+        port: parseInt(Deno.env.get('SMTP_PORT') || "465"),
+        secure: true, // true for 465, false for other ports
+        auth: {
+            user: Deno.env.get('SMTP_USER'),
+            pass: Deno.env.get('SMTP_PASS'),
+        },
+    });
+};
+
 Deno.serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders });
@@ -66,13 +79,7 @@ Deno.serve(async (req: Request) => {
             if (dbError) throw dbError;
 
             // Send "Pending" Email
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: Deno.env.get('SMTP_USER'),
-                    pass: Deno.env.get('SMTP_PASS'),
-                },
-            });
+            const transporter = createTransporter();
 
             const mailOptions = {
                 from: '"CodeKriti Team" <' + Deno.env.get('SMTP_USER') + '>',
@@ -158,13 +165,7 @@ Deno.serve(async (req: Request) => {
             const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrString)}&color=0a192f&bgcolor=64ffda`; // Custom colors for QR
 
             // 3. Send Confirmation Email
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: Deno.env.get('SMTP_USER'),
-                    pass: Deno.env.get('SMTP_PASS'),
-                },
-            });
+            const transporter = createTransporter();
 
             const mailOptions = {
                 from: '"CodeKriti Team" <' + Deno.env.get('SMTP_USER') + '>',
@@ -343,13 +344,7 @@ Deno.serve(async (req: Request) => {
         if (action === 'CONTACT') {
             const { name, email, message } = payload;
 
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: Deno.env.get('SMTP_USER'),
-                    pass: Deno.env.get('SMTP_PASS'),
-                },
-            });
+            const transporter = createTransporter();
 
             // Send to both Admin (SMTP_USER) and the specific user requested
             const recipients = [Deno.env.get('SMTP_USER'), 'patraayushman21@gmail.com'];

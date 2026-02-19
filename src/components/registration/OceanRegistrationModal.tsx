@@ -422,39 +422,41 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                             )}
 
                                             {currentStep === 3 && (
-                                                <div className="h-full flex items-center justify-center p-4">
-                                                    <div className="w-full max-w-4xl">
-                                                        <PaymentUploadStep
-                                                            amount={(() => {
-                                                                const values = methods.watch();
-                                                                const evt = EVENTS.find(e => e.id === values.eventId);
-                                                                if (values.eventId === 'devxtreme') {
-                                                                    const college = values.registrationType === 'team'
-                                                                        ? values.teamLeader?.college
-                                                                        : values.participant?.college;
-                                                                    const normalized = (college || '').toLowerCase().trim();
-                                                                    if (normalized.includes('pmec') || normalized.includes('parala maharaja')) {
-                                                                        return '₹400';
+                                                <div className="h-full overflow-y-auto custom-scrollbar p-4">
+                                                    <div className="min-h-full flex items-center justify-center py-8">
+                                                        <div className="w-full max-w-4xl">
+                                                            <PaymentUploadStep
+                                                                amount={(() => {
+                                                                    const values = methods.watch();
+                                                                    const evt = EVENTS.find(e => e.id === values.eventId);
+                                                                    if (values.eventId === 'devxtreme') {
+                                                                        const college = values.registrationType === 'team'
+                                                                            ? values.teamLeader?.college
+                                                                            : values.participant?.college;
+                                                                        const normalized = (college || '').toLowerCase().trim();
+                                                                        if (normalized.includes('pmec') || normalized.includes('parala maharaja')) {
+                                                                            return '₹400';
+                                                                        }
+                                                                        return '₹500';
                                                                     }
-                                                                    return '₹500';
-                                                                }
-                                                                return evt?.entryFee || 'Free';
-                                                            })()}
-                                                            isUploading={isSubmitting}
-                                                            onPaymentComplete={(txnId, fileData) => {
-                                                                setValue('transactionId', txnId);
-                                                                setUploadedFile(fileData); // Keep state sync
-                                                                handleSubmit(
-                                                                    (data) => processRegistration(data, fileData),
-                                                                    (errors) => {
-                                                                        console.error("Registration Validation Errors:", errors);
-                                                                        toast.error("Please check your details. Some fields are invalid or missing.", {
-                                                                            description: "Go back to step 1 to fix errors."
-                                                                        });
-                                                                    }
-                                                                )();
-                                                            }}
-                                                        />
+                                                                    return evt?.entryFee || 'Free';
+                                                                })()}
+                                                                isUploading={isSubmitting}
+                                                                onPaymentComplete={(txnId, fileData) => {
+                                                                    setValue('transactionId', txnId);
+                                                                    setUploadedFile(fileData); // Keep state sync
+                                                                    handleSubmit(
+                                                                        (data) => processRegistration(data, fileData),
+                                                                        (errors) => {
+                                                                            console.error("Registration Validation Errors:", errors);
+                                                                            toast.error("Please check your details. Some fields are invalid or missing.", {
+                                                                                description: "Go back to step 1 to fix errors."
+                                                                            });
+                                                                        }
+                                                                    )();
+                                                                }}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
