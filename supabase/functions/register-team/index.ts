@@ -12,11 +12,9 @@ const LOGO_URL = "https://codekriti.vercel.app/logo_bg.jpeg"; // Updated to Verc
 // Helper to create transporter
 const createTransporter = () => {
     return nodemailer.createTransport({
-        host: Deno.env.get('SMTP_HOST') || "smtp.titan.email", // Default to Titan if not set
-        port: parseInt(Deno.env.get('SMTP_PORT') || "465"),
-        secure: true, // true for 465, false for other ports
+        service: "gmail",
         auth: {
-            user: Deno.env.get('SMTP_USER'),
+            user: "codingclubpmec@gmail.com",
             pass: Deno.env.get('SMTP_PASS'),
         },
     });
@@ -79,56 +77,60 @@ Deno.serve(async (req: Request) => {
             if (dbError) throw dbError;
 
             // Send "Pending" Email
-            const transporter = createTransporter();
+            try {
+                const transporter = createTransporter();
 
-            const mailOptions = {
-                from: '"CodeKriti Team" <' + Deno.env.get('SMTP_USER') + '>',
-                to: email,
-                subject: `Registration Received: ${event} | CodeKriti`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a192f; color: #e6f1ff; padding: 40px 20px;">
-                        <div style="max-width: 600px; margin: auto; background-color: #112240; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                            
-                            <!-- Header -->
-                            <div style="background-color: #0a192f; padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
-                                <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
-                                <h1 style="color: #ccd6f6; margin-top: 15px; font-size: 24px; letter-spacing: 1px;">CodeKriti</h1>
-                            </div>
-
-                            <!-- Body -->
-                            <div style="padding: 40px 30px;">
-                                <h2 style="color: #64ffda; margin-top: 0;">Registration Received!</h2>
-                                <p style="font-size: 16px; line-height: 1.6; color: #8892b0;">
-                                    Hi <strong>${leaderName}</strong>,
-                                </p>
-                                <p style="font-size: 16px; line-height: 1.6; color: #8892b0;">
-                                    Thank you for registering for <strong>${event}</strong>. We have received your details and payment proof.
-                                </p>
+                const mailOptions = {
+                    from: '"CodeKriti Team" <codingclubpmec@gmail.com>',
+                    to: email,
+                    subject: `Registration Received: ${event} | CodeKriti`,
+                    html: `
+                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a192f; color: #e6f1ff; padding: 40px 20px;">
+                            <div style="max-width: 600px; margin: auto; background-color: #112240; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                                 
-                                <div style="background-color: #0a192f; border-left: 4px solid #64ffda; padding: 15px; margin: 25px 0; border-radius: 4px;">
-                                    <p style="margin: 0; color: #ccd6f6; font-weight: bold;">Status: Pending Verification</p>
-                                    <p style="margin: 5px 0 0; font-size: 14px; color: #8892b0;">Our team will verify your payment shortly.</p>
+                                <!-- Header -->
+                                <div style="background-color: #0a192f; padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
+                                    <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
+                                    <h1 style="color: #ccd6f6; margin-top: 15px; font-size: 24px; letter-spacing: 1px;">CodeKriti</h1>
                                 </div>
-
-                                <p style="font-size: 16px; line-height: 1.6; color: #8892b0;">
-                                    Once approved, you will receive another email with your **Official Ticket & QR Code**.
-                                </p>
-
-                                <div style="margin-top: 30px; border-top: 1px solid #233554; padding-top: 20px;">
-                                    <p style="margin: 5px 0; color: #8892b0; font-size: 14px;"><strong>Team:</strong> ${teamName}</p>
-                                    <p style="margin: 5px 0; color: #8892b0; font-size: 14px;"><strong>Transaction ID:</strong> ${utr}</p>
+    
+                                <!-- Body -->
+                                <div style="padding: 40px 30px;">
+                                    <h2 style="color: #64ffda; margin-top: 0;">Registration Received!</h2>
+                                    <p style="font-size: 16px; line-height: 1.6; color: #8892b0;">
+                                        Hi <strong>${leaderName}</strong>,
+                                    </p>
+                                    <p style="font-size: 16px; line-height: 1.6; color: #8892b0;">
+                                        Thank you for registering for <strong>${event}</strong>. We have received your details and payment proof.
+                                    </p>
+                                    
+                                    <div style="background-color: #0a192f; border-left: 4px solid #64ffda; padding: 15px; margin: 25px 0; border-radius: 4px;">
+                                        <p style="margin: 0; color: #ccd6f6; font-weight: bold;">Status: Pending Verification</p>
+                                        <p style="margin: 5px 0 0; font-size: 14px; color: #8892b0;">Our team will verify your payment shortly.</p>
+                                    </div>
+    
+                                    <p style="font-size: 16px; line-height: 1.6; color: #8892b0;">
+                                        Once approved, you will receive another email with your **Official Ticket & QR Code**.
+                                    </p>
+    
+                                    <div style="margin-top: 30px; border-top: 1px solid #233554; padding-top: 20px;">
+                                        <p style="margin: 5px 0; color: #8892b0; font-size: 14px;"><strong>Team:</strong> ${teamName}</p>
+                                        <p style="margin: 5px 0; color: #8892b0; font-size: 14px;"><strong>Transaction ID:</strong> ${utr}</p>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Footer -->
-                            <div style="background-color: #0a192f; padding: 20px; text-align: center; font-size: 12px; color: #8892b0;">
-                                <p>&copy; 2025 CodeKriti. All rights reserved.</p>
+    
+                                <!-- Footer -->
+                                <div style="background-color: #0a192f; padding: 20px; text-align: center; font-size: 12px; color: #8892b0;">
+                                    <p>&copy; 2025 CodeKriti. All rights reserved.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `,
-            };
-            await transporter.sendMail(mailOptions);
+                    `,
+                };
+                await transporter.sendMail(mailOptions);
+            } catch (emailError: any) {
+                console.error("Failed to send pending email:", emailError);
+            }
 
             return new Response(
                 JSON.stringify({ status: 'success', id: insertedData.id }),
@@ -165,68 +167,74 @@ Deno.serve(async (req: Request) => {
             const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrString)}&color=0a192f&bgcolor=64ffda`; // Custom colors for QR
 
             // 3. Send Confirmation Email
-            const transporter = createTransporter();
+            let emailSent = false;
+            try {
+                const transporter = createTransporter();
 
-            const mailOptions = {
-                from: '"CodeKriti Team" <' + Deno.env.get('SMTP_USER') + '>',
-                to: email,
-                subject: `🎟️ Ticket Confirmed: ${event} | CodeKriti`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a192f; margin: 0; padding: 20px 0;">
-                        <!-- Outer Wrapper with subtle oceanic gradient -->
-                        <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0a192f 0%, #112240 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554;">
-                            
-                            <!-- Header with Wave Effect (Simulated via gradient) -->
-                            <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
-                                <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
-                                <h1 style="color: #64ffda; margin-top: 15px; font-size: 28px; letter-spacing: 2px; text-transform: uppercase;">Ticket Confirmed</h1>
-                            </div>
-
-                            <!-- Body -->
-                            <div style="padding: 40px 30px; text-align: center;">
-                                <p style="font-size: 18px; color: #ccd6f6; margin-bottom: 30px;">
-                                    Get ready, <strong>${leaderName}</strong>! Your spot for <strong>${event}</strong> is secured.
-                                </p>
+                const mailOptions = {
+                    from: '"CodeKriti Team" <codingclubpmec@gmail.com>',
+                    to: email,
+                    subject: `🎟️ Ticket Confirmed: ${event} | CodeKriti`,
+                    html: `
+                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a192f; margin: 0; padding: 20px 0;">
+                            <!-- Outer Wrapper with subtle oceanic gradient -->
+                            <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0a192f 0%, #112240 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554;">
                                 
-                                <div style="background: rgba(100, 255, 218, 0.05); padding: 30px; border-radius: 12px; display: inline-block; border: 1px solid #64ffda; box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);">
-                                    <div style="background: #ffffff; padding: 10px; border-radius: 8px; display: inline-block;">
-                                        <img src="${qrImageUrl}" alt="Your Ticket QR" style="width: 100%; max-width: 250px; height: auto; display: block; margin: 0 auto;" />
-                                    </div>
-                                    <p style="margin-top: 15px; color: #64ffda; font-weight: bold; letter-spacing: 1px; word-break: break-all;">ID: ${id}</p>
+                                <!-- Header with Wave Effect (Simulated via gradient) -->
+                                <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
+                                    <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
+                                    <h1 style="color: #64ffda; margin-top: 15px; font-size: 28px; letter-spacing: 2px; text-transform: uppercase;">Ticket Confirmed</h1>
                                 </div>
 
-                                <p style="font-size: 14px; color: #8892b0; margin-top: 30px;">
-                                    Please present this QR code at the registration desk for check-in.
-                                </p>
-                            </div>
+                                <!-- Body -->
+                                <div style="padding: 40px 30px; text-align: center;">
+                                    <p style="font-size: 18px; color: #ccd6f6; margin-bottom: 30px;">
+                                        Get ready, <strong>${leaderName}</strong>! Your spot for <strong>${event}</strong> is secured.
+                                    </p>
+                                    
+                                    <div style="background: rgba(100, 255, 218, 0.05); padding: 30px; border-radius: 12px; display: inline-block; border: 1px solid #64ffda; box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);">
+                                        <div style="background: #ffffff; padding: 10px; border-radius: 8px; display: inline-block;">
+                                            <img src="${qrImageUrl}" alt="Your Ticket QR" style="width: 100%; max-width: 250px; height: auto; display: block; margin: 0 auto;" />
+                                        </div>
+                                        <p style="margin-top: 15px; color: #64ffda; font-weight: bold; letter-spacing: 1px; word-break: break-all;">ID: ${id}</p>
+                                    </div>
 
-                            <!-- Event Details -->
-                            <div style="background: rgba(23, 42, 69, 0.5); padding: 25px; border-top: 1px solid #233554;">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <tr>
-                                        <td style="padding: 8px; color: #8892b0; font-size: 14px;">Event</td>
-                                        <td style="padding: 8px; color: #ccd6f6; font-weight: bold; text-align: right;">${event}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px; color: #8892b0; font-size: 14px;">Team</td>
-                                        <td style="padding: 8px; color: #ccd6f6; font-weight: bold; text-align: right;">${teamName}</td>
-                                    </tr>
-                                </table>
-                            </div>
+                                    <p style="font-size: 14px; color: #8892b0; margin-top: 30px;">
+                                        Please present this QR code at the registration desk for check-in.
+                                    </p>
+                                </div>
 
-                            <!-- Footer -->
-                            <div style="background-color: #020c1b; padding: 20px; text-align: center; font-size: 12px; color: #8892b0; border-top: 1px solid #112240;">
-                                <p>See you at the event!</p>
-                                <p>&copy; 2025 CodeKriti. All rights reserved.</p>
+                                <!-- Event Details -->
+                                <div style="background: rgba(23, 42, 69, 0.5); padding: 25px; border-top: 1px solid #233554;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px; color: #8892b0; font-size: 14px;">Event</td>
+                                            <td style="padding: 8px; color: #ccd6f6; font-weight: bold; text-align: right;">${event}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; color: #8892b0; font-size: 14px;">Team</td>
+                                            <td style="padding: 8px; color: #ccd6f6; font-weight: bold; text-align: right;">${teamName}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <!-- Footer -->
+                                <div style="background-color: #020c1b; padding: 20px; text-align: center; font-size: 12px; color: #8892b0; border-top: 1px solid #112240;">
+                                    <p>See you at the event!</p>
+                                    <p>&copy; 2025 CodeKriti. All rights reserved.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `,
-            };
-            await transporter.sendMail(mailOptions);
+                    `,
+                };
+                await transporter.sendMail(mailOptions);
+                emailSent = true;
+            } catch (emailError: any) {
+                console.error("Failed to send confirmation email:", emailError);
+            }
 
             return new Response(
-                JSON.stringify({ status: 'success', message: 'Approved and Email Sent' }),
+                JSON.stringify({ status: 'success', message: 'Approved', emailSent }),
                 { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
@@ -344,54 +352,58 @@ Deno.serve(async (req: Request) => {
         if (action === 'CONTACT') {
             const { name, email, message } = payload;
 
-            const transporter = createTransporter();
+            try {
+                const transporter = createTransporter();
 
-            // Send to both Admin (SMTP_USER) and the specific user requested
-            const recipients = [Deno.env.get('SMTP_USER'), 'patraayushman21@gmail.com'];
+                // Send to both Admin (SMTP_USER) and the specific user requested
+                const recipients = [Deno.env.get('SMTP_USER'), 'patraayushman21@gmail.com'];
 
-            const mailOptions = {
-                from: '"CodeKriti Contact" <' + Deno.env.get('SMTP_USER') + '>',
-                to: recipients.join(','),
-                replyTo: email,
-                subject: `🌊 New Message from ${name} | CodeKriti Contact`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a192f; margin: 0; padding: 20px 0;">
-                        <!-- Outer Wrapper with subtle oceanic gradient -->
-                        <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0a192f 0%, #112240 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554;">
-                            
-                            <!-- Header -->
-                            <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
-                                <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
-                                <h1 style="color: #ccd6f6; margin-top: 15px; font-size: 24px; letter-spacing: 1px;">New Inquiry</h1>
-                            </div>
-
-                            <!-- Body -->
-                            <div style="padding: 40px 30px;">
-                                <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                                    <div style="width: 40px; height: 40px; background: rgba(100, 255, 218, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #64ffda; font-weight: bold; font-size: 18px;">
-                                        ${name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <p style="margin: 0; color: #64ffda; font-weight: bold; font-size: 18px;">${name}</p>
-                                        <p style="margin: 2px 0 0; color: #8892b0; font-size: 14px;"><a href="mailto:${email}" style="color: #8892b0; text-decoration: none;">${email}</a></p>
-                                    </div>
+                const mailOptions = {
+                    from: '"CodeKriti Contact" <' + Deno.env.get('SMTP_USER') + '>',
+                    to: recipients.join(','),
+                    replyTo: email,
+                    subject: `🌊 New Message from ${name} | CodeKriti Contact`,
+                    html: `
+                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a192f; margin: 0; padding: 20px 0;">
+                            <!-- Outer Wrapper with subtle oceanic gradient -->
+                            <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0a192f 0%, #112240 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #233554;">
+                                
+                                <!-- Header -->
+                                <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
+                                    <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover;">
+                                    <h1 style="color: #ccd6f6; margin-top: 15px; font-size: 24px; letter-spacing: 1px;">New Inquiry</h1>
                                 </div>
-
-                                <div style="background-color: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); position: relative;">
-                                    <span style="position: absolute; top: -10px; left: 20px; background: #0a192f; padding: 0 10px; color: #64ffda; font-size: 12px; font-weight: bold; letter-spacing: 1px;">MESSAGE</span>
-                                    <p style="font-size: 16px; line-height: 1.6; color: #e6f1ff; white-space: pre-wrap; margin: 0;">${message}</p>
-                                </div>
-
-                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #233554; text-align: center;">
-                                    <p style="color: #8892b0; font-size: 12px; margin: 0;">Sent via CodeKriti 4.0 Contact Form</p>
+    
+                                <!-- Body -->
+                                <div style="padding: 40px 30px;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                                        <div style="width: 40px; height: 40px; background: rgba(100, 255, 218, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #64ffda; font-weight: bold; font-size: 18px;">
+                                            ${name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p style="margin: 0; color: #64ffda; font-weight: bold; font-size: 18px;">${name}</p>
+                                            <p style="margin: 2px 0 0; color: #8892b0; font-size: 14px;"><a href="mailto:${email}" style="color: #8892b0; text-decoration: none;">${email}</a></p>
+                                        </div>
+                                    </div>
+    
+                                    <div style="background-color: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); position: relative;">
+                                        <span style="position: absolute; top: -10px; left: 20px; background: #0a192f; padding: 0 10px; color: #64ffda; font-size: 12px; font-weight: bold; letter-spacing: 1px;">MESSAGE</span>
+                                        <p style="font-size: 16px; line-height: 1.6; color: #e6f1ff; white-space: pre-wrap; margin: 0;">${message}</p>
+                                    </div>
+    
+                                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #233554; text-align: center;">
+                                        <p style="color: #8892b0; font-size: 12px; margin: 0;">Sent via CodeKriti 4.0 Contact Form</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `,
-            };
+                    `,
+                };
 
-            await transporter.sendMail(mailOptions);
+                await transporter.sendMail(mailOptions);
+            } catch (emailError: any) {
+                console.error("Failed to send contact email:", emailError);
+            }
 
             return new Response(
                 JSON.stringify({ status: 'success', message: 'Message sent successfully' }),
