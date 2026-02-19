@@ -1,7 +1,7 @@
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { ShoppingBag, FileText, CheckSquare } from 'lucide-react';
-import type { RegistrationFormData } from '@/types/registration';
+import type { RegistrationFormData } from '@/types/legacy-registration';
 import FormField from '../FormField';
 
 const FinalDetailsStep = () => {
@@ -80,8 +80,8 @@ const FinalDetailsStep = () => {
                             className="sr-only peer"
                         />
                         <div className={`w-5 h-5 border-2 rounded transition-all ${agreeToTerms
-                                ? 'bg-cyan-500 border-cyan-500'
-                                : 'bg-cyan-950/30 border-cyan-500/30 group-hover:border-cyan-500/50'
+                            ? 'bg-cyan-500 border-cyan-500'
+                            : 'bg-cyan-950/30 border-cyan-500/30 group-hover:border-cyan-500/50'
                             }`}>
                             {agreeToTerms && (
                                 <motion.svg

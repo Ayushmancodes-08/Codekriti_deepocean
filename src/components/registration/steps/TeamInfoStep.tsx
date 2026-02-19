@@ -1,7 +1,7 @@
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { Users, Plus, X, Mail } from 'lucide-react';
-import type { RegistrationFormData } from '@/types/registration';
+import type { RegistrationFormData } from '@/types/legacy-registration';
 import FormField from '../FormField';
 
 const TeamInfoStep = () => {

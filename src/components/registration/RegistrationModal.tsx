@@ -4,7 +4,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { registrationSchema, REGISTRATION_STEPS, type RegistrationFormData } from '@/types/registration';
+import { registrationSchema, REGISTRATION_STEPS, type RegistrationFormData } from '@/types/legacy-registration';
 import PersonalInfoStep from './steps/PersonalInfoStep';
 import AcademicInfoStep from './steps/AcademicInfoStep';
 import EventSelectionStep from './steps/EventSelectionStep';

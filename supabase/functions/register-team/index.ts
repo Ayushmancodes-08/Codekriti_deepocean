@@ -402,10 +402,17 @@ Deno.serve(async (req: Request) => {
         throw new Error('Invalid action');
 
     } catch (error: any) {
-        console.error(error);
+        console.error('Edge Function Error:', error);
         return new Response(
-            JSON.stringify({ status: 'error', message: error.message || 'Unknown error' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+            JSON.stringify({
+                status: 'error',
+                message: error.message || 'Internal Server Error',
+                details: error.stack // Helpful for debugging now
+            }),
+            {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 500
+            }
         );
     }
 });

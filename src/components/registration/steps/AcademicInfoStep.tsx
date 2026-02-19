@@ -1,7 +1,7 @@
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { GraduationCap, Building2, Calendar } from 'lucide-react';
-import type { RegistrationFormData } from '@/types/registration';
+import type { RegistrationFormData } from '@/types/legacy-registration';
 import FormField from '../FormField';
 
 const AcademicInfoStep = () => {

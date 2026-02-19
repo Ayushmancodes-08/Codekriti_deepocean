@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { REGISTRATION_STEPS } from '@/types/registration';
+import { REGISTRATION_STEPS } from '@/types/legacy-registration';
 
 interface ProgressIndicatorProps {
     currentStep: number;
@@ -44,8 +44,8 @@ const ProgressIndicator = ({ currentStep, totalSteps }: ProgressIndicatorProps) 
                                     : 'rgba(6, 182, 212, 0.1)',
                             }}
                             className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${step.step <= currentStep
-                                    ? 'border-cyan-400 text-cyan-300'
-                                    : 'border-cyan-700/50 text-cyan-700'
+                                ? 'border-cyan-400 text-cyan-300'
+                                : 'border-cyan-700/50 text-cyan-700'
                                 }`}
                         >
                             {/* Icon */}

@@ -1,7 +1,7 @@
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { Code, Lightbulb, Gamepad2, Check } from 'lucide-react';
-import type { RegistrationFormData } from '@/types/registration';
+import type { RegistrationFormData } from '@/types/legacy-registration';
 
 const EVENTS = [
     {
@@ -89,8 +89,8 @@ const EventSelectionStep = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`relative p-6 rounded-xl border-2 transition-all text-left ${isSelected
-                                    ? 'bg-cyan-500/20 border-cyan-400 shadow-lg shadow-cyan-500/20'
-                                    : 'bg-cyan-950/20 border-cyan-700/30 hover:border-cyan-600/50'
+                                ? 'bg-cyan-500/20 border-cyan-400 shadow-lg shadow-cyan-500/20'
+                                : 'bg-cyan-950/20 border-cyan-700/30 hover:border-cyan-600/50'
                                 }`}
                         >
                             {/* Selection Checkmark */}
