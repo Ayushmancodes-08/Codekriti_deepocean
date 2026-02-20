@@ -1,0 +1,1 @@
+import { z } from './node_modules/zod/lib/index.mjs'; const s = z.discriminatedUnion('type', [z.object({type: z.literal('a')})]); try { const r = s.safeParse(undefined); console.log('OK: errors=' + r.error?.issues?.length); } catch(e) { console.log('THROWS: ' + e.message); }  

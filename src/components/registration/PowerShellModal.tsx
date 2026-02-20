@@ -29,6 +29,10 @@ const PowerShellModal = ({ isOpen, onClose }: PowerShellModalProps) => {
     const methods = useForm<RegistrationFormData>({
         resolver: zodResolver(registrationSchema),
         mode: 'onBlur',
+        defaultValues: {
+            registrationType: 'team',
+            teamMembers: [],
+        } as any,
     });
 
     const { handleSubmit, setValue, trigger } = methods;

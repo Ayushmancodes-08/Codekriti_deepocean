@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 // Event configuration
-// Event configuration
 export const EVENTS = [
     {
         id: 'algo-to-code',
@@ -68,26 +67,11 @@ export const YEARS_OF_STUDY = ['1st Year', '2nd Year', '3rd Year', '4th Year', '
 
 // Event-specific college options
 export const EVENT_COLLEGES: Record<EventId, string[]> = {
-    'algo-to-code': [
-        'Parala Maharaja Engineering College',
-        'Other',
-    ],
-    'designathon': [
-        'Parala Maharaja Engineering College',
-        'Other',
-    ],
-    'innovation-challenge': [
-        'Parala Maharaja Engineering College',
-        'Other',
-    ],
-    'techmaze': [
-        'Parala Maharaja Engineering College',
-        'Other',
-    ],
-    'devxtreme': [
-        'Parala Maharaja Engineering College',
-        'Other',
-    ],
+    'algo-to-code': ['Parala Maharaja Engineering College', 'Other'],
+    'designathon': ['Parala Maharaja Engineering College', 'Other'],
+    'innovation-challenge': ['Parala Maharaja Engineering College', 'Other'],
+    'techmaze': ['Parala Maharaja Engineering College', 'Other'],
+    'devxtreme': ['Parala Maharaja Engineering College', 'Other'],
 };
 
 // Participant details schema
@@ -110,102 +94,105 @@ const teamMemberSchema = z.object({
     yearOfStudy: z.enum(YEARS_OF_STUDY, { errorMap: () => ({ message: 'Year is required' }) }),
 });
 
-// Main registration schema
-export const registrationSchema = z.discriminatedUnion('registrationType', [
-    // Solo registration
-    z.object({
-        registrationType: z.literal('solo'),
-        eventId: z.string(),
-        squadSize: z.literal(1),
-        participant: participantSchema.extend({
-            collegeCustom: z.string().optional(),
-        }),
-        subscribe: z.boolean().optional(),
-        transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
-        screenshotUrl: z.string().optional(),
-    }).superRefine((data, ctx) => {
-        // Validate that if college is 'Other', collegeCustom must be provided
-        if (data.participant.college === 'Other') {
+// Solo base schema — NO superRefine here (would make it ZodEffects, breaking discriminatedUnion)
+const soloBaseSchema = z.object({
+    registrationType: z.literal('solo'),
+    eventId: z.string(),
+    squadSize: z.literal(1),
+    participant: participantSchema.extend({
+        collegeCustom: z.string().optional(),
+    }),
+    subscribe: z.boolean().optional(),
+    transactionId: z.string({ required_error: 'Transaction ID is required' }).min(1, 'Transaction ID is required'),
+    screenshotUrl: z.string().optional(),
+});
+
+// Team base schema — NO superRefine here
+const teamBaseSchema = z.object({
+    registrationType: z.literal('team'),
+    eventId: z.string(),
+    squadSize: z.number().min(2).max(5),
+    teamName: z.string().min(2, 'Team name required').max(50, 'Team name too long'),
+    teamLeader: participantSchema.extend({
+        collegeCustom: z.string().optional(),
+    }),
+    teamMembers: z.array(teamMemberSchema.extend({
+        collegeCustom: z.string().optional(),
+    })).min(1, 'At least one team member required'),
+    subscribe: z.boolean().optional(),
+    transactionId: z.string({ required_error: 'Transaction ID is required' }).min(1, 'Transaction ID is required'),
+    screenshotUrl: z.string().optional(),
+    problemStatement: z.string().optional(),
+    solution: z.string().optional(),
+});
+
+// Build the discriminated union from plain ZodObject schemas (no superRefine on branches)
+const baseUnion = z.discriminatedUnion('registrationType', [soloBaseSchema, teamBaseSchema]);
+
+// Add all cross-field validations via superRefine on the UNION level
+export const registrationSchema = baseUnion.superRefine((data, ctx) => {
+    if (!data) return;
+
+    if (data.registrationType === 'solo') {
+        if (data.participant?.college === 'Other') {
             if (!data.participant.collegeCustom || data.participant.collegeCustom.length < 2) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: 'Please specify your college name',
-                    path: ['participant', 'collegeCustom']
-                });
-            }
-        }
-    }),
-    // Team registration
-    z.object({
-        registrationType: z.literal('team'),
-        eventId: z.string(),
-        squadSize: z.number().min(2).max(5),
-        teamName: z.string().min(2, 'Team name required').max(50, 'Team name too long'),
-        teamLeader: participantSchema.extend({
-            collegeCustom: z.string().optional(),
-        }),
-        teamMembers: z.array(teamMemberSchema.extend({
-            collegeCustom: z.string().optional(),
-        })).min(1, 'At least one team member required'),
-        subscribe: z.boolean().optional(),
-        transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
-        screenshotUrl: z.string().optional(),
-        problemStatement: z.string().optional(),
-        solution: z.string().optional(),
-    }).superRefine((data, ctx) => {
-        // Validate that if college is 'Other', collegeCustom must be provided
-        if (data.teamLeader.college === 'Other') {
-            if (!data.teamLeader.collegeCustom || data.teamLeader.collegeCustom.length < 2) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Please specify your college name',
-                    path: ['teamLeader', 'collegeCustom']
-                });
-            }
-        }
-        // Validate team members colleges
-        data.teamMembers.forEach((member, index) => {
-            if (member.college === 'Other') {
-                if (!member.collegeCustom || member.collegeCustom.length < 2) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: 'Please specify the college name',
-                        path: ['teamMembers', index, 'collegeCustom']
-                    });
-                }
-            }
-        });
-    }),
-]).superRefine((data, ctx) => {
-    // 1. Validate Squad Size based on Event
-    if (data.registrationType === 'team') {
-        const event = EVENTS.find(e => e.id === data.eventId);
-        if (event) {
-            if (data.squadSize < event.minTeamSize || data.squadSize > event.maxTeamSize) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: `Team size must be between ${event.minTeamSize} and ${event.maxTeamSize}`,
-                    path: ["squadSize"]
+                    path: ['participant', 'collegeCustom'],
                 });
             }
         }
     }
 
-    // 2. DevXtreme Specific Validations
-    if (data.registrationType === 'team' && data.eventId === 'devxtreme') {
-        if (!data.problemStatement || data.problemStatement.length < 10) {
+    if (data.registrationType === 'team') {
+        // College 'Other' validation for leader
+        if (data.teamLeader?.college === 'Other') {
+            if (!data.teamLeader.collegeCustom || data.teamLeader.collegeCustom.length < 2) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Please specify your college name',
+                    path: ['teamLeader', 'collegeCustom'],
+                });
+            }
+        }
+        // College 'Other' validation for members
+        (data.teamMembers || []).forEach((member, index) => {
+            if (member.college === 'Other') {
+                if (!member.collegeCustom || member.collegeCustom.length < 2) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'Please specify the college name',
+                        path: ['teamMembers', index, 'collegeCustom'],
+                    });
+                }
+            }
+        });
+        // Squad size validation
+        const event = EVENTS.find(e => e.id === data.eventId);
+        if (event && (data.squadSize < event.minTeamSize || data.squadSize > event.maxTeamSize)) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Problem Statement is required and must be detailed",
-                path: ["problemStatement"]
+                message: `Team size must be between ${event.minTeamSize} and ${event.maxTeamSize}`,
+                path: ['squadSize'],
             });
         }
-        if (!data.solution || data.solution.length < 10) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Solution description is required and must be detailed",
-                path: ["solution"]
-            });
+        // DevXtreme specific validations
+        if (data.eventId === 'devxtreme') {
+            if (!data.problemStatement || data.problemStatement.length < 10) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Problem Statement is required and must be detailed',
+                    path: ['problemStatement'],
+                });
+            }
+            if (!data.solution || data.solution.length < 10) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Solution description is required and must be detailed',
+                    path: ['solution'],
+                });
+            }
         }
     }
 });

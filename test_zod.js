@@ -1,0 +1,1 @@
+const z = require('./node_modules/zod/lib/index.cjs'); const s = z.discriminatedUnion('type', [z.object({type: z.literal('a')})]); try { const r = s.safeParse(undefined); console.log('OK:', JSON.stringify(r.error?.issues?.length)); } catch(e) { console.log('THROWS:', e.message); }  

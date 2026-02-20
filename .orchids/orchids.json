@@ -1,0 +1,9 @@
+{
+  "projectId": "2761ed84-68d3-4a9b-88fe-22a7a3d60ea1",
+  "createdAt": 1771585068715,
+  "version": "1.0",
+  "startupCommands": [
+    "C:\\Users\\patra\\.bun\\bin\\bun.exe install; C:\\Users\\patra\\.bun\\bin\\bun.exe run dev"
+  ],
+  "templateId": "any"
+}
