@@ -61,7 +61,7 @@ const PaymentUploadStep = ({ amount, onPaymentComplete, isUploading = false }: P
             <div className="text-center space-y-2">
                 <h3 className="text-xl font-semibold text-white">Payment Verification</h3>
                 <p className="text-gray-400 max-w-md mx-auto text-sm">
-                    Scan the QR code to pay <span className="text-cyan-400 font-bold text-lg">₹{amount}</span>
+                    Scan the QR code to pay <span className="text-cyan-400 font-bold text-lg">{amount}</span>
                 </p>
             </div>
 

@@ -59,14 +59,16 @@ const Footer = () => {
             {/* Social Icons */}
             <div className="flex gap-3 mt-2">
               {[
-                { icon: Twitter, href: '#', label: 'Twitter' },
+                { icon: Twitter, href: 'https://x.com/cddclubpmec', label: 'Twitter' },
                 { icon: MessageCircle, href: '#', label: 'Discord' }, // Using MessageCircle as Discord placeholder
-                { icon: Instagram, href: '#', label: 'Instagram' },
-                { icon: Github, href: '#', label: 'Github' }
+                { icon: Instagram, href: 'https://www.instagram.com/cdd_club_pmec', label: 'Instagram' },
+                { icon: Github, href: 'https://github.com/CodingClubPMEC', label: 'Github' }
               ].map((social, idx) => (
                 <a
                   key={idx}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-cyan-500/20 hover:border-cyan-500/50 cursor-pointer transition-all touch-manipulation"
                   aria-label={social.label}
                 >
