@@ -25,7 +25,7 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
 
     // Dynamic fee logic for DevXtreme
     if (formData.eventId === 'devxtreme') {
-        const isTeamReg = formData.registrationType === 'team';
+        const isTeamReg = (formData.registrationType ?? 'team') === 'team';
         const college = isTeamReg ? formData.teamLeader?.college : (formData as any).participant?.college;
         if (college) {
             const normalizedCollege = college.toLowerCase().trim();
@@ -41,7 +41,7 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
     }
 
     // Determine type and count
-    const isTeam = formData.registrationType === 'team';
+    const isTeam = (formData.registrationType ?? 'team') === 'team';
     const memberCount = isTeam && formData.teamMembers ? formData.teamMembers.length : 0;
     const requiredMembers = (formData.squadSize || 1) - 1;
 

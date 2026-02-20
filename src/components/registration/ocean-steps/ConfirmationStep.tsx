@@ -17,7 +17,7 @@ const ConfirmationStep = () => {
             </div>
 
             <div className="p-6 bg-[#0a192f] border border-cyan-500/20 rounded-xl space-y-6 shadow-[0_0_15px_rgba(6,182,212,0.05)]">
-                {data.registrationType === 'solo' ? (
+                {(data.registrationType ?? 'team') === 'solo' ? (
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-cyan-400 font-bold pb-3 border-b border-gray-700">
                             <User className="w-5 h-5" />
