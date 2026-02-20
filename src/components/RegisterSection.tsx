@@ -104,10 +104,6 @@ const RegisterSection = () => {
               className="mt-12 flex flex-col md:flex-row gap-6 justify-center items-center"
             >
               <div className="flex items-center gap-3 text-foreground/80">
-                <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs">✓</span>
-                <span className="font-body text-sm font-medium">Early Bird Access to 50+ Events</span>
-              </div>
-              <div className="flex items-center gap-3 text-foreground/80">
                 <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs">✓</span>
                 <span className="font-body text-sm font-medium">Official Certification from CodeKriti</span>
               </div>

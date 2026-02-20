@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useScrollProgress } from '@/hooks/useScrollProgress';
 import { Menu, X } from 'lucide-react';
 import { ASSETS } from '@/config/assets';
-import { smoothScrollTo } from '@/lib/smoothScroll';
+
 
 const navItems = [
   { name: 'Home', href: '#hero', id: 'hero' },
@@ -94,16 +94,14 @@ const Navbar = () => {
 
         {/* Desktop CTA Button */}
         <div className="hidden md:block">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              smoothScrollTo('events', { duration: 350 });
-            }}
-            className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95"
-            aria-label="Dive In"
+          <a
+            href="/assets/Brochurecokekriti.pdf"
+            download="CodeKriti_Brochure.pdf"
+            className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 inline-block"
+            aria-label="Download Brochure"
           >
-            <span className="relative z-10 text-white">Dive In</span>
-          </button>
+            <span className="relative z-10 text-white">Download Brochure</span>
+          </a>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -135,15 +133,14 @@ const Navbar = () => {
           ))}
 
           <div className="p-4">
-            <button
-              onClick={() => {
-                handleLinkClick();
-                smoothScrollTo('events', { duration: 350 });
-              }}
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold uppercase tracking-wider shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform h-[44px]" // Ensure 44px height
+            <a
+              href="/assets/Brochurecokekriti.pdf"
+              download="CodeKriti_Brochure.pdf"
+              onClick={handleLinkClick}
+              className="block w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold uppercase tracking-wider shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform h-[44px] text-center flex items-center justify-center" // Ensure 44px height
             >
-              Dive In
-            </button>
+              Download Brochure
+            </a>
           </div>
         </div>
       </div>

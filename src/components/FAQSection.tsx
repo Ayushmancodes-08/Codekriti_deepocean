@@ -9,7 +9,7 @@ const faqs = [
     },
     {
         question: "When & Where?",
-        answer: "Two high-voltage days at PMEC. From morning coding clashes to overnight hackathon grind — it's non-stop."
+        answer: "Two high-voltage days at PMEC. From morning coding clashes to the 8-hour hackathon grind — it's non-stop."
     },
     {
         question: "Who can participate?",
@@ -25,7 +25,7 @@ const faqs = [
     },
     {
         question: "Will food and accommodation be provided?",
-        answer: "Hackathon participants get dinner and breakfast. Work. Code. Repeat."
+        answer: "Hackathon participants get refreshments. Work. Code. Repeat."
     },
     {
         question: "What are the themes/tracks?",

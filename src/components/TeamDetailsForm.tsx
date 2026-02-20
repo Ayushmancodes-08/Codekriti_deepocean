@@ -43,6 +43,12 @@ const COLLEGES = [
   'Other',
 ];
 
+// Colleges for DevXtreme
+const DEVXTREME_COLLEGES = [
+  'Parala Maharaja Engineering College',
+  'Other',
+];
+
 export const TeamDetailsForm = React.forwardRef<
   HTMLFormElement,
   TeamDetailsFormProps
@@ -72,6 +78,13 @@ export const TeamDetailsForm = React.forwardRef<
     },
   });
 
+  // Watch for dynamic fields
+  const college = watch('college');
+  const selectedEvent = formState.selectedEvent;
+
+  // Use appropriate college list
+  const activeColleges = selectedEvent === 'dev-xtreme' ? DEVXTREME_COLLEGES : COLLEGES;
+
   const formValues = watch();
 
   // Update registration context with form data
@@ -99,7 +112,15 @@ export const TeamDetailsForm = React.forwardRef<
       setSubmitting(true);
 
       if (onSubmit) {
-        await onSubmit(data);
+        // Handle "Other" fields
+        const finalData = { ...data };
+        if (finalData.college === 'Other' && (data as any).collegeCustom) {
+          finalData.college = (data as any).collegeCustom;
+        }
+        // Clean up temporary fields
+        delete (finalData as any).collegeCustom;
+
+        await onSubmit(finalData);
       }
 
       setFormData({
@@ -146,9 +167,9 @@ export const TeamDetailsForm = React.forwardRef<
     >
       {/* Header with member count indicator */}
       <motion.div className="mb-6" variants={fieldVariantsAccessible}>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Details</h3>
+        <h3 className="text-lg font-semibold text-white mb-2">Team Details</h3>
         {teamSizeLimits && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-400">
             Team size: {teamSizeLimits.min} - {teamSizeLimits.max} members
           </p>
         )}
@@ -160,8 +181,8 @@ export const TeamDetailsForm = React.forwardRef<
         variants={fieldVariantsAccessible}
         animate={shakeField === 'name' ? 'shake' : 'still'}
       >
-        <Label htmlFor="teamName" className="text-sm font-medium">
-          Team Name <span className="text-red-500">*</span>
+        <Label htmlFor="teamName" className="text-sm font-medium text-gray-300">
+          Team Name <span className="text-cyan-400">*</span>
         </Label>
         <motion.div
           variants={errorShakeVariants}
@@ -171,9 +192,10 @@ export const TeamDetailsForm = React.forwardRef<
             id="teamName"
             placeholder="Enter your team name"
             {...register('name')}
-            className={`transition-all ${
-              errors.name ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-            }`}
+            className={`bg-[#0a192f] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.name
+                ? 'border-red-500 focus:ring-red-500'
+                : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+              }`}
             aria-invalid={errors.name ? 'true' : 'false'}
             aria-describedby={errors.name ? 'teamName-error' : undefined}
           />
@@ -181,7 +203,7 @@ export const TeamDetailsForm = React.forwardRef<
         {errors.name && (
           <motion.p
             id="teamName-error"
-            className="text-sm text-red-500"
+            className="text-sm text-red-400"
             variants={errorVariants}
             initial="hidden"
             animate="visible"
@@ -198,8 +220,8 @@ export const TeamDetailsForm = React.forwardRef<
         variants={fieldVariantsAccessible}
         animate={shakeField === 'college' ? 'shake' : 'still'}
       >
-        <Label htmlFor="teamCollege" className="text-sm font-medium">
-          College <span className="text-red-500">*</span>
+        <Label htmlFor="teamCollege" className="text-sm font-medium text-gray-300">
+          College <span className="text-cyan-400">*</span>
         </Label>
         <motion.div
           variants={errorShakeVariants}
@@ -208,17 +230,18 @@ export const TeamDetailsForm = React.forwardRef<
           <Select onValueChange={(value) => setValue('college', value)}>
             <SelectTrigger
               id="teamCollege"
-              className={`transition-all ${
-                errors.college ? 'border-red-500' : 'focus:ring-orange-500'
-              }`}
+              className={`bg-[#0a192f] border-gray-700 text-white transition-all ${errors.college
+                  ? 'border-red-500'
+                  : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                }`}
               aria-invalid={errors.college ? 'true' : 'false'}
               aria-describedby={errors.college ? 'teamCollege-error' : undefined}
             >
               <SelectValue placeholder="Select your college" />
             </SelectTrigger>
-            <SelectContent>
-              {COLLEGES.map((college) => (
-                <SelectItem key={college} value={college}>
+            <SelectContent className="bg-[#0a192f] border-gray-700 text-white">
+              {activeColleges.map((college) => (
+                <SelectItem key={college} value={college} className="focus:bg-cyan-900/50 focus:text-cyan-400">
                   {college}
                 </SelectItem>
               ))}
@@ -228,7 +251,7 @@ export const TeamDetailsForm = React.forwardRef<
         {errors.college && (
           <motion.p
             id="teamCollege-error"
-            className="text-sm text-red-500"
+            className="text-sm text-red-400"
             variants={errorVariants}
             initial="hidden"
             animate="visible"
@@ -239,9 +262,30 @@ export const TeamDetailsForm = React.forwardRef<
         )}
       </motion.div>
 
+      {/* Custom College Input */}
+      {college === 'Other' && (
+        <motion.div
+          className="space-y-2"
+          variants={fieldVariantsAccessible}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <Label htmlFor="teamCollegeCustom" className="text-sm font-medium text-gray-300">
+            Enter College Name <span className="text-cyan-400">*</span>
+          </Label>
+          <Input
+            id="teamCollegeCustom"
+            placeholder="Enter your college name"
+            {...register('collegeCustom' as any)}
+            className="bg-[#0a192f] border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+          />
+        </motion.div>
+      )}
+
       {/* Team Leader Section */}
-      <motion.div className="space-y-4 pt-4 border-t border-gray-200" variants={fieldVariantsAccessible}>
-        <h4 className="text-base font-semibold text-gray-900">Team Leader Information</h4>
+      <motion.div className="space-y-4 pt-4 border-t border-gray-700" variants={fieldVariantsAccessible}>
+        <h4 className="text-base font-semibold text-white">Team Leader Information</h4>
 
         {/* Leader Name Field */}
         <motion.div
@@ -249,8 +293,8 @@ export const TeamDetailsForm = React.forwardRef<
           variants={fieldVariantsAccessible}
           animate={shakeField === 'leader.name' ? 'shake' : 'still'}
         >
-          <Label htmlFor="leaderName" className="text-sm font-medium">
-            Leader Name <span className="text-red-500">*</span>
+          <Label htmlFor="leaderName" className="text-sm font-medium text-gray-300">
+            Leader Name <span className="text-cyan-400">*</span>
           </Label>
           <motion.div
             variants={errorShakeVariants}
@@ -260,9 +304,10 @@ export const TeamDetailsForm = React.forwardRef<
               id="leaderName"
               placeholder="Enter team leader's full name"
               {...register('leader.name')}
-              className={`transition-all ${
-                errors.leader?.name ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-              }`}
+              className={`bg-[#0a192f] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.leader?.name
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                }`}
               aria-invalid={errors.leader?.name ? 'true' : 'false'}
               aria-describedby={errors.leader?.name ? 'leaderName-error' : undefined}
             />
@@ -270,7 +315,7 @@ export const TeamDetailsForm = React.forwardRef<
           {errors.leader?.name && (
             <motion.p
               id="leaderName-error"
-              className="text-sm text-red-500"
+              className="text-sm text-red-400"
               variants={errorVariants}
               initial="hidden"
               animate="visible"
@@ -287,8 +332,8 @@ export const TeamDetailsForm = React.forwardRef<
           variants={fieldVariantsAccessible}
           animate={shakeField === 'leader.phoneNumber' ? 'shake' : 'still'}
         >
-          <Label htmlFor="leaderPhone" className="text-sm font-medium">
-            Phone Number <span className="text-red-500">*</span>
+          <Label htmlFor="leaderPhone" className="text-sm font-medium text-gray-300">
+            Phone Number <span className="text-cyan-400">*</span>
           </Label>
           <motion.div
             variants={errorShakeVariants}
@@ -299,11 +344,10 @@ export const TeamDetailsForm = React.forwardRef<
               type="tel"
               placeholder="Enter 10-digit phone number"
               {...register('leader.phoneNumber')}
-              className={`transition-all ${
-                errors.leader?.phoneNumber
+              className={`bg-[#0a192f] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.leader?.phoneNumber
                   ? 'border-red-500 focus:ring-red-500'
-                  : 'focus:ring-orange-500'
-              }`}
+                  : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                }`}
               aria-invalid={errors.leader?.phoneNumber ? 'true' : 'false'}
               aria-describedby={errors.leader?.phoneNumber ? 'leaderPhone-error' : undefined}
             />
@@ -311,7 +355,7 @@ export const TeamDetailsForm = React.forwardRef<
           {errors.leader?.phoneNumber && (
             <motion.p
               id="leaderPhone-error"
-              className="text-sm text-red-500"
+              className="text-sm text-red-400"
               variants={errorVariants}
               initial="hidden"
               animate="visible"
@@ -328,8 +372,8 @@ export const TeamDetailsForm = React.forwardRef<
           variants={fieldVariantsAccessible}
           animate={shakeField === 'leader.email' ? 'shake' : 'still'}
         >
-          <Label htmlFor="leaderEmail" className="text-sm font-medium">
-            Email <span className="text-red-500">*</span>
+          <Label htmlFor="leaderEmail" className="text-sm font-medium text-gray-300">
+            Email <span className="text-cyan-400">*</span>
           </Label>
           <motion.div
             variants={errorShakeVariants}
@@ -340,9 +384,10 @@ export const TeamDetailsForm = React.forwardRef<
               type="email"
               placeholder="Enter team leader's email address"
               {...register('leader.email')}
-              className={`transition-all ${
-                errors.leader?.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-              }`}
+              className={`bg-[#0a192f] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.leader?.email
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                }`}
               aria-invalid={errors.leader?.email ? 'true' : 'false'}
               aria-describedby={errors.leader?.email ? 'leaderEmail-error' : undefined}
             />
@@ -350,7 +395,7 @@ export const TeamDetailsForm = React.forwardRef<
           {errors.leader?.email && (
             <motion.p
               id="leaderEmail-error"
-              className="text-sm text-red-500"
+              className="text-sm text-red-400"
               variants={errorVariants}
               initial="hidden"
               animate="visible"
@@ -369,14 +414,14 @@ export const TeamDetailsForm = React.forwardRef<
           onClick={onBack}
           disabled={isSubmitting || isLoading}
           variant="outline"
-          className="flex-1 min-h-11 md:min-h-10 touch-manipulation"
+          className="flex-1 min-h-11 md:min-h-10 touch-manipulation border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
         >
           Back
         </Button>
         <Button
           type="submit"
           disabled={isSubmitting || isLoading}
-          className="flex-1 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold py-3 md:py-2 px-4 rounded-lg transition-all duration-200 min-h-11 md:min-h-10 touch-manipulation"
+          className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold py-3 md:py-2 px-4 rounded-lg transition-all duration-200 min-h-11 md:min-h-10 touch-manipulation shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
         >
           {isSubmitting || isLoading ? 'Processing...' : 'Add Team Members'}
         </Button>

@@ -11,6 +11,7 @@ const HorizontalTimelineEvents = lazy(() => import('../components/HorizontalTime
 const FAQSection = lazy(() => import('../components/FAQSection'));
 
 const RegisterSection = lazy(() => import('../components/RegisterSection'));
+const EventCardsSection = lazy(() => import('../components/EventCardsSection'));
 const ContactSection = lazy(() => import('../components/ContactSection'));
 const Footer = lazy(() => import('../components/Footer'));
 import SmoothScroll from '../components/SmoothScroll';
@@ -72,6 +73,9 @@ const Index = () => {
               <AboutSection />
             </Suspense>
           </div>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+            <EventCardsSection />
+          </Suspense>
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
             <HorizontalTimelineEvents />
           </Suspense>

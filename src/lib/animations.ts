@@ -54,11 +54,11 @@ export const fieldVariants: Variants = {
  */
 export const fieldFocusVariants: Variants = {
   unfocused: {
-    boxShadow: '0 0 0 0px rgba(255, 107, 53, 0)',
+    boxShadow: '0 0 0 0px rgba(6, 182, 212, 0)',
     transition: { duration: 0.2 },
   },
   focused: {
-    boxShadow: '0 0 0 3px rgba(255, 107, 53, 0.1)',
+    boxShadow: '0 0 0 3px rgba(6, 182, 212, 0.3)',
     transition: { duration: 0.2 },
   },
 };
@@ -194,7 +194,7 @@ export const touchRippleVariants: Variants = {
 export const interactiveTouchVariants: Variants = {
   idle: { backgroundColor: 'transparent' },
   active: {
-    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    backgroundColor: 'rgba(6, 182, 212, 0.2)',
     transition: { duration: 0.15 },
   },
 };

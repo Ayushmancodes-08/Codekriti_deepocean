@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 
 const sponsors = [
-    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme",
-    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme",
-    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme"
+    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme", "Designathon",
+    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme", "Designathon",
+    "Algo to Code", "Tech Maze", "Innovation Challenge", "DevXtreme", "Designathon"
 ];
 
 const SponsorsRibbon = () => {

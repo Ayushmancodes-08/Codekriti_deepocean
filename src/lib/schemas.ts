@@ -63,7 +63,10 @@ export const SingleParticipantSchema = z.object({
     .regex(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
   branch: z.string().min(1, 'Branch is required'),
+  branchCustom: z.string().optional(),
   year: z.string().min(1, 'Year is required'),
+  yearCustom: z.string().optional(),
+  collegeCustom: z.string().optional(),
 });
 
 export type SingleParticipant = z.infer<typeof SingleParticipantSchema>;
@@ -89,7 +92,10 @@ export const TeamMemberSchema = z.object({
     .regex(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
   branch: z.string().min(1, 'Branch is required'),
+  branchCustom: z.string().optional(),
   year: z.string().min(1, 'Year is required'),
+  yearCustom: z.string().optional(),
+  collegeCustom: z.string().optional(),
 });
 
 export type TeamMember = z.infer<typeof TeamMemberSchema>;
@@ -110,6 +116,7 @@ export type TeamLeader = z.infer<typeof TeamLeaderSchema>;
 export const TeamDetailsSchema = z.object({
   name: z.string().min(1, 'Team name is required').min(2, 'Team name must be at least 2 characters'),
   college: z.string().min(1, 'College is required'),
+  collegeCustom: z.string().optional(),
   leader: TeamLeaderSchema,
 });
 

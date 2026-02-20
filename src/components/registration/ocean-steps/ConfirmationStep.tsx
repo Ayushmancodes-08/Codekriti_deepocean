@@ -9,17 +9,17 @@ const ConfirmationStep = () => {
     return (
         <div className="space-y-6">
             <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00D9FF] to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#00D9FF]/30">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
                     <CheckCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Confirm Your Registration</h3>
-                <p className="text-gray-400">Review your information before diving in</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Confirm Your Registration</h3>
+                <p className="text-gray-400 text-sm">Review your information before final submission</p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-[#00D9FF]/10 to-blue-500/10 border-2 border-[#00D9FF]/30 rounded-xl space-y-6">
+            <div className="p-6 bg-[#0a192f] border border-cyan-500/20 rounded-xl space-y-6 shadow-[0_0_15px_rgba(6,182,212,0.05)]">
                 {data.registrationType === 'solo' ? (
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-[#00D9FF] font-bold pb-3 border-b border-[#00D9FF]/30">
+                        <div className="flex items-center gap-2 text-cyan-400 font-bold pb-3 border-b border-gray-700">
                             <User className="w-5 h-5" />
                             Solo Participant
                         </div>
@@ -31,7 +31,7 @@ const ConfirmationStep = () => {
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">Email</p>
-                                <p className="text-white font-medium">{data.participant?.email || '-'}</p>
+                                <p className="text-white font-medium break-all">{data.participant?.email || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">Phone</p>
@@ -53,8 +53,8 @@ const ConfirmationStep = () => {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        <div className="flex items-center justify-between pb-3 border-b border-[#00D9FF]/30">
-                            <div className="flex items-center gap-2 text-[#00D9FF] font-bold">
+                        <div className="flex items-center justify-between pb-3 border-b border-gray-700">
+                            <div className="flex items-center gap-2 text-cyan-400 font-bold">
                                 <Users className="w-5 h-5" />
                                 Team Registration
                             </div>
@@ -62,7 +62,7 @@ const ConfirmationStep = () => {
                         </div>
 
                         {/* Team Leader */}
-                        <div className="p-4 bg-[#1A1A2E]/50 rounded-lg border border-[#00D9FF]/20">
+                        <div className="p-4 bg-[#112240] rounded-lg border border-gray-700">
                             <p className="text-cyan-400 font-bold mb-3 flex items-center gap-2">
                                 <User className="w-4 h-4" />
                                 Team Leader
@@ -74,7 +74,7 @@ const ConfirmationStep = () => {
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-xs mb-1">Email</p>
-                                    <p className="text-white">{data.teamLeader?.email || '-'}</p>
+                                    <p className="text-white break-all">{data.teamLeader?.email || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-xs mb-1">Phone</p>
@@ -90,16 +90,16 @@ const ConfirmationStep = () => {
                         {/* Team Members */}
                         {data.teamMembers && data.teamMembers.length > 0 && (
                             <div>
-                                <p className="text-white font-bold mb-3">Team Members ({data.teamMembers.length})</p>
+                                <p className="text-white font-bold mb-3 text-sm">Team Members ({data.teamMembers.length})</p>
                                 <div className="space-y-3">
                                     {data.teamMembers.map((member, idx) => (
-                                        <div key={idx} className="p-3 bg-[#1A1A2E]/30 rounded-lg border border-[#00D9FF]/10">
+                                        <div key={idx} className="p-3 bg-[#112240] rounded-lg border border-gray-700">
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <p className="text-white font-medium">{member.name}</p>
+                                                    <p className="text-white font-medium text-sm">{member.name}</p>
                                                     <p className="text-gray-400 text-xs">{member.email}</p>
                                                 </div>
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00D9FF] to-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                                                <div className="w-6 h-6 rounded-full bg-cyan-900/50 flex items-center justify-center text-cyan-400 text-xs font-bold border border-cyan-500/30">
                                                     {idx + 1}
                                                 </div>
                                             </div>
@@ -113,25 +113,25 @@ const ConfirmationStep = () => {
             </div>
 
             {/* Newsletter Subscription */}
-            <div className="p-4 rounded-xl border border-[#00D9FF]/30 bg-[#1A1A2E]/50 flex items-start gap-3">
+            <div className="p-4 rounded-xl border border-gray-700 bg-[#0a192f] flex items-start gap-3 hover:border-cyan-500/30 transition-colors">
                 <input
                     type="checkbox"
                     id="subscribe"
-                    className="mt-1 w-4 h-4 rounded border-gray-600 bg-black/50 text-[#00D9FF] focus:ring-[#00D9FF] focus:ring-offset-0"
+                    className="mt-1 w-4 h-4 rounded border-gray-600 bg-[#112240] text-cyan-500 focus:ring-cyan-500 focus:ring-offset-0"
                     {...useFormContext().register('subscribe')}
                 />
-                <label htmlFor="subscribe" className="text-sm text-gray-300 cursor-pointer select-none">
-                    <span className="text-white font-bold block mb-1">Subscribe to Abyss Daily</span>
-                    Get daily updates, match schedules, and exclusive CodeKriti news delivered to your inbox.
+                <label htmlFor="subscribe" className="text-sm text-gray-400 cursor-pointer select-none">
+                    <span className="text-white font-medium block mb-1">Subscribe to CodeKriti Newsletter</span>
+                    Get updates, match schedules, and exclusive news delivered to your inbox.
                 </label>
             </div>
 
-            <div className="p-4 bg-gradient-to-r from-[#00D9FF]/20 to-blue-500/20 border border-[#00D9FF]/50 rounded-xl">
+            <div className="p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-xl">
                 <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#00D9FF]" />
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
                     <div>
-                        <p className="text-white font-bold">Ready to Submit!</p>
-                        <p className="text-gray-300 text-sm">Click "Complete Registration" to finish</p>
+                        <p className="text-emerald-100 font-bold text-sm">Ready to Submit!</p>
+                        <p className="text-emerald-400/70 text-xs">Click "Complete Registration" to finish</p>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Waves, ArrowLeft, CheckCircle2, PartyPopper } from 'lucide-react';
+import { X, ArrowLeft, CheckCircle2, PartyPopper } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -12,6 +13,7 @@ import TeamMembersStep from './ocean-steps/TeamMembersStep';
 import RegistrationSummary from './ocean-steps/RegistrationSummary';
 import PaymentUploadStep from './ocean-steps/PaymentUploadStep';
 import { submitRegistration, uploadScreenshot } from '@/utils/supabaseClient';
+import { ASSETS } from '@/config/assets';
 
 interface OceanRegistrationModalProps {
     isOpen: boolean;
@@ -132,6 +134,14 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
             // Use passed fileData if available, otherwise fall back to state
             const finalFile = (fileDataOverride && 'base64' in fileDataOverride) ? fileDataOverride : uploadedFile;
 
+            // Helper function to get actual college value (handling custom entries)
+            const getCollegeValue = (college: string, customCollege?: string): string => {
+                if (college === 'Other' && customCollege) {
+                    return customCollege;
+                }
+                return college;
+            };
+
             // 1. Upload Screenshot first if exists
             let screenshotUrl = '';
             if (finalFile && finalFile.fileObject) {
@@ -154,19 +164,23 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
             // Structure data for Supabase
             let dbData: any;
             if (data.registrationType === 'team') {
+                const teamLeaderCollege = getCollegeValue(
+                    data.teamLeader.college,
+                    (data.teamLeader as any).collegeCustom
+                );
                 dbData = {
                     teamName: data.teamName,
                     leaderName: data.teamLeader.name,
                     email: data.teamLeader.email,
                     phone: data.teamLeader.phone,
-                    college: data.teamLeader.college,
+                    college: teamLeaderCollege,
                     branch: data.teamLeader.branch,
                     year: data.teamLeader.yearOfStudy,
                     members: data.teamMembers.map(m => ({
                         name: m.name,
                         email: m.email,
                         phone: m.phone,
-                        college: m.college,
+                        college: getCollegeValue(m.college, (m as any).collegeCustom),
                         branch: m.branch,
                         year: m.yearOfStudy
                     })),
@@ -178,12 +192,16 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                     solution: data.solution,
                 };
             } else {
+                const participantCollege = getCollegeValue(
+                    data.participant.college,
+                    (data.participant as any).collegeCustom
+                );
                 dbData = {
                     teamName: 'Solo - ' + data.participant.name,
                     leaderName: data.participant.name,
                     email: data.participant.email,
                     phone: data.participant.phone,
-                    college: data.participant.college,
+                    college: participantCollege,
                     branch: data.participant.branch,
                     year: data.participant.yearOfStudy,
                     members: [],
@@ -227,7 +245,9 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
 
     const onSubmit = (data: RegistrationFormData) => processRegistration(data);
 
-    return (
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <motion.div
@@ -312,13 +332,60 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                 MISSION ASSIGNMENT PENDING
                                             </div>
 
-                                            <button
-                                                onClick={handleClose}
-                                                className="group relative w-full py-4 bg-transparent border-2 border-[#00D9FF] text-[#00D9FF] font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-[#00D9FF] hover:text-[#0a192f] transition-all duration-300 overflow-hidden"
-                                            >
-                                                <span className="relative z-10">Return to Surface</span>
-                                                <div className="absolute inset-x-0 bottom-0 h-0 bg-white group-hover:h-full transition-all duration-300 opacity-10" />
-                                            </button>
+                                            <div className="flex flex-col gap-3">
+                                                {/* Dynamic Rulebook/Sponsor Button */}
+                                                {(() => {
+                                                    const isDesignathon = ticketData?.event?.toLowerCase().includes('designathon');
+                                                    const rulebookMap: Record<string, string> = {
+                                                        'algo-to-code': '/assets/AlgotoCode.pdf',
+                                                        'designathon': '/assets/PS_with_overall Solution.pdf',
+                                                        'innovation-challenge': '/assets/Innovation Challenge.pdf',
+                                                        'techmaze': '/assets/TechMaze.pdf',
+                                                        'devxtreme': '/assets/Devxtreme.pdf',
+                                                    };
+                                                    // Try to match event ID from name or check if there's a way to persist ID better
+                                                    // Since we have ticketData.event which is likely the display name, we might need to map it back or pass ID safely.
+                                                    // Actually, inside processRegistration we have data.eventId.
+                                                    // But here we are in the render phase of ticketData.
+                                                    // Let's rely on the fact that we can re-derive or just use selectedEvent state if available?
+                                                    // Yes, selectedEvent state should still be valid here as we haven't closed the modal.
+
+                                                    const currentEventId = selectedEvent;
+                                                    const downloadLink = currentEventId ? rulebookMap[currentEventId] : null;
+
+                                                    if (!downloadLink) return null;
+
+                                                    return (
+                                                        <button
+                                                            onClick={() => {
+                                                                const link = document.createElement('a');
+                                                                link.href = downloadLink;
+                                                                link.download = downloadLink.split('/').pop() || 'document.pdf';
+                                                                document.body.appendChild(link);
+                                                                link.click();
+                                                                document.body.removeChild(link);
+                                                            }}
+                                                            className={`group relative w-full py-4 bg-transparent border-2 font-black uppercase tracking-[0.3em] text-xs rounded-2xl transition-all duration-300 overflow-hidden ${isDesignathon
+                                                                ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-[#0a192f]'
+                                                                : 'border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda] hover:text-[#0a192f]'
+                                                                }`}
+                                                        >
+                                                            <span className="relative z-10">
+                                                                {currentEventId === 'designathon' ? 'P.S by Our Sponsors' : 'Download Rulebook'}
+                                                            </span>
+                                                            <div className="absolute inset-x-0 bottom-0 h-0 bg-white group-hover:h-full transition-all duration-300 opacity-10" />
+                                                        </button>
+                                                    );
+                                                })()}
+
+                                                <button
+                                                    onClick={handleClose}
+                                                    className="group relative w-full py-4 bg-transparent border-2 border-[#00D9FF] text-[#00D9FF] font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-[#00D9FF] hover:text-[#0a192f] transition-all duration-300 overflow-hidden"
+                                                >
+                                                    <span className="relative z-10">Return to Surface</span>
+                                                    <div className="absolute inset-x-0 bottom-0 h-0 bg-white group-hover:h-full transition-all duration-300 opacity-10" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -346,12 +413,12 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                             </button>
                                         )}
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-900/50 to-black/50 border border-[#00D9FF]/30 flex items-center justify-center shadow-[0_0_15px_rgba(0,217,255,0.2)]">
-                                                <Waves className="w-5 h-5 text-[#00D9FF] animate-pulse" />
+                                            <div className="w-12 h-12 rounded-full bg-black/50 border border-[#00D9FF]/30 flex items-center justify-center shadow-[0_0_15px_rgba(0,217,255,0.2)] overflow-hidden">
+                                                <img src={ASSETS.LOGO} alt="CodeKriti" className="w-full h-full object-cover" />
                                             </div>
                                             <div>
                                                 <h2 className="text-xl font-bold bg-gradient-to-r from-[#00D9FF] via-cyan-200 to-blue-400 bg-clip-text text-transparent tracking-tight">
-                                                    Deep Dive Registration
+                                                    CodeKriti Registration
                                                 </h2>
                                                 {selectedEvent && (
                                                     <p className="text-[#00D9FF]/60 text-[10px] uppercase font-bold tracking-[0.1em] flex items-center gap-2">
@@ -468,7 +535,8 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 };
 

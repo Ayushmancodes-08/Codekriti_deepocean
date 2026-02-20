@@ -13,10 +13,19 @@ export const EVENTS = [
         category: 'Intra-College',
     },
     {
+        id: 'designathon',
+        name: 'Designathon',
+        minTeamSize: 1,
+        maxTeamSize: 1,
+        description: 'UI/UX Design Challenge',
+        entryFee: '₹60',
+        category: 'Intra-College',
+    },
+    {
         id: 'innovation-challenge',
         name: 'Innovation Challenge',
         minTeamSize: 2,
-        maxTeamSize: 3,
+        maxTeamSize: 2,
         description: 'Idea Pitch & Innovation',
         entryFee: '₹60',
         category: 'Intra-College',
@@ -24,7 +33,7 @@ export const EVENTS = [
     {
         id: 'techmaze',
         name: 'Tech Maze',
-        minTeamSize: 2,
+        minTeamSize: 3,
         maxTeamSize: 3,
         description: 'Fun Technical Event',
         entryFee: '₹90',
@@ -57,6 +66,30 @@ export const BRANCHES = [
 // Year of study
 export const YEARS_OF_STUDY = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Other'] as const;
 
+// Event-specific college options
+export const EVENT_COLLEGES: Record<EventId, string[]> = {
+    'algo-to-code': [
+        'Parala Maharaja Engineering College',
+        'Other',
+    ],
+    'designathon': [
+        'Parala Maharaja Engineering College',
+        'Other',
+    ],
+    'innovation-challenge': [
+        'Parala Maharaja Engineering College',
+        'Other',
+    ],
+    'techmaze': [
+        'Parala Maharaja Engineering College',
+        'Other',
+    ],
+    'devxtreme': [
+        'Parala Maharaja Engineering College',
+        'Other',
+    ],
+};
+
 // Participant details schema
 const participantSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -84,10 +117,23 @@ export const registrationSchema = z.discriminatedUnion('registrationType', [
         registrationType: z.literal('solo'),
         eventId: z.string(),
         squadSize: z.literal(1),
-        participant: participantSchema,
+        participant: participantSchema.extend({
+            collegeCustom: z.string().optional(),
+        }),
         subscribe: z.boolean().optional(),
         transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
         screenshotUrl: z.string().optional(),
+    }).superRefine((data, ctx) => {
+        // Validate that if college is 'Other', collegeCustom must be provided
+        if (data.participant.college === 'Other') {
+            if (!data.participant.collegeCustom || data.participant.collegeCustom.length < 2) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Please specify your college name',
+                    path: ['participant', 'collegeCustom']
+                });
+            }
+        }
     }),
     // Team registration
     z.object({
@@ -95,15 +141,57 @@ export const registrationSchema = z.discriminatedUnion('registrationType', [
         eventId: z.string(),
         squadSize: z.number().min(2).max(5),
         teamName: z.string().min(2, 'Team name required').max(50, 'Team name too long'),
-        teamLeader: participantSchema,
-        teamMembers: z.array(teamMemberSchema).min(1, 'At least one team member required'),
+        teamLeader: participantSchema.extend({
+            collegeCustom: z.string().optional(),
+        }),
+        teamMembers: z.array(teamMemberSchema.extend({
+            collegeCustom: z.string().optional(),
+        })).min(1, 'At least one team member required'),
         subscribe: z.boolean().optional(),
         transactionId: z.string({ required_error: "Transaction ID is required" }).min(1, "Transaction ID is required"),
         screenshotUrl: z.string().optional(),
         problemStatement: z.string().optional(),
         solution: z.string().optional(),
+    }).superRefine((data, ctx) => {
+        // Validate that if college is 'Other', collegeCustom must be provided
+        if (data.teamLeader.college === 'Other') {
+            if (!data.teamLeader.collegeCustom || data.teamLeader.collegeCustom.length < 2) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Please specify your college name',
+                    path: ['teamLeader', 'collegeCustom']
+                });
+            }
+        }
+        // Validate team members colleges
+        data.teamMembers.forEach((member, index) => {
+            if (member.college === 'Other') {
+                if (!member.collegeCustom || member.collegeCustom.length < 2) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'Please specify the college name',
+                        path: ['teamMembers', index, 'collegeCustom']
+                    });
+                }
+            }
+        });
     }),
 ]).superRefine((data, ctx) => {
+    // 1. Validate Squad Size based on Event
+    if (data.registrationType === 'team') {
+        const event = EVENTS.find(e => e.id === data.eventId);
+        if (event) {
+            if (data.squadSize < event.minTeamSize || data.squadSize > event.maxTeamSize) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: `Team size must be between ${event.minTeamSize} and ${event.maxTeamSize}`,
+                    path: ["squadSize"]
+                });
+            }
+        }
+    }
+
+    // 2. DevXtreme Specific Validations
     if (data.registrationType === 'team' && data.eventId === 'devxtreme') {
         if (!data.problemStatement || data.problemStatement.length < 10) {
             ctx.addIssue({

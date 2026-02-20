@@ -100,7 +100,7 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
                             {isTeam && (
                                 <div className="flex justify-between items-center text-[10px] p-2 bg-white/[0.02] border border-white/[0.05] rounded-lg group-hover:bg-white/[0.05] transition-colors">
                                     <span className="text-gray-400 font-medium uppercase tracking-wider">Units Synced</span>
-                                    <span className={`font-black ${memberCount >= requiredMembers ? 'text-green-400' : 'text-orange-400'}`}>
+                                    <span className={`font-black ${memberCount >= requiredMembers ? 'text-green-400' : 'text-yellow-400'}`}>
                                         {memberCount} / {requiredMembers}
                                     </span>
                                 </div>

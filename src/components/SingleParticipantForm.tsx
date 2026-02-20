@@ -85,6 +85,9 @@ export const SingleParticipantForm = React.forwardRef<
   });
 
   const formValues = watch();
+  const watchedBranch = watch('branch');
+  const watchedYear = watch('year');
+  const watchedCollege = watch('college');
 
   // Update registration context with form data
   useEffect(() => {
@@ -110,7 +113,18 @@ export const SingleParticipantForm = React.forwardRef<
       setSubmitting(true);
 
       if (onSubmit) {
-        await onSubmit(data);
+        // Handle "Other" fields
+        const finalData = { ...data };
+        if (finalData.branch === 'Other' && (data as any).branchCustom) finalData.branch = (data as any).branchCustom;
+        if (finalData.year === 'Other' && (data as any).yearCustom) finalData.year = (data as any).yearCustom;
+        if (finalData.college === 'Other' && (data as any).collegeCustom) finalData.college = (data as any).collegeCustom;
+
+        // Clean up temporary fields
+        delete (finalData as any).branchCustom;
+        delete (finalData as any).yearCustom;
+        delete (finalData as any).collegeCustom;
+
+        await onSubmit(finalData);
       }
 
       setFormData({
@@ -175,9 +189,8 @@ export const SingleParticipantForm = React.forwardRef<
             id="name"
             placeholder="Enter your full name"
             {...register('name')}
-            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              errors.name ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-            }`}
+            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.name ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
+              }`}
             aria-invalid={errors.name ? 'true' : 'false'}
             aria-describedby={errors.name ? 'name-error' : undefined}
             aria-required="true"
@@ -214,9 +227,8 @@ export const SingleParticipantForm = React.forwardRef<
           <Select onValueChange={(value) => setValue('college', value)}>
             <SelectTrigger
               id="college"
-              className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                errors.college ? 'border-red-500' : 'focus:ring-orange-500'
-              }`}
+              className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.college ? 'border-red-500' : 'focus:ring-orange-500'
+                }`}
               aria-invalid={errors.college ? 'true' : 'false'}
               aria-describedby={errors.college ? 'college-error' : undefined}
               aria-required="true"
@@ -247,6 +259,25 @@ export const SingleParticipantForm = React.forwardRef<
         )}
       </motion.div>
 
+      {/* Custom College Input */}
+      {watchedCollege === 'Other' && (
+        <motion.div
+          className="space-y-2"
+          variants={fieldVariantsAccessible}
+          animate={shakeField === 'college' ? 'shake' : 'still'}
+        >
+          <Label htmlFor="collegeCustom" className="text-sm font-medium">
+            Enter College Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="collegeCustom"
+            placeholder="Enter your college name"
+            {...register('collegeCustom' as any)}
+            className="focus:ring-orange-500"
+          />
+        </motion.div>
+      )}
+
       {/* Student ID Field */}
       <motion.div
         className="space-y-2"
@@ -264,9 +295,8 @@ export const SingleParticipantForm = React.forwardRef<
             id="studentId"
             placeholder="Enter your student ID"
             {...register('studentId')}
-            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              errors.studentId ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-            }`}
+            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.studentId ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
+              }`}
             aria-invalid={errors.studentId ? 'true' : 'false'}
             aria-describedby={errors.studentId ? 'studentId-error' : undefined}
             aria-required="true"
@@ -305,9 +335,8 @@ export const SingleParticipantForm = React.forwardRef<
             type="tel"
             placeholder="Enter 10-digit phone number"
             {...register('phoneNumber')}
-            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              errors.phoneNumber ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-            }`}
+            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.phoneNumber ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
+              }`}
             aria-invalid={errors.phoneNumber ? 'true' : 'false'}
             aria-describedby={errors.phoneNumber ? 'phoneNumber-error' : undefined}
             aria-required="true"
@@ -346,9 +375,8 @@ export const SingleParticipantForm = React.forwardRef<
             type="email"
             placeholder="Enter your email address"
             {...register('email')}
-            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              errors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
-            }`}
+            className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-orange-500'
+              }`}
             aria-invalid={errors.email ? 'true' : 'false'}
             aria-describedby={errors.email ? 'email-error' : undefined}
             aria-required="true"
@@ -385,9 +413,8 @@ export const SingleParticipantForm = React.forwardRef<
           <Select onValueChange={(value) => setValue('branch', value)}>
             <SelectTrigger
               id="branch"
-              className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                errors.branch ? 'border-red-500' : 'focus:ring-orange-500'
-              }`}
+              className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.branch ? 'border-red-500' : 'focus:ring-orange-500'
+                }`}
               aria-invalid={errors.branch ? 'true' : 'false'}
               aria-describedby={errors.branch ? 'branch-error' : undefined}
               aria-required="true"
@@ -418,6 +445,25 @@ export const SingleParticipantForm = React.forwardRef<
         )}
       </motion.div>
 
+      {/* Custom Branch Input */}
+      {watchedBranch === 'Other' && (
+        <motion.div
+          className="space-y-2"
+          variants={fieldVariantsAccessible}
+          animate={shakeField === 'branch' ? 'shake' : 'still'}
+        >
+          <Label htmlFor="branchCustom" className="text-sm font-medium">
+            Enter Branch Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="branchCustom"
+            placeholder="Enter your branch name"
+            {...register('branchCustom' as any)}
+            className="focus:ring-orange-500"
+          />
+        </motion.div>
+      )}
+
       {/* Year Field */}
       <motion.div
         className="space-y-2"
@@ -434,9 +480,8 @@ export const SingleParticipantForm = React.forwardRef<
           <Select onValueChange={(value) => setValue('year', value)}>
             <SelectTrigger
               id="year"
-              className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                errors.year ? 'border-red-500' : 'focus:ring-orange-500'
-              }`}
+              className={`transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${errors.year ? 'border-red-500' : 'focus:ring-orange-500'
+                }`}
               aria-invalid={errors.year ? 'true' : 'false'}
               aria-describedby={errors.year ? 'year-error' : undefined}
               aria-required="true"
@@ -466,6 +511,25 @@ export const SingleParticipantForm = React.forwardRef<
           </motion.p>
         )}
       </motion.div>
+
+      {/* Custom Year Input */}
+      {watchedYear === 'Other' && (
+        <motion.div
+          className="space-y-2"
+          variants={fieldVariantsAccessible}
+          animate={shakeField === 'year' ? 'shake' : 'still'}
+        >
+          <Label htmlFor="yearCustom" className="text-sm font-medium">
+            Enter Year <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="yearCustom"
+            placeholder="Enter your year (e.g., 5th Year)"
+            {...register('yearCustom' as any)}
+            className="focus:ring-orange-500"
+          />
+        </motion.div>
+      )}
 
       {/* Submit Button */}
       <motion.div variants={fieldVariantsAccessible} className="pt-4">

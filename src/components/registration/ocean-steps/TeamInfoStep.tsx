@@ -1,6 +1,6 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield } from 'lucide-react';
-import { BRANCHES, YEARS_OF_STUDY, EVENTS, type RegistrationFormData } from '@/types/registration';
+import { BRANCHES, YEARS_OF_STUDY, EVENTS, EVENT_COLLEGES, type RegistrationFormData } from '@/types/registration';
 import OceanInput from '../OceanInput';
 import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
 import { motion } from 'framer-motion';
@@ -10,7 +10,11 @@ const TeamInfoStep = () => {
 
     const eventId = watch('eventId');
     const currentSquadSize = watch('squadSize');
+    const teamLeaderCollege = watch('teamLeader.college');
     const event = EVENTS.find(e => e.id === eventId);
+
+    // Get event-specific colleges
+    const collegeOptions = eventId && EVENT_COLLEGES[eventId as any] ? EVENT_COLLEGES[eventId as any] : EVENT_COLLEGES['algo-to-code'];
 
     const hasSizeRange = event && event.minTeamSize !== event.maxTeamSize;
     const sizeOptions = hasSizeRange
@@ -144,18 +148,38 @@ const TeamInfoStep = () => {
                         icon={School}
                         error={(errors as any).teamLeader?.college?.message}
                     >
-                        <input
-                            {...register('teamLeader.college')}
-                            onBlur={(e) => {
-                                const formatted = capitalizeName(e.target.value);
-                                e.target.value = formatted;
-                                register('teamLeader.college').onChange(e);
-                            }}
-                            type="text"
-                            placeholder="College Name"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
-                        />
+                        <div className="relative">
+                            <select
+                                {...register('teamLeader.college')}
+                                className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all min-h-[44px] text-[16px] appearance-none"
+                            >
+                                <option value="" className="bg-[#1A1A2E]">Select College</option>
+                                {collegeOptions.map((col) => (
+                                    <option key={col} value={col} className={`bg-[#1A1A2E] ${col === 'Other' ? 'text-yellow-400 font-bold' : ''}`}>
+                                        {col}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                            </div>
+                        </div>
                     </OceanInput>
+
+                    {teamLeaderCollege === 'Other' && (
+                        <OceanInput
+                            label="Specify College Name"
+                            icon={School}
+                            error={(errors as any).teamLeader?.collegeCustom?.message}
+                        >
+                            <input
+                                {...register('teamLeader.collegeCustom' as any)}
+                                type="text"
+                                placeholder="Enter your college name"
+                                className="w-full bg-[#0a192f]/50 border-2 border-yellow-400/50 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-yellow-400 transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
+                            />
+                        </OceanInput>
+                    )}
 
                     <div className="grid grid-cols-2 gap-3">
                         <OceanInput
@@ -205,12 +229,12 @@ const TeamInfoStep = () => {
             {eventId === 'devxtreme' && (
                 <div className="space-y-4 pt-4 border-t border-[#00D9FF]/10">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                            <BookOpen className="w-4 h-4 text-orange-400" />
+                        <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                            <BookOpen className="w-4 h-4 text-cyan-400" />
                         </div>
                         <div>
                             <h3 className="text-sm font-bold text-white uppercase tracking-widest">Project Proposal</h3>
-                            <p className="text-orange-400/50 text-[10px] font-medium uppercase">Shortlisting Required</p>
+                            <p className="text-cyan-400/50 text-[10px] font-medium uppercase">Shortlisting Required</p>
                         </div>
                     </div>
 
