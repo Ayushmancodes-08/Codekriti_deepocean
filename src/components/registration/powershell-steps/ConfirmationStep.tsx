@@ -19,7 +19,7 @@ const ConfirmationStep = () => {
                     REGISTRATION SUMMARY
                 </div>
 
-                {data.registrationType === 'solo' ? (
+                {(data.registrationType ?? 'team') === 'solo' ? (
                     <div className="space-y-3 text-sm">
                         <div>
                             <span className="text-gray-400">&gt; Name:</span>
