@@ -101,11 +101,21 @@ const RegisterSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="mt-12 flex flex-col md:flex-row gap-6 justify-center items-center"
+              className="mt-12 flex flex-col md:flex-row gap-6 justify-center items-center flex-wrap"
             >
-              <div className="flex items-center gap-3 text-foreground/80">
-                <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs">✓</span>
+              <div className="flex items-center gap-3 text-foreground/80 hover:text-accent transition-colors duration-300">
+                <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">✓</span>
+                <span className="font-body text-sm font-medium">Early Bird Access to 5+ Events</span>
+              </div>
+              <div className="hidden md:block w-1 h-1 rounded-full bg-accent/40"></div>
+              <div className="flex items-center gap-3 text-foreground/80 hover:text-accent transition-colors duration-300">
+                <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">✓</span>
                 <span className="font-body text-sm font-medium">Official Certification from CodeKriti</span>
+              </div>
+              <div className="hidden md:block w-1 h-1 rounded-full bg-accent/40"></div>
+              <div className="flex items-center gap-3 text-foreground/80 hover:text-accent transition-colors duration-300">
+                <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">✓</span>
+                <span className="font-body text-sm font-medium">Cash Prizes & Goodies</span>
               </div>
             </motion.div>
           </div>
