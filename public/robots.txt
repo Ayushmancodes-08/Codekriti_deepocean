@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://codekriti.tech/sitemap.xml
+Sitemap: https://www.codekriti-4-0.tech/sitemap.xml
