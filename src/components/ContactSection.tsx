@@ -120,7 +120,7 @@ const ContactSection = () => {
 
                     {/* Form - Right Column */}
                     <div className="p-8 rounded-3xl bg-black/40 border border-white/10 backdrop-blur-sm shadow-xl">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6" aria-label="Contact support form">
 
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-300 ml-1">Your Name</label>
@@ -130,6 +130,8 @@ const ContactSection = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Enter your name"
+                                    required
+                                    aria-required="true"
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
                                 />
                             </div>
@@ -142,6 +144,8 @@ const ContactSection = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="Enter your email"
+                                    required
+                                    aria-required="true"
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
                                 />
                             </div>
@@ -153,6 +157,8 @@ const ContactSection = () => {
                                     value={formData.message}
                                     onChange={handleChange}
                                     placeholder="How can we help you?"
+                                    required
+                                    aria-required="true"
                                     rows={4}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none"
                                 />
@@ -161,11 +167,12 @@ const ContactSection = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
+                                aria-label={isSubmitting ? 'Sending message...' : 'Send message to CodeKriti team'}
                                 className="w-full mt-4 py-4 rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-600 hover:from-cyan-500 hover:to-cyan-700 text-black font-bold text-lg shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? 'Sending...' : (
                                     <>
-                                        Send Message <Send size={18} className="transform rotate-12" />
+                                        Send Message <Send size={18} className="transform rotate-12" aria-hidden="true" />
                                     </>
                                 )}
                             </button>

@@ -143,7 +143,7 @@ const EventCardsSection = () => {
                                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10" />
                                 <img
                                     src={event.image}
-                                    alt={event.title}
+                                    alt={`CodeKriti 4.0 Event: ${event.title} - ${event.description.substring(0, 50)}...`}
                                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 />
                                 <div className="absolute top-3 left-3 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
@@ -183,9 +183,10 @@ const EventCardsSection = () => {
                                     <button
                                         onClick={() => handleRegisterClick(event.id)}
                                         className="flex-1 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-500/60 text-cyan-300 font-semibold transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                                        aria-label={`Register for ${event.title}`}
                                     >
                                         Register
-                                        <Rocket className="w-4 h-4" />
+                                        <Rocket className="w-4 h-4" aria-hidden="true" />
                                     </button>
                                     <a
                                         href={event.rulebook_url || '#'}

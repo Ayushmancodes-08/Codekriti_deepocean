@@ -44,7 +44,7 @@ const Footer = () => {
               <div className="p-1 rounded-full border border-cyan-500/30">
                 <img
                   src={ASSETS.LOGO}
-                  alt="CodeKriti Logo"
+                  alt="CodeKriti 4.0 Official Logo - Coding Design Development"
                   loading="lazy"
                   className="h-10 w-10 rounded-full object-cover shadow-[0_0_10px_rgba(6,182,212,0.3)]"
                 />
@@ -127,6 +127,7 @@ const Footer = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
+                aria-label={isSubmitting ? 'Subscribing to newsletter...' : 'Subscribe to newsletter'}
                 className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm min-h-[44px]"
               >
                 {isSubmitting ? 'Subscribing...' : 'Subscribe'}

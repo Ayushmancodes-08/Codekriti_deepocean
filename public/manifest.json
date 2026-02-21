@@ -1,0 +1,21 @@
+{
+    "name": "CodeKriti 4.0 - PMEC Techfest",
+    "short_name": "CodeKriti",
+    "description": "The premier Techfest at Parala Maharaja Engineering College (PMEC). Join CodeKritio for the ultimate digital expedition.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#020817",
+    "theme_color": "#06b6d4",
+    "icons": [
+        {
+            "src": "/logo_circle.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo_circle.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

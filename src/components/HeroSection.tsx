@@ -125,15 +125,18 @@ const HeroSection = () => {
             <button
               type="button"
               onClick={() => smoothScrollTo('about', { duration: 350, easing: 'easeInOutQuart' })}
-              className="dive-in-btn group w-full sm:w-auto px-12 py-3.5 md:py-5 rounded-full text-white font-display font-bold text-base md:text-xl uppercase tracking-wider flex items-center justify-center gap-3 cursor-pointer min-h-[44px]">
+              className="dive-in-btn group w-full sm:w-auto px-12 py-3.5 md:py-5 rounded-full text-white font-display font-bold text-base md:text-xl uppercase tracking-wider flex items-center justify-center gap-3 cursor-pointer min-h-[44px]"
+              aria-label="Dive in to find more about CodeKriti 4.0"
+            >
               <span>Dive In</span>
-              <Send className="w-5 h-5 md:w-6 md:h-6 text-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+              <Send className="w-5 h-5 md:w-6 md:h-6 text-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden="true" />
             </button>
 
             {/* Explore Events Button - Secondary CTA */}
             <button
               type="button"
               onClick={() => smoothScrollTo('events', { duration: 350, easing: 'easeInOutQuart' })}
+              aria-label="Explore the list of technical events"
               className="group relative w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-white font-display font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-105 min-h-[44px]"
               style={{
                 background: 'rgba(6, 182, 212, 0.1)',
@@ -151,7 +154,7 @@ const HeroSection = () => {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              <Play className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 fill-cyan-400/20 group-hover:fill-cyan-400/40 transition-all duration-200" />
+              <Play className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 fill-cyan-400/20 group-hover:fill-cyan-400/40 transition-all duration-200" aria-hidden="true" />
               <span>Explore Events</span>
             </button>
           </div>

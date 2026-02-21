@@ -66,6 +66,8 @@ const AboutSection = () => {
           <div className="w-full flex flex-col justify-center items-center h-full">
             <div
               className={`relative w-full aspect-square max-w-sm md:max-w-md transition-all duration-700 delay-500 transform ${isInView ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-90 translate-x-5'}`}
+              aria-label="Interactive Brick Breaker game representing the digital abyss"
+              role="img"
             >
               <BrickBreaker />
             </div>

@@ -68,22 +68,27 @@ const FAQSection = () => {
                         <div key={index} className="group h-fit">
                             <button
                                 onClick={() => setOpenIndex(active => active === index ? null : index)}
+                                aria-expanded={openIndex === index}
+                                aria-controls={`faq-answer-${index}`}
                                 className={`w-full text-left p-4 rounded-xl glass-card transition-all duration-300 flex items-center justify-between border
                                     ${openIndex === index
                                         ? 'bg-cyan-950/30 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                         : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'}`}
                             >
-                                <span className={`font-display font-medium text-base md:text-lg transition-colors pr-4 ${openIndex === index ? 'text-cyan-400' : 'text-foreground/90'}`}>
+                                <span id={`faq-question-${index}`} className={`font-display font-medium text-base md:text-lg transition-colors pr-4 ${openIndex === index ? 'text-cyan-400' : 'text-foreground/90'}`}>
                                     {faq.question}
                                 </span>
                                 <span className={`p-1 rounded-full transition-all duration-300 flex-shrink-0 ${openIndex === index ? 'bg-cyan-500 text-black rotate-180' : 'bg-white/10 text-white group-hover:bg-white/20'}`}>
-                                    {openIndex === index ? <Minus size={16} /> : <Plus size={16} />}
+                                    {openIndex === index ? <Minus size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
                                 </span>
                             </button>
 
                             <AnimatePresence>
                                 {openIndex === index && (
                                     <motion.div
+                                        id={`faq-answer-${index}`}
+                                        role="region"
+                                        aria-labelledby={`faq-question-${index}`}
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}

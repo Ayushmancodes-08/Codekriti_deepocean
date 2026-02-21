@@ -17,7 +17,7 @@ const ConfirmationStep = () => {
             </div>
 
             <div className="p-6 bg-[#0a192f] border border-cyan-500/20 rounded-xl space-y-6 shadow-[0_0_15px_rgba(6,182,212,0.05)]">
-                {(data.registrationType ?? 'team') === 'solo' ? (
+                {data.registrationType === 'solo' ? (
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-cyan-400 font-bold pb-3 border-b border-gray-700">
                             <User className="w-5 h-5" />
@@ -27,27 +27,27 @@ const ConfirmationStep = () => {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <p className="text-gray-500 mb-1">Name</p>
-                                <p className="text-white font-medium">{data.participant?.name || '-'}</p>
+                                <p className="text-white font-medium">{data.participant.name || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">Email</p>
-                                <p className="text-white font-medium break-all">{data.participant?.email || '-'}</p>
+                                <p className="text-white font-medium break-all">{data.participant.email || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">Phone</p>
-                                <p className="text-white font-medium">{data.participant?.phone || '-'}</p>
+                                <p className="text-white font-medium">{data.participant.phone || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">College</p>
-                                <p className="text-white font-medium">{data.participant?.college || '-'}</p>
+                                <p className="text-white font-medium">{data.participant.college || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">Branch</p>
-                                <p className="text-white font-medium">{data.participant?.branch || '-'}</p>
+                                <p className="text-white font-medium">{data.participant.branch || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500 mb-1">Year</p>
-                                <p className="text-white font-medium">{data.participant?.yearOfStudy || '-'}</p>
+                                <p className="text-white font-medium">{data.participant.yearOfStudy || '-'}</p>
                             </div>
                         </div>
                     </div>
@@ -58,7 +58,7 @@ const ConfirmationStep = () => {
                                 <Users className="w-5 h-5" />
                                 Team Registration
                             </div>
-                            <p className="text-white font-bold">{data.teamName || 'Team Name'}</p>
+                            <p className="text-white font-bold">{(data as any).teamName || 'Team Name'}</p>
                         </div>
 
                         {/* Team Leader */}
@@ -70,29 +70,29 @@ const ConfirmationStep = () => {
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
                                     <p className="text-gray-500 text-xs mb-1">Name</p>
-                                    <p className="text-white">{data.teamLeader?.name || '-'}</p>
+                                    <p className="text-white">{(data as any).teamLeader?.name || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-xs mb-1">Email</p>
-                                    <p className="text-white break-all">{data.teamLeader?.email || '-'}</p>
+                                    <p className="text-white break-all">{(data as any).teamLeader?.email || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-xs mb-1">Phone</p>
-                                    <p className="text-white">{data.teamLeader?.phone || '-'}</p>
+                                    <p className="text-white">{(data as any).teamLeader?.phone || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-xs mb-1">College</p>
-                                    <p className="text-white">{data.teamLeader?.college || '-'}</p>
+                                    <p className="text-white">{(data as any).teamLeader?.college || '-'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Team Members */}
-                        {data.teamMembers && data.teamMembers.length > 0 && (
+                        {(data as any).teamMembers && (data as any).teamMembers.length > 0 && (
                             <div>
-                                <p className="text-white font-bold mb-3 text-sm">Team Members ({data.teamMembers.length})</p>
+                                <p className="text-white font-bold mb-3 text-sm">Team Members ({(data as any).teamMembers.length})</p>
                                 <div className="space-y-3">
-                                    {data.teamMembers.map((member, idx) => (
+                                    {(data as any).teamMembers.map((member: any, idx: number) => (
                                         <div key={idx} className="p-3 bg-[#112240] rounded-lg border border-gray-700">
                                             <div className="flex items-center justify-between">
                                                 <div>
