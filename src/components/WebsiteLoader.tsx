@@ -42,8 +42,8 @@ export default function WebsiteLoader({ onFinish }: { onFinish: () => void }) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0a192f] via-transparent to-[#0a192f] opacity-90" />
 
-                {/* Animated Bubbles/Particles */}
-                {[...Array(20)].map((_, i) => (
+                {/* Animated Bubbles/Particles - Reduced count for mobile */}
+                {[...Array(navigator.userAgent.toLowerCase().includes('mobile') ? 8 : 20)].map((_, i) => (
                     <motion.div
                         key={i}
                         className="absolute rounded-full bg-cyan-400/20 blur-sm"
@@ -54,9 +54,9 @@ export default function WebsiteLoader({ onFinish }: { onFinish: () => void }) {
                             bottom: '-20px',
                         }}
                         animate={{
-                            y: -1200, // Move up screen
-                            x: [0, Math.sin(i) * 50, 0], // Slight wave motion
-                            opacity: [0, 0.5, 0],
+                            y: -1200,
+                            x: [0, Math.sin(i) * 30, 0],
+                            opacity: [0, 0.4, 0],
                         }}
                         transition={{
                             duration: Math.random() * 10 + 10,

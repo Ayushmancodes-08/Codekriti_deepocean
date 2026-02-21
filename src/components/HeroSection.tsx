@@ -163,14 +163,12 @@ const HeroSection = () => {
 
       </div>
 
-      {/* Floating decorative elements with Parallax */}
+      {/* Floating decorative elements with Parallax - Optimized for tier */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Increased particle count for a lively, dense atmosphere */}
-        {[...Array(20)].map((_, i) => (
+        {[...Array(performanceTier === 'low' ? 6 : 20)].map((_, i) => (
           <ParallaxParticle
             key={i}
             index={i}
-            // Deterministic "random" positions based on index
             left={`${(i * 17) % 100}%`}
             top={`${(i * 23) % 100}%`}
             delay={`${(i * 0.4) % 3}s`}

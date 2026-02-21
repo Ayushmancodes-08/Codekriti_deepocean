@@ -110,19 +110,18 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
     setVideoErrors(prev => new Set([...prev, index]));
   }, []);
 
-  // Memoize render list
+  // Memoize render list - AGGRESSIVE PRUNING
   const videosToRender = useMemo(() => {
     return ASSETS.VIDEOS.map((src, index) => {
       const isCurrent = index === activeIndex;
-      // Only render if it's the current one OR if others are allowed to load and distinct logic applies
-      // Actually, we should render them to DOM if they are in 'loadedVideos' set, so they can buffer
-      // But to save DOM nodes/memory, we can be stricter.
+      const isNext = index === (activeIndex + 1) % ASSETS.VIDEOS.length;
 
-      const shouldRender = loadedVideos.has(index) || index === 0;
+      // ONLY render current and next. Remove all others from DOM completely.
+      const shouldRender = isCurrent || isNext || (index === 0 && !canLoadOthers);
 
       return { src, index, isCurrent, shouldRender };
     });
-  }, [activeIndex, loadedVideos]);
+  }, [activeIndex, canLoadOthers]);
 
   return (
     <div ref={containerRef} className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-background">
@@ -148,8 +147,9 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
                 muted
                 loop
                 playsInline
-                autoPlay={index === 0} // Only force autoplay attribute on first one
-                preload={index === 0 ? "auto" : "none"} // Aggressive preload only for first
+                crossOrigin="anonymous"
+                autoPlay={index === activeIndex || index === 0}
+                preload={index === activeIndex ? "auto" : "metadata"}
                 onLoadedData={() => handleVideoLoaded(index)}
                 onError={() => handleVideoError(index)}
                 className="absolute inset-0 w-full h-full object-cover"
@@ -162,6 +162,7 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
               <img
                 src={ASSETS.VIDEO_POSTERS[index]}
                 alt={`Scene ${index + 1}`}
+                crossOrigin="anonymous"
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ filter: 'brightness(0.6) saturate(1.1)' }}
               />

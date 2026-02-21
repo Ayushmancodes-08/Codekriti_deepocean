@@ -47,7 +47,7 @@ const EventCardsSection = () => {
             time: '10:00 AM',
             venue: 'PMEC ACADEMIC BLOCK - Lab Complex 1',
             teamSize: 'Individual',
-            image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=2669&auto=format&fit=crop', // Coding/Laptop
+            image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=800&auto=format&fit=crop', // Coding/Laptop
             description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
             prize: '₹30',
             category: 'Intra-College',
@@ -61,7 +61,7 @@ const EventCardsSection = () => {
             time: '11:00 AM',
             venue: 'PMEC ACADEMIC BLOCK - Design Studio',
             teamSize: 'Individual',
-            image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2664&auto=format&fit=crop', // Design/Creative
+            image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop', // Design/Creative
             description: 'UI/UX Design challenge. Create stunning interfaces and user experiences.',
             prize: '₹60',
             category: 'Intra-College',
@@ -75,7 +75,7 @@ const EventCardsSection = () => {
             time: '09:00 AM',
             venue: 'PMEC ACADEMIC BLOCK - Seminar Hall',
             teamSize: 'Team of 2',
-            image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2670&auto=format&fit=crop', // Group/Brainstorming
+            image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop', // Group/Brainstorming
             description: 'Pitch your innovative ideas and solutions to real-world problems.',
             prize: '₹60',
             category: 'Intra-College',
@@ -89,7 +89,7 @@ const EventCardsSection = () => {
             time: '02:00 PM',
             venue: 'PMEC ACADEMIC BLOCK - Central Courtyard',
             teamSize: 'Team of 3',
-            image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2670&auto=format&fit=crop', // Tech/Abstract
+            image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop', // Tech/Abstract
             description: 'Navigate through a series of technical puzzles and rapid-fire quizzes.',
             prize: '₹90',
             category: 'Intra-College',
@@ -144,6 +144,9 @@ const EventCardsSection = () => {
                                 <img
                                     src={event.image}
                                     alt={`CodeKriti 4.0 Event: ${event.title} - ${event.description.substring(0, 50)}...`}
+                                    loading="lazy"
+                                    crossOrigin="anonymous"
+                                    decoding="async"
                                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 />
                                 <div className="absolute top-3 left-3 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">

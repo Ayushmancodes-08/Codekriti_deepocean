@@ -163,8 +163,21 @@ const Bubbles = () => {
     // Initialize bubbles
     initializeBubbles(canvas.width, canvas.height);
 
-    // Start animation loop
-    animationIdRef.current = requestAnimationFrame(animate);
+    // Visibility-aware animation loop
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (!animationIdRef.current) {
+          animationIdRef.current = requestAnimationFrame(animate);
+        }
+      } else {
+        if (animationIdRef.current) {
+          cancelAnimationFrame(animationIdRef.current);
+          animationIdRef.current = undefined;
+        }
+      }
+    }, { threshold: 0 });
+
+    observer.observe(canvas);
 
     // Handle window resize
     window.addEventListener('resize', handleResize);
@@ -173,6 +186,7 @@ const Bubbles = () => {
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
+      observer.disconnect();
       window.removeEventListener('resize', handleResize);
     };
   }, []);
