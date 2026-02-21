@@ -13,7 +13,7 @@ interface RegistrationSummaryProps {
 const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "Complete Registration" }: RegistrationSummaryProps) => {
     // Watch form values to update summary in real-time
     const watchedValues = useWatch();
-    const { formState: { errors } } = useFormContext<RegistrationFormData>();
+    const { formState: { } } = useFormContext<RegistrationFormData>();
 
     // Safely cast watched values (handling potential undefined during initial render)
     const formData = watchedValues as Partial<RegistrationFormData>;
@@ -26,7 +26,9 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
     // Dynamic fee logic for DevXtreme
     if (formData.eventId === 'devxtreme') {
         const isTeamReg = (formData.registrationType ?? 'team') === 'team';
-        const college = isTeamReg ? formData.teamLeader?.college : (formData as any).participant?.college;
+        const college = isTeamReg
+            ? (formData as any).teamLeader?.college
+            : (formData as any).participant?.college;
         if (college) {
             const normalizedCollege = college.toLowerCase().trim();
             if (normalizedCollege.includes('pmec') || normalizedCollege.includes('parala maharaja')) {
@@ -42,20 +44,33 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
 
     // Determine type and count
     const isTeam = (formData.registrationType ?? 'team') === 'team';
-    const memberCount = isTeam && formData.teamMembers ? formData.teamMembers.length : 0;
+    const teamData = isTeam ? (formData as any) : null;
+    const memberCount = isTeam && teamData.teamMembers ? teamData.teamMembers.length : 0;
     const requiredMembers = (formData.squadSize || 1) - 1;
 
-    // Calculate progress/completion
-    const hasLeader = isTeam ? !!(formData.teamLeader?.name && formData.teamLeader?.email) : !!((formData as any).participant?.name);
-    const hasTeamName = isTeam ? !!formData.teamName : true;
+    // Validation Regexes for instant sync feedback
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^(\+91\s\d{5}\s\d{5}|\d{5}\s\d{5}|\d{10}|\+91\d{10})$/;
+
+    // Helper to check if a participant/leader is fully valid
+    const isParticipantValid = (p: any) => {
+        return !!(p?.name && p?.email && p?.phone && p?.college && p?.branch && p?.yearOfStudy) &&
+            emailRegex.test(p.email) &&
+            phoneRegex.test(p.phone);
+    };
+
+    // Dynamic status checks for UI indicators
+    const hasLeader = isTeam ? isParticipantValid(teamData.teamLeader) : isParticipantValid((formData as any).participant);
+    const hasTeamName = isTeam ? !!teamData.teamName : true;
     const membersComplete = isTeam ? memberCount >= requiredMembers : true;
 
-    // Check if any visible fields have errors
-    const hasVisibleErrors = isTeam
-        ? !!((errors as any).teamName || (errors as any).teamLeader || (errors as any).teamMembers)
-        : !!((errors as any).participant);
+    // DevXtreme specific check
+    const isDevXtremeComplete = formData.eventId === 'devxtreme'
+        ? !!((formData as any).problemStatement && (formData as any).solution)
+        : true;
 
-    const isReady = !hasVisibleErrors && hasLeader && hasTeamName && membersComplete;
+    // Manual readiness check: field presence + format validation
+    const isReady = hasTeamName && hasLeader && membersComplete && isDevXtremeComplete;
 
     return (
         <div className="h-full flex flex-col space-y-3">

@@ -1,6 +1,6 @@
 import CountdownTimer from './CountdownTimer';
 import GlowingParticles from './GlowingParticles';
-import { Play, Send } from 'lucide-react';
+import { Play, Send, Download } from 'lucide-react';
 import { usePerformanceTier } from '@/hooks/use-mobile';
 import { smoothScrollTo } from '@/lib/smoothScroll';
 import { TextReveal } from '@/components/ui/text-reveal';
@@ -121,15 +121,32 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center w-full max-w-md sm:max-w-none mx-auto animate-fade-in-up opacity-0 fill-mode-forwards"
             style={{ animationDelay: '1.1s' }}
           >
-            {/* Dive In Button - Primary CTA */}
+            {/* Dive In / Brochure Button - Primary CTA */}
             <button
               type="button"
-              onClick={() => smoothScrollTo('about', { duration: 350, easing: 'easeInOutQuart' })}
+              onClick={() => {
+                if (window.innerWidth < 640) {
+                  const link = document.createElement('a');
+                  link.href = '/assets/Brochurecokekriti.pdf';
+                  link.download = 'CodeKriti_4_0_Brochure.pdf';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                } else {
+                  smoothScrollTo('about', { duration: 350, easing: 'easeInOutQuart' });
+                }
+              }}
               className="dive-in-btn group w-full sm:w-auto px-12 py-3.5 md:py-5 rounded-full text-white font-display font-bold text-base md:text-xl uppercase tracking-wider flex items-center justify-center gap-3 cursor-pointer min-h-[44px]"
-              aria-label="Dive in to find more about CodeKriti 4.0"
+              aria-label={window.innerWidth < 640 ? "Download brochure" : "Dive in to find more about CodeKriti 4.0"}
             >
-              <span>Dive In</span>
-              <Send className="w-5 h-5 md:w-6 md:h-6 text-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden="true" />
+              <span className="block sm:hidden">Brochure</span>
+              <span className="hidden sm:block">Dive In</span>
+              <div className="block sm:hidden">
+                <Download className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+              </div>
+              <div className="hidden sm:block">
+                <Send className="w-5 h-5 md:w-6 md:h-6 text-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden="true" />
+              </div>
             </button>
 
             {/* Explore Events Button - Secondary CTA */}

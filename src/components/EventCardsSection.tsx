@@ -41,62 +41,6 @@ const EventCardsSection = () => {
 
     const events = [
         {
-            id: 'algo-to-code',
-            title: 'Algo to Code',
-            date: 'March 6, 2026',
-            time: '10:00 AM',
-            venue: 'PMEC ACADEMIC BLOCK - Lab Complex 1',
-            teamSize: 'Individual',
-            image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=800&auto=format&fit=crop', // Coding/Laptop
-            description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
-            prize: '₹30',
-            category: 'Intra-College',
-            rulebook_url: '/assets/AlgotoCode.pdf',
-            icon: <Code className="w-5 h-5 text-cyan-400" />
-        },
-        {
-            id: 'designathon',
-            title: 'Designathon',
-            date: 'March 6, 2026',
-            time: '11:00 AM',
-            venue: 'PMEC ACADEMIC BLOCK - Design Studio',
-            teamSize: 'Individual',
-            image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop', // Design/Creative
-            description: 'UI/UX Design challenge. Create stunning interfaces and user experiences.',
-            prize: '₹60',
-            category: 'Intra-College',
-            rulebook_url: '/assets/Designathon.pdf',
-            icon: <Palette className="w-5 h-5 text-purple-400" />
-        },
-        {
-            id: 'innovation-challenge',
-            title: 'Innovation Challenge',
-            date: 'March 6, 2026',
-            time: '09:00 AM',
-            venue: 'PMEC ACADEMIC BLOCK - Seminar Hall',
-            teamSize: 'Team of 2',
-            image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop', // Group/Brainstorming
-            description: 'Pitch your innovative ideas and solutions to real-world problems.',
-            prize: '₹60',
-            category: 'Intra-College',
-            rulebook_url: '/assets/Innovation Challenge.pdf',
-            icon: <Lightbulb className="w-5 h-5 text-yellow-400" />
-        },
-        {
-            id: 'techmaze',
-            title: 'Tech Maze',
-            date: 'March 6, 2026',
-            time: '02:00 PM',
-            venue: 'PMEC ACADEMIC BLOCK - Central Courtyard',
-            teamSize: 'Team of 3',
-            image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop', // Tech/Abstract
-            description: 'Navigate through a series of technical puzzles and rapid-fire quizzes.',
-            prize: '₹90',
-            category: 'Intra-College',
-            rulebook_url: '/assets/TechMaze.pdf',
-            icon: <Puzzle className="w-5 h-5 text-green-400" />
-        },
-        {
             id: 'devxtreme',
             title: 'DevXtreme',
             date: 'March 7, 2026',
@@ -109,6 +53,62 @@ const EventCardsSection = () => {
             category: 'Inter-College',
             rulebook_url: '/assets/Devxtreme.pdf',
             icon: <Rocket className="w-5 h-5 text-red-400" />
+        },
+        {
+            id: 'designathon',
+            title: 'Designathon',
+            date: 'March 7, 2026',
+            time: '11:00 AM',
+            venue: 'PMEC ACADEMIC BLOCK - Design Studio',
+            teamSize: 'Individual',
+            image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop', // Design/Creative
+            description: 'UI/UX Design challenge. Create stunning interfaces and user experiences.',
+            prize: '₹60',
+            category: 'Inter-College',
+            rulebook_url: '/assets/Designathon.pdf',
+            icon: <Palette className="w-5 h-5 text-purple-400" />
+        },
+        {
+            id: 'techmaze',
+            title: 'Tech Maze',
+            date: 'March 6, 2026',
+            time: '02:00 PM',
+            venue: 'PMEC ACADEMIC BLOCK - Central Courtyard',
+            teamSize: 'Team of 3',
+            image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop', // Tech/Abstract
+            description: 'Navigate through a series of technical puzzles and rapid-fire quizzes.',
+            prize: '₹90',
+            category: 'Inter-College',
+            rulebook_url: '/assets/TechMaze.pdf',
+            icon: <Puzzle className="w-5 h-5 text-green-400" />
+        },
+        {
+            id: 'innovation-challenge',
+            title: 'Innovation Challenge',
+            date: 'March 6, 2026',
+            time: '09:00 AM',
+            venue: 'PMEC ACADEMIC BLOCK - Seminar Hall',
+            teamSize: 'Team of 2',
+            image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop', // Group/Brainstorming
+            description: 'Pitch your innovative ideas and solutions to real-world problems.',
+            prize: '₹60',
+            category: 'Inter-College',
+            rulebook_url: '/assets/Innovation Challenge.pdf',
+            icon: <Lightbulb className="w-5 h-5 text-yellow-400" />
+        },
+        {
+            id: 'algo-to-code',
+            title: 'Algo to Code',
+            date: 'March 6, 2026',
+            time: '10:00 AM',
+            venue: 'PMEC ACADEMIC BLOCK - Lab Complex 1',
+            teamSize: 'Individual',
+            image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=800&auto=format&fit=crop', // Coding/Laptop
+            description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
+            prize: '₹30',
+            category: 'Inter-College',
+            rulebook_url: '/assets/AlgotoCode.pdf',
+            icon: <Code className="w-5 h-5 text-cyan-400" />
         }
     ];
 

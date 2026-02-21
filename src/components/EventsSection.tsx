@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Calendar, Users, Trophy, Target, Code, Rocket, Lightbulb, Puzzle } from 'lucide-react';
+import { Calendar, Users, Trophy, Target, Code, Rocket, Lightbulb, Puzzle, Palette } from 'lucide-react';
 import OceanRegistrationModal from '@/components/registration/OceanRegistrationModal';
 import { ASSETS } from '@/config/assets';
 
@@ -43,17 +43,30 @@ const EventsSection = () => {
 
   const events = [
     {
-      id: 'algo-to-code',
-      title: 'Algo to Code',
-      date: 'March 6, 2026',
-      time: '10:00 AM',
-      venue: 'PMEC ACADEMIC BLOCK - Lab Complex 1',
+      id: 'devxtreme',
+      title: 'DevXtreme',
+      date: 'March 7, 2026',
+      time: '8 Hours',
+      venue: 'PMEC ACADEMIC BLOCK - Main Auditorium',
+      teamSize: 'Team of 3-5',
+      image: ASSETS.DEVXTREME_POSTER,
+      description: '8-hour hackathon working on real-world problem statements.',
+      prize: '₹400 / ₹500',
+      category: 'Inter-College',
+      icon: <Rocket className="w-5 h-5 text-cyan-400" />
+    },
+    {
+      id: 'designathon',
+      title: 'Designathon',
+      date: 'March 7, 2026',
+      time: '11:00 AM',
+      venue: 'PMEC ACADEMIC BLOCK - Design Studio',
       teamSize: 'Individual',
-      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop',
-      description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
-      prize: '₹30',
-      category: 'Intra-College',
-      icon: <Code className="w-5 h-5 text-cyan-400" />
+      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop',
+      description: 'UI/UX Design competition for creative designers.',
+      prize: '₹60',
+      category: 'Inter-College',
+      icon: <Palette className="w-5 h-5 text-cyan-400" />
     },
     {
       id: 'techmaze',
@@ -65,7 +78,7 @@ const EventsSection = () => {
       image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop',
       description: 'Technical fun event with quizzes, puzzles, and rapid-fire challenges.',
       prize: '₹90',
-      category: 'Intra-College',
+      category: 'Inter-College',
       icon: <Puzzle className="w-5 h-5 text-cyan-400" />
     },
     {
@@ -78,21 +91,21 @@ const EventsSection = () => {
       image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop',
       description: 'Non-coding ideation event. Pitch your ideas and showcase innovation.',
       prize: '₹60',
-      category: 'Intra-College',
+      category: 'Inter-College',
       icon: <Lightbulb className="w-5 h-5 text-cyan-400" />
     },
     {
-      id: 'devxtreme',
-      title: 'DevXtreme',
-      date: 'March 7, 2026',
-      time: '8 Hours',
-      venue: 'PMEC ACADEMIC BLOCK - Main Auditorium',
-      teamSize: 'Team of 3-5',
-      image: ASSETS.DEVXTREME_POSTER,
-      description: '8-hour hackathon working on real-world problem statements.',
-      prize: '₹400 / ₹500',
+      id: 'algo-to-code',
+      title: 'Algo to Code',
+      date: 'March 6, 2026',
+      time: '10:00 AM',
+      venue: 'PMEC ACADEMIC BLOCK - Lab Complex 1',
+      teamSize: 'Individual',
+      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop',
+      description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
+      prize: '₹30',
       category: 'Inter-College',
-      icon: <Rocket className="w-5 h-5 text-cyan-400" />
+      icon: <Code className="w-5 h-5 text-cyan-400" />
     }
   ];
 

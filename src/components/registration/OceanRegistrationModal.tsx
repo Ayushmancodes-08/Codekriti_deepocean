@@ -118,6 +118,38 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
         }
     };
 
+    const handleProceedToPayment = async () => {
+        const isTeam = methods.getValues('registrationType') === 'team';
+        const eventId = methods.getValues('eventId');
+
+        // Define fields to validate for Step 2
+        let fieldsToValidate: any[] = ['eventId'];
+
+        if (isTeam) {
+            fieldsToValidate.push('teamName', 'teamLeader.name', 'teamLeader.email', 'teamLeader.phone', 'teamLeader.college', 'teamLeader.branch', 'teamLeader.yearOfStudy');
+            const teamMembers = methods.getValues('teamMembers') || [];
+            teamMembers.forEach((_, index) => {
+                fieldsToValidate.push(`teamMembers.${index}.name`, `teamMembers.${index}.email`, `teamMembers.${index}.phone`, `teamMembers.${index}.college`);
+            });
+        } else {
+            fieldsToValidate.push('participant.name', 'participant.email', 'participant.phone', 'participant.college', 'participant.branch', 'participant.yearOfStudy');
+        }
+
+        if (eventId === 'devxtreme') {
+            fieldsToValidate.push('problemStatement', 'solution');
+        }
+
+        const isValid = await methods.trigger(fieldsToValidate);
+
+        if (isValid) {
+            setCurrentStep(3);
+        } else {
+            toast.error("Required fields missing", {
+                description: "Please fill all details correctly before proceeding to payment."
+            });
+        }
+    };
+
     const handleBackToSelection = () => {
         setCurrentStep(1);
         setSelectedEvent(null);
@@ -478,7 +510,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                         <div className="h-full">
                                                             <RegistrationSummary
                                                                 isSubmitting={isSubmitting}
-                                                                onSubmit={() => setCurrentStep(3)} // Proceed to Payment
+                                                                onSubmit={handleProceedToPayment} // Proceed to Payment with validation
                                                                 eventName={EVENTS.find(e => e.id === selectedEvent)?.name || ''}
                                                                 buttonText="Proceed to Pay"
                                                             />

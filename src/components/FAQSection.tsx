@@ -13,7 +13,7 @@ const faqs = [
     },
     {
         question: "Who can participate?",
-        answer: "Undergraduate students ready to compete. Hackathon welcomes teams from other colleges. Other events are exclusive to PMEC."
+        answer: "Undergraduate students ready to compete. All events are Inter-College and welcome participants from all institutions."
     },
     {
         question: "What is the team size?",
@@ -21,7 +21,7 @@ const faqs = [
     },
     {
         question: "Is there a registration fee?",
-        answer: "Yes. Small investment. Serious competition. ₹30–₹90 for intra-college events. ₹400–₹500 for the hackathon."
+        answer: "Yes. Small investment. Serious competition. Registration fees range from ₹30–₹500 depending on the event."
     },
     {
         question: "Will food and accommodation be provided?",

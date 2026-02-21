@@ -25,7 +25,7 @@ const VerticalTimelineEvents = () => {
                     teamSize: 'Individual',
                     description: 'Competitive programming contest testing algorithmic thinking and coding efficiency.',
                     fee: '₹30',
-                    category: 'Intra-College',
+                    category: 'Inter-College',
                     icon: <Code className="w-5 h-5" />,
                     side: 'left'
                 },
@@ -37,7 +37,7 @@ const VerticalTimelineEvents = () => {
                     teamSize: '2-3 Members',
                     description: 'Non-coding ideation event. Pitch your ideas and showcase innovation.',
                     fee: '₹60',
-                    category: 'Intra-College',
+                    category: 'Inter-College',
                     icon: <Lightbulb className="w-5 h-5" />,
                     side: 'right'
                 },
@@ -49,7 +49,7 @@ const VerticalTimelineEvents = () => {
                     teamSize: 'Team of 3',
                     description: 'Technical fun event with quizzes, puzzles, and rapid-fire challenges.',
                     fee: '₹90',
-                    category: 'Intra-College',
+                    category: 'Inter-College',
                     icon: <Puzzle className="w-5 h-5" />,
                     side: 'left'
                 }

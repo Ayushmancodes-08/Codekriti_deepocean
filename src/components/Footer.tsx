@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '@/utils/supabaseClient';
 import { ASSETS } from '@/config/assets';
-import { Mail, Twitter, MessageCircle, Instagram, Github, Lock } from 'lucide-react';
+import { Mail, Twitter, Instagram, Linkedin, Lock } from 'lucide-react';
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -60,9 +60,8 @@ const Footer = () => {
             <div className="flex gap-3 mt-2">
               {[
                 { icon: Twitter, href: 'https://x.com/cddclubpmec', label: 'Twitter' },
-                { icon: MessageCircle, href: '#', label: 'Discord' }, // Using MessageCircle as Discord placeholder
                 { icon: Instagram, href: 'https://www.instagram.com/cdd_club_pmec', label: 'Instagram' },
-                { icon: Github, href: 'https://github.com/CodingClubPMEC', label: 'Github' }
+                { icon: Linkedin, href: 'https://www.linkedin.com/in/coding-design-development-club/', label: 'LinkedIn' }
               ].map((social, idx) => (
                 <a
                   key={idx}
@@ -187,5 +186,4 @@ const Footer = () => {
     </footer >
   );
 };
-
 export default Footer;
