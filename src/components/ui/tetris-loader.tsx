@@ -280,10 +280,10 @@ export default function TetrisLoading({
                 {row.map((cell, colIndex) => (
                     <div
                         key={`${rowIndex}-${colIndex}`}
-                        className={`${config.cellSize} border border-white/5 transition-all duration-100 ${cell.filled
-                                ? `${cell.color} scale-100`
-                                : 'bg-black/20 scale-95'
-                            } ${isClearing && rowIndex < 4 ? 'animate-pulse' : ''}`}
+                        className={`${config.cellSize} border border-white/5 transition-[transform,opacity] duration-100 ${cell.filled
+                            ? `${cell.color} scale-100 opacity-100`
+                            : 'bg-black/20 scale-95 opacity-80'
+                            }`}
                     />
                 ))}
             </div>

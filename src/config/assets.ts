@@ -24,10 +24,10 @@ export const ASSETS = {
     // Generated Video Posters (Fallback)
     // Using Cloudinary video-to-image feature
     VIDEO_POSTERS: [
-        `${CLOUD_BASE}/video/upload/so_0,f_jpg,q_auto/v1769794991/scene1_wrfmca.jpg`,
-        `${CLOUD_BASE}/video/upload/so_0,f_jpg,q_auto/v1769794987/scene2_k3ev3u.jpg`,
-        `${CLOUD_BASE}/video/upload/so_0,f_jpg,q_auto/v1769794990/scene3_zx3drx.jpg`,
-        `${CLOUD_BASE}/video/upload/so_0,f_jpg,q_auto/v1769795005/scene4_obyxpp.jpg`,
-        `${CLOUD_BASE}/video/upload/so_0,f_jpg,q_auto/v1769795001/scene5_aujiwv.jpg`,
+        `${CLOUD_BASE}/video/upload/so_0,f_auto,q_auto/v1769794991/scene1_wrfmca.jpg`,
+        `${CLOUD_BASE}/video/upload/so_0,f_auto,q_auto/v1769794987/scene2_k3ev3u.jpg`,
+        `${CLOUD_BASE}/video/upload/so_0,f_auto,q_auto/v1769794990/scene3_zx3drx.jpg`,
+        `${CLOUD_BASE}/video/upload/so_0,f_auto,q_auto/v1769795005/scene4_obyxpp.jpg`,
+        `${CLOUD_BASE}/video/upload/so_0,f_auto,q_auto/v1769795001/scene5_aujiwv.jpg`,
     ]
 };
