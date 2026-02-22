@@ -1,55 +1,45 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { ASSETS } from '@/config/assets';
 
 const BackgroundMusic = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const [hasInteracted, setHasInteracted] = useState(false);
+    const initializedRef = useRef(false);
 
-    useEffect(() => {
-        // Create audio instance
-        const audio = new Audio(ASSETS.MUSIC_THEME);
-        audio.loop = true;
-        audio.volume = 0.4;
-        audioRef.current = audio;
-
-        // Try to verify if file exists
-        audio.addEventListener('error', () => {
-            console.warn("Audio file not found.");
-        });
-
-        return () => {
-            audio.pause();
-            audio.src = '';
-        };
+    /** Lazily create the Audio object only on first user interaction.
+     *  This prevents the 2.7MB MP3 from downloading on page load. */
+    const getOrCreateAudio = useCallback(() => {
+        if (!initializedRef.current) {
+            const audio = new Audio();
+            // Set preload=none so even after construction the file isn't fetched
+            // until .play() is explicitly called.
+            audio.preload = 'none';
+            audio.loop = true;
+            audio.volume = 0.4;
+            audio.addEventListener('error', () => {
+                console.warn('Audio file not found.');
+            });
+            audioRef.current = audio;
+            initializedRef.current = true;
+        }
+        return audioRef.current!;
     }, []);
 
-    // Handle initial user interaction
-    useEffect(() => {
-        const handleInteraction = () => {
-            if (!hasInteracted && audioRef.current) {
-                setHasInteracted(true);
-            }
-        };
-
-        window.addEventListener('click', handleInteraction);
-        window.addEventListener('keydown', handleInteraction);
-        return () => {
-            window.removeEventListener('click', handleInteraction);
-            window.removeEventListener('keydown', handleInteraction);
-        };
-    }, [hasInteracted]);
-
     const togglePlay = () => {
-        if (!audioRef.current) return;
+        const audio = getOrCreateAudio();
 
         if (isPlaying) {
-            audioRef.current.pause();
+            audio.pause();
             setIsPlaying(false);
         } else {
-            audioRef.current.volume = 0.4;
-            audioRef.current.play().catch(e => console.log("Audio play failed:", e));
+            // Set src only once — first time user clicks play
+            if (!audio.src) {
+                audio.src = ASSETS.MUSIC_THEME;
+                audio.load();
+            }
+            audio.volume = 0.4;
+            audio.play().catch(e => console.log('Audio play failed:', e));
             setIsPlaying(true);
         }
     };

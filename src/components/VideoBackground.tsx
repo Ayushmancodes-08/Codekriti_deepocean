@@ -149,7 +149,7 @@ const VideoBackground = ({ activeIndex }: VideoBackgroundProps) => {
                 playsInline
                 crossOrigin="anonymous"
                 autoPlay={index === activeIndex || index === 0}
-                preload={index === activeIndex ? "auto" : "metadata"}
+                preload={index === activeIndex ? "metadata" : "none"}
                 onLoadedData={() => handleVideoLoaded(index)}
                 onError={() => handleVideoError(index)}
                 className="absolute inset-0 w-full h-full object-cover"

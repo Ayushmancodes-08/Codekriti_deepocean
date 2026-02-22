@@ -7,9 +7,9 @@ export const ASSETS = {
     LOGO: '/logo_bg.jpeg', // Black Background Logo
     LOGO_WHITE_TEXT_TRANSPARENT: '/logo_bg.jpeg', // Used everywhere now
     DEVXTREME_POSTER: `${CLOUD_BASE}/image/upload/f_auto,q_auto,w_800/v1769794944/devx_y2lkjc.jpg`,
-    // q_60 reduces size by ~40% vs q_auto; w_800 is enough for a background overlay on mobile
-    SEA_BG: `${CLOUD_BASE}/image/upload/f_auto,q_60,w_800,dpr_auto/v1769794945/sea_yyeaix.jpg`,
-    ROCK_TEXTURE: `${CLOUD_BASE}/image/upload/f_auto,q_60,w_800,dpr_auto/v1769794945/sea_yyeaix.jpg`,
+    // q_30 + e_blur:200: displayed at 30% opacity so very low quality is imperceptible; saves ~75% vs original
+    SEA_BG: `${CLOUD_BASE}/image/upload/f_auto,q_30,w_600,e_blur:200,dpr_auto/v1769794945/sea_yyeaix.jpg`,
+    ROCK_TEXTURE: `${CLOUD_BASE}/image/upload/f_auto,q_30,w_600,e_blur:200,dpr_auto/v1769794945/sea_yyeaix.jpg`,
     MUSIC_THEME: '/audio/theme_music.mp3',
 
     // Videos (Optimized)

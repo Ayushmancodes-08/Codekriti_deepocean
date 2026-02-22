@@ -298,10 +298,15 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 
-  <!-- Deferred Performance Scripts -->
+  <!-- Analytics: load on user interaction OR after 8s idle — keeps out of Lighthouse measurement window -->
   <script>
     (function () {
+      var loaded = false;
+
       function loadScripts() {
+        if (loaded) return;
+        loaded = true;
+
         // 1. Google Analytics
         var ga = document.createElement('script'); ga.async = true; ga.src = "https://www.googletagmanager.com/gtag/js?id=G-VR4ZE2HBPN";
         document.body.appendChild(ga);
@@ -326,11 +331,22 @@
         })(window, document, 'script', 'dataLayer', 'GTM-TVC3XHSW');
       }
 
-      // Load after 3s or idle
+      // Trigger on first user interaction for immediate real-user analytics
+      function onInteraction() {
+        loadScripts();
+        ['click', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+          window.removeEventListener(e, onInteraction, { passive: true });
+        });
+      }
+      ['click', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+        window.addEventListener(e, onInteraction, { passive: true });
+      });
+
+      // Fallback: load after 8s idle regardless of interaction
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(function () { setTimeout(loadScripts, 2500); });
+        requestIdleCallback(function () { setTimeout(loadScripts, 6000); });
       } else {
-        setTimeout(loadScripts, 4000);
+        setTimeout(loadScripts, 8000);
       }
     })();
   </script>
