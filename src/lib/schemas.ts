@@ -138,8 +138,8 @@ export type RegistrationData = SingleParticipantRegistration | TeamRegistration;
 export const RegistrationFormStateSchema = z.object({
   currentStep: z.enum(['event-selection', 'details', 'members', 'confirmation']),
   selectedEvent: EventTypeSchema.nullable(),
-  formData: z.record(z.any()).optional(),
-  errors: z.record(z.string()).optional(),
+  formData: z.record(z.string(), z.any()).optional(),
+  errors: z.record(z.string(), z.string()).optional(),
   isSubmitting: z.boolean().default(false),
   isComplete: z.boolean().default(false),
 });

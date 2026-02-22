@@ -13,7 +13,7 @@ interface Bubble {
 const Bubbles = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bubblesRef = useRef<Bubble[]>([]);
-  const animationIdRef = useRef<number>();
+  const animationIdRef = useRef<number | undefined>(undefined);
 
   const GRAVITY = 0.15;
   const BOUNCE_DAMPING = 0.7;

@@ -12,7 +12,7 @@ interface ScheduleEvent {
     time: string;
     title: string;
     description: string;
-    icon: JSX.Element;
+    icon: React.ReactNode;
     pathX: number;
     pathY: number;
 }

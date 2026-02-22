@@ -353,6 +353,7 @@ export const TeamMembersForm = React.forwardRef<
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
+            key="member-form"
           >
             <h4 className="font-semibold text-white border-b border-gray-700 pb-2">
               {editingIndex !== null ? 'Edit Member Details' : 'Add New Member'}
@@ -369,8 +370,8 @@ export const TeamMembersForm = React.forwardRef<
                   placeholder="Enter member's full name"
                   {...register('name')}
                   className={`bg-[#112240] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.name
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                     }`}
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'memberName-error' : undefined}
@@ -392,12 +393,12 @@ export const TeamMembersForm = React.forwardRef<
                 <Label htmlFor="memberCollege" className="text-sm font-medium text-gray-300">
                   College <span className="text-cyan-400">*</span>
                 </Label>
-                <Select onValueChange={(value) => setValue('college', value)}>
+                <Select value={watchedCollege} onValueChange={(value) => setValue('college', value)}>
                   <SelectTrigger
                     id="memberCollege"
                     className={`bg-[#112240] border-gray-700 text-white transition-all ${errors.college
-                        ? 'border-red-500'
-                        : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                      ? 'border-red-500'
+                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                       }`}
                     aria-invalid={errors.college ? 'true' : 'false'}
                     aria-describedby={errors.college ? 'memberCollege-error' : undefined}
@@ -449,8 +450,8 @@ export const TeamMembersForm = React.forwardRef<
                   placeholder="Enter student ID"
                   {...register('studentId')}
                   className={`bg-[#112240] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.studentId
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                     }`}
                   aria-invalid={errors.studentId ? 'true' : 'false'}
                   aria-describedby={errors.studentId ? 'memberStudentId-error' : undefined}
@@ -478,8 +479,8 @@ export const TeamMembersForm = React.forwardRef<
                   placeholder="Enter 10-digit phone number"
                   {...register('phoneNumber')}
                   className={`bg-[#112240] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.phoneNumber
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                     }`}
                   aria-invalid={errors.phoneNumber ? 'true' : 'false'}
                   aria-describedby={errors.phoneNumber ? 'memberPhone-error' : undefined}
@@ -507,8 +508,8 @@ export const TeamMembersForm = React.forwardRef<
                   placeholder="Enter email address"
                   {...register('email')}
                   className={`bg-[#112240] border-gray-700 text-white placeholder:text-gray-500 transition-all ${errors.email
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                     }`}
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'memberEmail-error' : undefined}
@@ -530,12 +531,12 @@ export const TeamMembersForm = React.forwardRef<
                 <Label htmlFor="memberBranch" className="text-sm font-medium text-gray-300">
                   Branch <span className="text-cyan-400">*</span>
                 </Label>
-                <Select onValueChange={(value) => setValue('branch', value)}>
+                <Select value={watchedBranch} onValueChange={(value) => setValue('branch', value)}>
                   <SelectTrigger
                     id="memberBranch"
                     className={`bg-[#112240] border-gray-700 text-white transition-all ${errors.branch
-                        ? 'border-red-500'
-                        : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                      ? 'border-red-500'
+                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                       }`}
                     aria-invalid={errors.branch ? 'true' : 'false'}
                     aria-describedby={errors.branch ? 'memberBranch-error' : undefined}
@@ -582,12 +583,12 @@ export const TeamMembersForm = React.forwardRef<
                 <Label htmlFor="memberYear" className="text-sm font-medium text-gray-300">
                   Year <span className="text-cyan-400">*</span>
                 </Label>
-                <Select onValueChange={(value) => setValue('year', value)}>
+                <Select value={watchedYear} onValueChange={(value) => setValue('year', value)}>
                   <SelectTrigger
                     id="memberYear"
                     className={`bg-[#112240] border-gray-700 text-white transition-all ${errors.year
-                        ? 'border-red-500'
-                        : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
+                      ? 'border-red-500'
+                      : 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
                       }`}
                     aria-invalid={errors.year ? 'true' : 'false'}
                     aria-describedby={errors.year ? 'memberYear-error' : undefined}
@@ -677,7 +678,7 @@ export const TeamMembersForm = React.forwardRef<
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          {formState.errors.submit}
+          {String(formState.errors.submit)}
         </motion.div>
       )}
 

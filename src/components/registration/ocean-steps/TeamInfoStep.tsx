@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 const TeamInfoStep = () => {
-    const { register, watch, setValue, control, formState: { errors } } = useFormContext<RegistrationFormData>();
+    const { watch, setValue, control } = useFormContext<RegistrationFormData>();
 
     const eventId = watch('eventId');
     const currentSquadSize = watch('squadSize');
