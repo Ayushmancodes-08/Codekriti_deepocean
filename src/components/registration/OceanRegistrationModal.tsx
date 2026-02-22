@@ -367,20 +367,13 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                             <div className="flex flex-col gap-3">
                                                 {/* Dynamic Rulebook/Sponsor Button */}
                                                 {(() => {
-                                                    const isDesignathon = ticketData?.event?.toLowerCase().includes('designathon');
                                                     const rulebookMap: Record<string, string> = {
                                                         'algo-to-code': '/assets/AlgotoCode.pdf',
-                                                        'designathon': '/assets/PS_with_overall Solution.pdf',
+                                                        'designathon': '/assets/Designathon.pdf',
                                                         'innovation-challenge': '/assets/Innovation Challenge.pdf',
                                                         'techmaze': '/assets/TechMaze.pdf',
                                                         'devxtreme': '/assets/Devxtreme.pdf',
                                                     };
-                                                    // Try to match event ID from name or check if there's a way to persist ID better
-                                                    // Since we have ticketData.event which is likely the display name, we might need to map it back or pass ID safely.
-                                                    // Actually, inside processRegistration we have data.eventId.
-                                                    // But here we are in the render phase of ticketData.
-                                                    // Let's rely on the fact that we can re-derive or just use selectedEvent state if available?
-                                                    // Yes, selectedEvent state should still be valid here as we haven't closed the modal.
 
                                                     const currentEventId = selectedEvent;
                                                     const downloadLink = currentEventId ? rulebookMap[currentEventId] : null;
@@ -397,14 +390,9 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                                 link.click();
                                                                 document.body.removeChild(link);
                                                             }}
-                                                            className={`group relative w-full py-4 bg-transparent border-2 font-black uppercase tracking-[0.3em] text-xs rounded-2xl transition-all duration-300 overflow-hidden ${isDesignathon
-                                                                ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-[#0a192f]'
-                                                                : 'border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda] hover:text-[#0a192f]'
-                                                                }`}
+                                                            className="group relative w-full py-4 bg-transparent border-2 border-[#64ffda] text-[#64ffda] font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-[#64ffda] hover:text-[#0a192f] transition-all duration-300 overflow-hidden"
                                                         >
-                                                            <span className="relative z-10">
-                                                                {currentEventId === 'designathon' ? 'P.S by Our Sponsors' : 'Download Rulebook'}
-                                                            </span>
+                                                            <span className="relative z-10">Download Rulebook</span>
                                                             <div className="absolute inset-x-0 bottom-0 h-0 bg-white group-hover:h-full transition-all duration-300 opacity-10" />
                                                         </button>
                                                     );
