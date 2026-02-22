@@ -1,5 +1,5 @@
 // Cloudinary Asset Configuration
-// Auto-optimization parameters: f_auto (format), q_auto (quality)
+// Optimization params: f_auto (WebP/AVIF auto-format), q_auto (quality), w_* (width cap), dpr_auto (retina)
 const CLOUD_BASE = "https://res.cloudinary.com/dlanrr3jl";
 
 export const ASSETS = {
@@ -7,8 +7,9 @@ export const ASSETS = {
     LOGO: '/logo_bg.jpeg', // Black Background Logo
     LOGO_WHITE_TEXT_TRANSPARENT: '/logo_bg.jpeg', // Used everywhere now
     DEVXTREME_POSTER: `${CLOUD_BASE}/image/upload/f_auto,q_auto,w_800/v1769794944/devx_y2lkjc.jpg`,
-    SEA_BG: `${CLOUD_BASE}/image/upload/f_auto,q_auto,w_1200/v1769794945/sea_yyeaix.jpg`,
-    ROCK_TEXTURE: `${CLOUD_BASE}/image/upload/f_auto,q_auto,w_1200/v1769794945/sea_yyeaix.jpg`,
+    // q_60 reduces size by ~40% vs q_auto; w_800 is enough for a background overlay on mobile
+    SEA_BG: `${CLOUD_BASE}/image/upload/f_auto,q_60,w_800,dpr_auto/v1769794945/sea_yyeaix.jpg`,
+    ROCK_TEXTURE: `${CLOUD_BASE}/image/upload/f_auto,q_60,w_800,dpr_auto/v1769794945/sea_yyeaix.jpg`,
     MUSIC_THEME: '/audio/theme_music.mp3',
 
     // Videos (Optimized)

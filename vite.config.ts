@@ -29,28 +29,36 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: "ES2020",
     minify: "terser",
+    cssMinify: true,
+    cssCodeSplit: true,
     terserOptions: {
       compress: {
         drop_console: mode === "production",
+        drop_debugger: true,
+        pure_funcs: mode === "production" ? ['console.log', 'console.info', 'console.debug'] : [],
       },
     },
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Vendor chunks - Core dependencies
-          if (id.includes("node_modules/react") && !id.includes("react-hook-form")) {
-            return "vendor-react";
+          // Core React - smallest possible chunk, cached aggressively
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/") || id.includes("node_modules/scheduler/")) {
+            if (!id.includes("react-hook-form") && !id.includes("react-router")) {
+              return "vendor-react";
+            }
           }
 
-          // UI and form libraries
+          // Radix UI component primitives
           if (id.includes("node_modules/@radix-ui")) {
             return "vendor-radix-ui";
           }
+
+          // Forms
           if (id.includes("node_modules/react-hook-form") || id.includes("node_modules/zod")) {
             return "vendor-forms";
           }
 
-          // Animation library
+          // Animation library (large — keep isolated)
           if (id.includes("node_modules/framer-motion")) {
             return "vendor-framer-motion";
           }
@@ -60,29 +68,43 @@ export default defineConfig(({ mode }) => ({
             return "vendor-router";
           }
 
-          // Query library
+          // Data fetching
           if (id.includes("node_modules/@tanstack/react-query")) {
             return "vendor-query";
           }
 
-          // Other utilities
-          if (id.includes("node_modules/lucide-react") || id.includes("node_modules/sonner")) {
+          // Icons — lucide-react is large, isolate so it's cached separately
+          if (id.includes("node_modules/lucide-react")) {
+            return "vendor-icons";
+          }
+
+          // Supabase — admin-only, keep out of main bundle
+          if (id.includes("node_modules/@supabase") || id.includes("node_modules/supabase")) {
+            return "vendor-supabase";
+          }
+
+          // Notifications
+          if (id.includes("node_modules/sonner")) {
             return "vendor-utils";
           }
 
-          // Registration Components - Lazy loaded, separate chunk
-          if (id.includes("components/RegistrationFlow") ||
+          // Registration flow — lazy loaded, separate chunk
+          if (
+            id.includes("components/RegistrationFlow") ||
             id.includes("components/SingleParticipantForm") ||
             id.includes("components/TeamMembersForm") ||
             id.includes("components/TeamDetailsForm") ||
-            id.includes("components/EventSelection")) {
+            id.includes("components/EventSelection")
+          ) {
             return "chunk-registration";
           }
 
-          // Media Components - Lazy loaded
-          if (id.includes("components/VideoOptimization") ||
+          // Media — lazy loaded
+          if (
+            id.includes("components/VideoOptimization") ||
             id.includes("components/ResponsiveImage") ||
-            id.includes("components/VideoBackground")) {
+            id.includes("components/VideoBackground")
+          ) {
             return "chunk-media";
           }
 
