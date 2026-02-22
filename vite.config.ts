@@ -4,9 +4,8 @@ import path from "path";
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
 
 /**
- * Makes the main Vite-injected CSS bundle non-blocking.
- * Replaces blocking <link rel="stylesheet"> with preload+onload swap —
- * removes the CSS from the critical render path entirely.
+ * Makes the main Vite-injected CSS bundle non-blocking at build time.
+ * Converts blocking <link rel="stylesheet"> → preload + onload swap.
  * A <noscript> fallback keeps CSS working without JS.
  */
 function nonBlockingCssPlugin(): Plugin {
@@ -32,6 +31,17 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     hmr: {
       overlay: false,
+    },
+    // Pre-warm critical-path files so the first browser request is instant
+    warmup: {
+      clientFiles: [
+        './src/main.tsx',
+        './src/App.tsx',
+        './src/pages/Index.tsx',
+        './src/components/VideoBackground.tsx',
+        './src/components/Navbar.tsx',
+        './src/components/HeroSection.tsx',
+      ],
     },
   },
   plugins: [
@@ -59,81 +69,81 @@ export default defineConfig(({ mode }) => ({
         drop_console: mode === "production",
         drop_debugger: true,
         pure_funcs: mode === "production" ? ['console.log', 'console.info', 'console.debug'] : [],
+        passes: 2,           // 2nd pass catches additional dead code
+        unsafe_arrows: true, // arrow → shorthand — saves bytes
       },
     },
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Core React - smallest possible chunk, cached aggressively
-          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/") || id.includes("node_modules/scheduler/")) {
-            if (!id.includes("react-hook-form") && !id.includes("react-router")) {
-              return "vendor-react";
+          // ── Core React ──────────────────────────────────────────────────────
+          if (
+            (id.includes("node_modules/react/") ||
+              id.includes("node_modules/react-dom/") ||
+              id.includes("node_modules/scheduler/")) &&
+            !id.includes("react-hook-form") &&
+            !id.includes("react-router")
+          ) {
+            return "vendor-react";
+          }
+
+          // ── Radix UI: per-package split ─────────────────────────────────────
+          // Each @radix-ui/react-* is independent — split them so only
+          // packages actually imported on a page are downloaded.
+          const radixMatch = id.match(/node_modules\/@radix-ui\/(react-[^/]+)/);
+          if (radixMatch) {
+            const pkg = radixMatch[1];
+            // Core components used everywhere — group for fewer round-trips
+            const coreGroup = ['react-dialog', 'react-tooltip', 'react-select',
+              'react-checkbox', 'react-scroll-area', 'react-label', 'react-slot'];
+            if (coreGroup.some(p => pkg === p)) {
+              return 'vendor-radix-core';
             }
+            return `vendor-radix-${pkg}`;
           }
 
-          // Radix UI component primitives
-          if (id.includes("node_modules/@radix-ui")) {
-            return "vendor-radix-ui";
-          }
-
-          // Forms
+          // ── Forms ──────────────────────────────────────────────────────────
           if (id.includes("node_modules/react-hook-form") || id.includes("node_modules/zod")) {
             return "vendor-forms";
           }
 
-          // Animation library (large — keep isolated)
+          // ── Framer Motion ────────────────────────────────────────────────
           if (id.includes("node_modules/framer-motion")) {
             return "vendor-framer-motion";
           }
 
-          // Router
+          // ── Router ────────────────────────────────────────────────────────
           if (id.includes("node_modules/react-router")) {
             return "vendor-router";
           }
 
-          // Data fetching
+          // ── Data fetching ─────────────────────────────────────────────────
           if (id.includes("node_modules/@tanstack/react-query")) {
             return "vendor-query";
           }
 
-          // Icons — lucide-react is large, isolate so it's cached separately
+          // ── Icons ─────────────────────────────────────────────────────────
           if (id.includes("node_modules/lucide-react")) {
             return "vendor-icons";
           }
 
-          // Supabase — admin-only, keep out of main bundle
+          // ── Supabase (admin-only) ──────────────────────────────────────────
           if (id.includes("node_modules/@supabase") || id.includes("node_modules/supabase")) {
             return "vendor-supabase";
           }
 
-          // Notifications
+          // ── Notifications ─────────────────────────────────────────────────
           if (id.includes("node_modules/sonner")) {
             return "vendor-utils";
           }
 
-          // Registration flow — lazy loaded, separate chunk
+          // ── Registration flow (lazy loaded) ───────────────────────────────
           if (
-            id.includes("components/RegistrationFlow") ||
+            id.includes("components/registration") ||
             id.includes("components/SingleParticipantForm") ||
-            id.includes("components/TeamMembersForm") ||
-            id.includes("components/TeamDetailsForm") ||
-            id.includes("components/EventSelection")
+            id.includes("components/TeamMembersForm")
           ) {
             return "chunk-registration";
-          }
-
-          // Media — lazy loaded
-          if (
-            id.includes("components/VideoOptimization") ||
-            id.includes("components/ResponsiveImage") ||
-            id.includes("components/VideoBackground")
-          ) {
-            return "chunk-media";
-          }
-
-          // Contexts and hooks
-          if (id.includes("contexts/") || id.includes("hooks/")) {
-            return "chunk-state";
           }
         },
       },
@@ -142,12 +152,31 @@ export default defineConfig(({ mode }) => ({
     reportCompressedSize: true,
   },
   optimizeDeps: {
+    // Pre-bundle frequently-used deps at server start (not on first request)
     include: [
       "react",
       "react-dom",
+      "react/jsx-runtime",
       "framer-motion",
       "react-hook-form",
       "zod",
+      "react-router-dom",
+      "@tanstack/react-query",
+      "lucide-react",
+      "sonner",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-scroll-area",
+      "@radix-ui/react-select",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-label",
+      "@radix-ui/react-slot",
     ],
+    // KEY: don't block the server start waiting for the full crawl to finish
+    holdUntilCrawlEnd: false,
+  },
+  esbuild: {
+    target: 'es2020',
+    legalComments: 'none', // strip /* MIT */ blocks → slightly smaller dev output
   },
 }));
