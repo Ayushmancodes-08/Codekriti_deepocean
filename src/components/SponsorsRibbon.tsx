@@ -21,7 +21,7 @@ const SponsorsRibbon = () => (
             <motion.div
                 className="flex whitespace-nowrap min-w-full gap-8 md:gap-24 pl-8 md:pl-24 items-center"
                 animate={{ x: ['0%', '-50%'] }}
-                transition={{ repeat: Infinity, ease: 'linear', duration: 20 }}
+                transition={{ repeat: Infinity, ease: 'linear', duration: 12 }}
             >
                 {[...items, ...items].map((item, i) => (
                     <div
