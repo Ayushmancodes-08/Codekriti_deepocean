@@ -32,7 +32,7 @@ const BrickBreaker = () => {
     const bricks = useRef<{ x: number; y: number; status: number }[][]>([]);
     const livesRef = useRef(4);
     const levelRef = useRef(1); // Ref for level to be accessible in draw loop
-    const reqRef = useRef<number>();
+    const reqRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
         const saved = localStorage.getItem('brickBreakerHighScore');
