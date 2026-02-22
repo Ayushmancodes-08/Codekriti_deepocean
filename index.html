@@ -4,6 +4,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Critical above-fold CSS: prevents FOUC while main stylesheet loads async -->
+  <style>
+    *,
+    ::before,
+    ::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      color-scheme: dark
+    }
+
+    body {
+      background: #020817;
+      color: #e2e8f0;
+      font-family: system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    #root {
+      min-height: 100vh
+    }
+
+    /* Loading shimmer for initial paint */
+    .init-bg {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #020817 0%, #0a192f 50%, #020817 100%);
+      z-index: -1
+    }
+  </style>
   <meta name="google-site-verification" content="eD9ukQDIiETBA0T89koOPGaazTUtBRkVidRMOP71k50" />
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -295,6 +329,98 @@
 <body>
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVC3XHSW" height="0" width="0"
       style="display:none;visibility:hidden"></iframe></noscript>
+
+  <!-- DevTools Protection -->
+  <script>
+    (function () {
+      'use strict';
+
+      // ── 1. Block keyboard shortcuts ──────────────────────────────────────────
+      document.addEventListener('keydown', function (e) {
+        // F12
+        if (e.key === 'F12') { e.preventDefault(); return false; }
+        // Ctrl+Shift+I / J / C / K  (DevTools shortcuts)
+        if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k'].includes(e.key)) {
+          e.preventDefault(); return false;
+        }
+        // Ctrl+U (View Source)
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+          e.preventDefault(); return false;
+        }
+        // Cmd+Option+I (macOS)
+        if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i')) {
+          e.preventDefault(); return false;
+        }
+      }, true);
+
+      // ── 2. Disable right-click ────────────────────────────────────────────────
+      document.addEventListener('contextmenu', function (e) {
+        e.preventDefault(); return false;
+      }, true);
+
+      // ── 3. Detect DevTools via window size difference ─────────────────────────
+      var THRESHOLD = 160;
+      var devtoolsOverlay = null;
+
+      function showProtectionOverlay() {
+        if (devtoolsOverlay) return;
+        devtoolsOverlay = document.createElement('div');
+        devtoolsOverlay.style.cssText = [
+          'position:fixed', 'inset:0', 'z-index:2147483647',
+          'background:linear-gradient(135deg,#020817 0%,#0a192f 100%)',
+          'display:flex', 'align-items:center', 'justify-content:center',
+          'flex-direction:column', 'gap:24px', 'font-family:system-ui,sans-serif',
+          'backdrop-filter:blur(10px)'
+        ].join(';');
+        devtoolsOverlay.innerHTML = [
+          '<div style="text-align:center;max-width:420px;padding:40px">',
+          '<div style="font-size:64px;margin-bottom:16px">🔐</div>',
+          '<h1 style="color:#00D9FF;font-size:22px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Access Restricted</h1>',
+          '<p style="color:#94a3b8;font-size:14px;line-height:1.7">Developer tools are not permitted on this site.</p>',
+          '<p style="color:#64748b;font-size:12px;margin-top:16px">Close DevTools to continue.</p>',
+          '</div>'
+        ].join('');
+        document.body.appendChild(devtoolsOverlay);
+      }
+
+      function hideProtectionOverlay() {
+        if (devtoolsOverlay) {
+          devtoolsOverlay.remove();
+          devtoolsOverlay = null;
+        }
+      }
+
+      function checkDevTools() {
+        var widthDiff = window.outerWidth - window.innerWidth;
+        var heightDiff = window.outerHeight - window.innerHeight;
+        if (widthDiff > THRESHOLD || heightDiff > THRESHOLD) {
+          showProtectionOverlay();
+        } else {
+          hideProtectionOverlay();
+        }
+      }
+
+      // Poll every 800ms
+      setInterval(checkDevTools, 800);
+
+      // ── 4. Debugger trap (slows debugger significantly) ───────────────────────
+      // A setInterval debugger loop that adds latency when devtools are open
+      (function dbgTrap() {
+        try {
+          var start = performance.now();
+          (function () { }).constructor('debugger')(); // triggers only when devtools open
+          if (performance.now() - start > 100) {
+            showProtectionOverlay();
+          } else {
+            hideProtectionOverlay();
+          }
+        } catch (e) { }
+        setTimeout(dbgTrap, 1000);
+      })();
+
+    })();
+  </script>
+
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 

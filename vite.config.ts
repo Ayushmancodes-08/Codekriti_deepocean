@@ -1,7 +1,29 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
+
+/**
+ * Makes the main Vite-injected CSS bundle non-blocking.
+ * Replaces blocking <link rel="stylesheet"> with preload+onload swap —
+ * removes the CSS from the critical render path entirely.
+ * A <noscript> fallback keeps CSS working without JS.
+ */
+function nonBlockingCssPlugin(): Plugin {
+  return {
+    name: 'non-blocking-css',
+    apply: 'build',
+    transformIndexHtml(html) {
+      // Vite injects: <link rel="stylesheet" crossorigin href="/assets/index-XXXX.css">
+      return html.replace(
+        /(<link rel="stylesheet" crossorigin href="([^"]+\.css)"\s*\/>)/g,
+        (_, _full, href) =>
+          `<link rel="preload" as="style" href="${href}" onload="this.onload=null;this.rel='stylesheet'" />` +
+          `<noscript><link rel="stylesheet" href="${href}" /></noscript>`
+      );
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -20,6 +42,7 @@ export default defineConfig(({ mode }) => ({
       webp: { quality: 80, lossless: true },
       avif: { quality: 70, lossless: true },
     }),
+    nonBlockingCssPlugin(),
   ],
   resolve: {
     alias: {
