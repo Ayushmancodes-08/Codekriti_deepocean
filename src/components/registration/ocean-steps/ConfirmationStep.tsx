@@ -3,7 +3,8 @@ import { CheckCircle, Users, User } from 'lucide-react';
 import type { RegistrationFormData } from '@/types/registration';
 
 const ConfirmationStep = () => {
-    const { watch } = useFormContext<RegistrationFormData>();
+    const methods = useFormContext<RegistrationFormData>();
+    const { watch, register } = methods;
     const data = watch();
 
     return (
@@ -118,7 +119,7 @@ const ConfirmationStep = () => {
                     type="checkbox"
                     id="subscribe"
                     className="mt-1 w-4 h-4 rounded border-gray-600 bg-[#112240] text-cyan-500 focus:ring-cyan-500 focus:ring-offset-0"
-                    {...useFormContext().register('subscribe')}
+                    {...register('subscribe')}
                 />
                 <label htmlFor="subscribe" className="text-sm text-gray-400 cursor-pointer select-none">
                     <span className="text-white font-medium block mb-1">Subscribe to CodeKriti Newsletter</span>

@@ -150,8 +150,9 @@ const CustomCursor = () => {
         };
     }, [isTouchDevice, isVisible, cursorX, cursorY]);
 
-    // Don't render on touch devices
-    if (isTouchDevice) return null;
+    // We don't return null here to keep hooks active
+    // Instead we handle visibility in the motion.div components
+
 
     const getCursorSize = () => {
         if (cursorState.isClicking) return 20; // Slightly larger click
@@ -180,7 +181,12 @@ const CustomCursor = () => {
                     <motion.div
                         key={ripple.id}
                         initial={{ width: 0, height: 0, opacity: 0.8, borderWidth: 2 }}
-                        animate={{ width: 300, height: 300, opacity: 0, borderWidth: 0 }}
+                        animate={{
+                            width: 300,
+                            height: 300,
+                            opacity: isTouchDevice ? 0 : 0, // Keep as is but technically should be 0 anyway if invisible
+                            borderWidth: 0
+                        }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="fixed pointer-events-none rounded-full z-[9990]"
@@ -210,7 +216,11 @@ const CustomCursor = () => {
                     <motion.div
                         key={t.id}
                         initial={{ opacity: 0.5, scale: 0.5 }}
-                        animate={{ opacity: 0, scale: 0, y: -20 }}
+                        animate={{
+                            opacity: isTouchDevice ? 0 : 0,
+                            scale: 0,
+                            y: -20
+                        }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.8 }}
                         className="fixed pointer-events-none rounded-full bg-cyan-400/30 z-[9998]"
@@ -242,7 +252,7 @@ const CustomCursor = () => {
                         y: -getCursorSize() / 2,
                         backgroundColor: getCursorColor(),
                         border: `1px solid ${getBorderColor()}`,
-                        opacity: isVisible ? 1 : 0,
+                        opacity: (isVisible && !isTouchDevice) ? 1 : 0,
                     }}
                     transition={{
                         type: 'spring',

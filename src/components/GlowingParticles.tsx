@@ -43,9 +43,6 @@ const GlowingParticles = ({ className = '', count }: GlowingParticlesProps) => {
         }
     }, [performanceTier, count]);
 
-    // Skip rendering entirely on low-end devices
-    if (performanceTier === 'low') return null;
-
     const createParticle = (width: number, height: number): Particle => {
         const type = Math.random() < 0.7 ? 'star' : Math.random() < 0.8 ? 'dust' : 'orb';
         return {
@@ -180,9 +177,7 @@ const GlowingParticles = ({ className = '', count }: GlowingParticlesProps) => {
         <canvas
             ref={canvasRef}
             className={`absolute inset-0 pointer-events-none z-5 ${className}`}
-            style={{
-                opacity: 1,
-            }}
+            style={{ opacity: particleCount === 0 ? 0 : 1 }}
         />
     );
 };

@@ -1,12 +1,18 @@
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, EVENTS, EVENT_COLLEGES, type RegistrationFormData } from '@/types/registration';
-import OceanInput from '../OceanInput';
 import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
 import { motion } from 'framer-motion';
+import { FormControl, FormField } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { OceanFormItem } from '@/components/ui/ocean-form';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 const TeamInfoStep = () => {
-    const { register, watch, setValue, formState: { errors } } = useFormContext<RegistrationFormData>();
+    const { register, watch, setValue, control, formState: { errors } } = useFormContext<RegistrationFormData>();
 
     const eventId = watch('eventId');
     const currentSquadSize = watch('squadSize');
@@ -14,7 +20,7 @@ const TeamInfoStep = () => {
     const event = EVENTS.find(e => e.id === eventId);
 
     // Get event-specific colleges
-    const collegeOptions = eventId && EVENT_COLLEGES[eventId as any] ? EVENT_COLLEGES[eventId as any] : EVENT_COLLEGES['algo-to-code'];
+    const collegeOptions = (eventId && EVENT_COLLEGES[eventId as keyof typeof EVENT_COLLEGES] ? EVENT_COLLEGES[eventId as keyof typeof EVENT_COLLEGES] : EVENT_COLLEGES['algo-to-code']) as string[];
 
     const hasSizeRange = event && event.minTeamSize !== event.maxTeamSize;
     const sizeOptions = hasSizeRange
@@ -37,18 +43,21 @@ const TeamInfoStep = () => {
             </div>
 
             {/* Team Name */}
-            <OceanInput
-                label="Team Name"
-                icon={Users}
-                error={(errors as any).teamName?.message}
-            >
-                <input
-                    {...register('teamName' as any)}
-                    type="text"
-                    placeholder="Enter unique team name"
-                    className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 text-sm"
-                />
-            </OceanInput>
+            <FormField
+                control={control}
+                name="teamName"
+                render={({ field }) => (
+                    <OceanFormItem label="Team Name" icon={Users}>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                placeholder="Enter unique team name"
+                                className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 h-11"
+                            />
+                        </FormControl>
+                    </OceanFormItem>
+                )}
+            />
 
             {/* Dynamic Squad Size Selector - Compact Version */}
             {hasSizeRange && (
@@ -59,16 +68,22 @@ const TeamInfoStep = () => {
                     </div>
                     <div className="flex gap-2">
                         {sizeOptions.map((size) => (
-                            <button
+                            <Button
                                 key={size}
                                 type="button"
+                                variant="ghost"
                                 onClick={() => setValue('squadSize', size as any)}
-                                className={`flex-1 py-1.5 rounded-lg border transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden ${currentSquadSize === size
-                                    ? 'bg-[#00D9FF]/10 border-[#00D9FF] text-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.1)]'
-                                    : 'bg-transparent border-white/10 text-gray-500 hover:border-white/20'
-                                    }`}
+                                className={cn(
+                                    "flex-1 h-10 rounded-lg border transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden",
+                                    currentSquadSize === size
+                                        ? "bg-[#00D9FF]/10 border-[#00D9FF] text-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.1)] hover:bg-[#00D9FF]/20"
+                                        : "bg-transparent border-white/10 text-gray-500 hover:border-white/20 hover:bg-white/5"
+                                )}
                             >
-                                <span className={`text-sm font-black transition-transform ${currentSquadSize === size ? 'scale-110' : ''}`}>
+                                <span className={cn(
+                                    "text-sm font-black transition-transform",
+                                    currentSquadSize === size ? "scale-110" : ""
+                                )}>
                                     {size}
                                 </span>
                                 <span className="text-[7px] font-black uppercase tracking-tighter opacity-60">Ops</span>
@@ -79,7 +94,7 @@ const TeamInfoStep = () => {
                                         className="absolute inset-0 bg-[#00D9FF]/5 rounded-lg pointer-events-none"
                                     />
                                 )}
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 </div>
@@ -93,134 +108,152 @@ const TeamInfoStep = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                    <OceanInput
-                        label="Full Name"
-                        icon={User}
-                        error={(errors as any).teamLeader?.name?.message}
-                    >
-                        <input
-                            {...register('teamLeader.name')}
-                            onBlur={(e) => {
-                                const formatted = capitalizeName(e.target.value);
-                                e.target.value = formatted;
-                                register('teamLeader.name').onChange(e);
-                            }}
-                            type="text"
-                            placeholder="Leader Name"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
-                        />
-                    </OceanInput>
+                    <FormField
+                        control={control}
+                        name="teamLeader.name"
+                        render={({ field }) => (
+                            <OceanFormItem label="Full Name" icon={User}>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        onBlur={(e) => {
+                                            const formatted = capitalizeName(e.target.value);
+                                            field.onChange(formatted);
+                                        }}
+                                        placeholder="Leader Name"
+                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 h-11"
+                                    />
+                                </FormControl>
+                            </OceanFormItem>
+                        )}
+                    />
 
-                    <OceanInput
-                        label="Email"
-                        icon={Mail}
-                        error={(errors as any).teamLeader?.email?.message}
-                    >
-                        <input
-                            {...register('teamLeader.email')}
-                            type="email"
-                            placeholder="Leader Email"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
-                        />
-                    </OceanInput>
+                    <FormField
+                        control={control}
+                        name="teamLeader.email"
+                        render={({ field }) => (
+                            <OceanFormItem label="Email" icon={Mail}>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        type="email"
+                                        placeholder="Leader Email"
+                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 h-11"
+                                    />
+                                </FormControl>
+                            </OceanFormItem>
+                        )}
+                    />
 
-                    <OceanInput
-                        label="Phone"
-                        icon={Phone}
-                        error={(errors as any).teamLeader?.phone?.message}
-                    >
-                        <input
-                            {...register('teamLeader.phone')}
-                            onKeyDown={preventNonNumeric}
-                            onChange={(e) => {
-                                const formatted = formatStrictPhone(e.target.value);
-                                e.target.value = formatted;
-                                register('teamLeader.phone').onChange(e);
-                            }}
-                            type="tel"
-                            placeholder="Phone Number"
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
-                        />
-                    </OceanInput>
+                    <FormField
+                        control={control}
+                        name="teamLeader.phone"
+                        render={({ field }) => (
+                            <OceanFormItem label="Phone" icon={Phone}>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        onKeyDown={preventNonNumeric}
+                                        onChange={(e) => {
+                                            const formatted = formatStrictPhone(e.target.value);
+                                            field.onChange(formatted);
+                                        }}
+                                        type="tel"
+                                        placeholder="Phone Number"
+                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 h-11"
+                                    />
+                                </FormControl>
+                            </OceanFormItem>
+                        )}
+                    />
 
-                    <OceanInput
-                        label="College"
-                        icon={School}
-                        error={(errors as any).teamLeader?.college?.message}
-                    >
-                        <div className="relative">
-                            <select
-                                {...register('teamLeader.college')}
-                                className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all min-h-[44px] text-[16px] appearance-none"
-                            >
-                                <option value="" className="bg-[#1A1A2E]">Select College</option>
-                                {collegeOptions.map((col) => (
-                                    <option key={col} value={col} className={`bg-[#1A1A2E] ${col === 'Other' ? 'text-yellow-400 font-bold' : ''}`}>
-                                        {col}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white">
-                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                            </div>
-                        </div>
-                    </OceanInput>
+                    <FormField
+                        control={control}
+                        name="teamLeader.college"
+                        render={({ field }) => (
+                            <OceanFormItem label="College" icon={School}>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
+                                            <SelectValue placeholder="Select College" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
+                                        {collegeOptions.map((col) => (
+                                            <SelectItem key={col} value={col} className={cn(col === 'Other' && "text-yellow-400 font-bold")}>
+                                                {col}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </OceanFormItem>
+                        )}
+                    />
 
                     {teamLeaderCollege === 'Other' && (
-                        <OceanInput
-                            label="Specify College Name"
-                            icon={School}
-                            error={(errors as any).teamLeader?.collegeCustom?.message}
-                        >
-                            <input
-                                {...register('teamLeader.collegeCustom' as any)}
-                                type="text"
-                                placeholder="Enter your college name"
-                                className="w-full bg-[#0a192f]/50 border-2 border-yellow-400/50 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-yellow-400 transition-all placeholder-gray-500 min-h-[44px] text-[16px]"
-                            />
-                        </OceanInput>
+                        <FormField
+                            control={control}
+                            name="teamLeader.collegeCustom"
+                            render={({ field }) => (
+                                <OceanFormItem label="Specify College Name" icon={School}>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder="Enter your college name"
+                                            className="bg-[#0a192f]/50 border-2 border-yellow-400/50 text-white focus:border-yellow-400 transition-all placeholder:text-gray-500 h-11"
+                                        />
+                                    </FormControl>
+                                </OceanFormItem>
+                            )}
+                        />
                     )}
 
                     <div className="grid grid-cols-2 gap-3">
-                        <OceanInput
-                            label="Branch"
-                            icon={BookOpen}
-                            error={(errors as any).teamLeader?.branch?.message}
-                        >
-                            <div className="relative">
-                                <select
-                                    {...register('teamLeader.branch')}
-                                    className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-2 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all min-h-[44px] text-[16px] appearance-none"
-                                >
-                                    <option value="" className="bg-[#1A1A2E]">Branch</option>
-                                    {BRANCHES.map((branch) => (
-                                        <option key={branch} value={branch} className="bg-[#1A1A2E]">
-                                            {branch}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </OceanInput>
+                        <FormField
+                            control={control}
+                            name="teamLeader.branch"
+                            render={({ field }) => (
+                                <OceanFormItem label="Branch" icon={BookOpen}>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
+                                                <SelectValue placeholder="Branch" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
+                                            {BRANCHES.map((branch) => (
+                                                <SelectItem key={branch} value={branch}>
+                                                    {branch}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </OceanFormItem>
+                            )}
+                        />
 
-                        <OceanInput
-                            label="Year"
-                            icon={Calendar}
-                            error={(errors as any).teamLeader?.yearOfStudy?.message}
-                        >
-                            <div className="relative">
-                                <select
-                                    {...register('teamLeader.yearOfStudy')}
-                                    className="w-full bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white px-2 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all min-h-[44px] text-[16px] appearance-none"
-                                >
-                                    <option value="" className="bg-[#1A1A2E]">Year</option>
-                                    {YEARS_OF_STUDY.map((year) => (
-                                        <option key={year} value={year} className="bg-[#1A1A2E]">
-                                            {year}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </OceanInput>
+                        <FormField
+                            control={control}
+                            name="teamLeader.yearOfStudy"
+                            render={({ field }) => (
+                                <OceanFormItem label="Year" icon={Calendar}>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
+                                                <SelectValue placeholder="Year" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
+                                            {YEARS_OF_STUDY.map((year) => (
+                                                <SelectItem key={year} value={year}>
+                                                    {year}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </OceanFormItem>
+                            )}
+                        />
                     </div>
                 </div>
             </div>
@@ -238,29 +271,37 @@ const TeamInfoStep = () => {
                         </div>
                     </div>
 
-                    <OceanInput
-                        label="Problem Statement"
-                        icon={BookOpen}
-                        error={(errors as any).problemStatement?.message}
-                    >
-                        <textarea
-                            {...register('problemStatement' as any)}
-                            placeholder="Describe the problem you are solving..."
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[100px] text-sm resize-y"
-                        />
-                    </OceanInput>
+                    <FormField
+                        control={control}
+                        name="problemStatement"
+                        render={({ field }) => (
+                            <OceanFormItem label="Problem Statement" icon={BookOpen}>
+                                <FormControl>
+                                    <Textarea
+                                        {...field}
+                                        placeholder="Describe the problem you are solving..."
+                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 min-h-[100px] resize-y"
+                                    />
+                                </FormControl>
+                            </OceanFormItem>
+                        )}
+                    />
 
-                    <OceanInput
-                        label="Proposed Solution"
-                        icon={Shield}
-                        error={(errors as any).solution?.message}
-                    >
-                        <textarea
-                            {...register('solution' as any)}
-                            placeholder="Describe your technical solution..."
-                            className="w-full bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#00D9FF] transition-all placeholder-gray-500 min-h-[120px] text-sm resize-y"
-                        />
-                    </OceanInput>
+                    <FormField
+                        control={control}
+                        name="solution"
+                        render={({ field }) => (
+                            <OceanFormItem label="Proposed Solution" icon={Shield}>
+                                <FormControl>
+                                    <Textarea
+                                        {...field}
+                                        placeholder="Describe your technical solution..."
+                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 min-h-[120px] resize-y"
+                                    />
+                                </FormControl>
+                            </OceanFormItem>
+                        )}
+                    />
                 </div>
             )}
         </div>

@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin, CalendarDays, Mail } from 'lucide-react';
 import OceanRegistrationModal from './registration/OceanRegistrationModal';
 // PERFORMANCE: Disabled Bubbles
 // import Bubbles from './Bubbles';
@@ -37,12 +37,12 @@ const RegisterSection = () => {
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="absolute top-0 right-0 p-8 text-primary/10">
-            <Seaweed className="w-32 h-48 rotate-12" />
-          </div>
-          <div className="absolute bottom-0 left-0 p-8 text-accent/10">
-            <Seaweed className="w-24 h-36 -rotate-12" />
-          </div>
+          <div className="absolute top-0 right-0 p-8 text-primary/10 hidden sm:block">
+              <Seaweed className="w-32 h-48 rotate-12" />
+            </div>
+            <div className="absolute bottom-0 left-0 p-8 text-accent/10 hidden sm:block">
+              <Seaweed className="w-24 h-36 -rotate-12" />
+            </div>
 
           <div className="text-center relative z-10">
             {/* Title */}
@@ -116,16 +116,19 @@ const RegisterSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
         >
           {[
-            { label: 'Venue', value: 'PMEC ACADEMIC BLOCK' },
-            { label: 'Dates', value: 'March 6-7, 2026' },
-            { label: 'Contact', value: 'codingclubpmec@gmail.com' },
+            { label: 'Venue',   value: 'PMEC ACADEMIC BLOCK',       icon: <MapPin       className="w-4 h-4 text-cyan-400" /> },
+            { label: 'Dates',   value: 'March 6–7, 2026',           icon: <CalendarDays className="w-4 h-4 text-cyan-400" /> },
+            { label: 'Contact', value: 'codingclubpmec@gmail.com',  icon: <Mail         className="w-4 h-4 text-cyan-400" /> },
           ].map((item) => (
-            <div key={item.label} className="glass-card rounded-2xl p-6 border border-white/5 text-center">
-              <div className="text-[10px] text-primary/50 uppercase tracking-[0.2em] font-bold mb-1">{item.label}</div>
-              <div className="font-display text-lg font-medium text-foreground">{item.value}</div>
+            <div key={item.label} className="glass-card rounded-2xl p-4 sm:p-6 border border-white/5 text-center flex flex-col items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                {item.icon}
+              </div>
+              <div className="text-[10px] text-primary/50 uppercase tracking-[0.2em] font-bold">{item.label}</div>
+              <div className="font-display text-sm sm:text-base font-medium text-foreground break-all leading-snug">{item.value}</div>
             </div>
           ))}
         </motion.div>

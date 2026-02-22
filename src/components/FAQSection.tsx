@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 const faqs = [
     {
@@ -24,7 +24,7 @@ const faqs = [
         answer: "Yes. Small investment. Serious competition. Registration fees range from ₹30–₹500 depending on the event."
     },
     {
-        question: "Will food and accommodation be provided?",
+        question: "Will food & accommodation be provided?",
         answer: "Hackathon participants get refreshments. Work. Code. Repeat."
     },
     {
@@ -49,60 +49,83 @@ const FAQSection = () => {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
-        <section className="relative py-20 min-h-[50vh] flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-black/90 z-10" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black via-cyan-950/20 to-black z-0" />
+        <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden">
+            {/* Background */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 bg-black/90" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black via-cyan-950/20 to-black" />
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px]" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px]" />
             </div>
 
-            <div className="container mx-auto px-4 relative z-10 max-w-6xl">
-                <div className="text-center mb-12">
-                    <span className="text-cyan-400 font-bold tracking-widest uppercase text-sm mb-2 opacity-80">Knowledge Base</span>
-                    <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
-                        Freq. Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Questions</span>
+            <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-6xl">
+
+                {/* Header */}
+                <div className="text-center mb-10 sm:mb-14">
+                    <span className="inline-block text-cyan-400 font-bold tracking-widest uppercase text-xs sm:text-sm mb-3 opacity-80 px-4 py-1.5 rounded-full border border-cyan-500/20 bg-cyan-950/20">
+                        Knowledge Base
+                    </span>
+                    <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mt-3 leading-tight">
+                        Frequently Asked{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Questions</span>
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {faqs.map((faq, index) => (
-                        <div key={index} className="group h-fit">
-                            <button
-                                onClick={() => setOpenIndex(active => active === index ? null : index)}
-                                aria-expanded={openIndex === index}
-                                aria-controls={`faq-answer-${index}`}
-                                className={`w-full text-left p-4 rounded-xl glass-card transition-all duration-300 flex items-center justify-between border
-                                    ${openIndex === index
-                                        ? 'bg-cyan-950/30 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'}`}
-                            >
-                                <span id={`faq-question-${index}`} className={`font-display font-medium text-base md:text-lg transition-colors pr-4 ${openIndex === index ? 'text-cyan-400' : 'text-foreground/90'}`}>
-                                    {faq.question}
-                                </span>
-                                <span className={`p-1 rounded-full transition-all duration-300 flex-shrink-0 ${openIndex === index ? 'bg-cyan-500 text-black rotate-180' : 'bg-white/10 text-white group-hover:bg-white/20'}`}>
-                                    {openIndex === index ? <Minus size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
-                                </span>
-                            </button>
+                {/*
+                 * Grid:
+                 *   mobile/tablet → 1 col (stacked, easy to scroll)
+                 *   lg+           → 2 col
+                 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                    {faqs.map((faq, index) => {
+                        const isOpen = openIndex === index;
+                        return (
+                            <div key={index} className="group h-fit">
+                                <button
+                                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                                    aria-expanded={isOpen}
+                                    aria-controls={`faq-body-${index}`}
+                                    id={`faq-btn-${index}`}
+                                    className={`
+                                        w-full text-left px-4 sm:px-5 py-4 rounded-xl
+                                        flex items-center justify-between gap-3
+                                        border transition-all duration-300
+                                        min-h-[56px] touch-manipulation
+                                        ${isOpen
+                                            ? 'bg-cyan-950/30 border-cyan-500/50 shadow-[0_0_18px_rgba(6,182,212,0.1)]'
+                                            : 'bg-white/5 border-white/8 hover:bg-white/8 hover:border-white/15'}
+                                    `}
+                                >
+                                    <span className={`font-display font-medium text-sm sm:text-base leading-snug transition-colors pr-2 ${isOpen ? 'text-cyan-400' : 'text-white/90'}`}>
+                                        {faq.question}
+                                    </span>
+                                    <ChevronDown
+                                        className={`w-4 h-4 flex-shrink-0 transition-all duration-300 ${isOpen ? 'text-cyan-400 rotate-180' : 'text-gray-400'}`}
+                                        aria-hidden="true"
+                                    />
+                                </button>
 
-                            <AnimatePresence>
-                                {openIndex === index && (
-                                    <motion.div
-                                        id={`faq-answer-${index}`}
-                                        role="region"
-                                        aria-labelledby={`faq-question-${index}`}
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="overflow-hidden"
-                                    >
-                                        <div className="p-4 pt-2 text-foreground/70 text-sm md:text-base leading-relaxed border-l-2 border-cyan-500/30 ml-4 my-2">
-                                            {faq.answer}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    ))}
+                                <AnimatePresence>
+                                    {isOpen && (
+                                        <motion.div
+                                            id={`faq-body-${index}`}
+                                            role="region"
+                                            aria-labelledby={`faq-btn-${index}`}
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.22, ease: 'easeInOut' }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="px-4 sm:px-5 py-3 text-gray-400 text-sm sm:text-base leading-relaxed border-l-2 border-cyan-500/30 mx-4 mt-1 mb-2">
+                                                {faq.answer}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </section>

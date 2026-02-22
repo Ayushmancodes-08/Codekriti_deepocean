@@ -47,7 +47,12 @@ const App = () => {
           {isLoading ? (
             <WebsiteLoader key="loader" onFinish={() => setIsLoading(false)} />
           ) : (
-            <BrowserRouter>
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
               <AnimatedRoutes />
             </BrowserRouter>
           )}

@@ -80,8 +80,8 @@ const participantSchema = z.object({
     email: z.string().email('Invalid email address'),
     phone: z.string().regex(/^(\+91\s\d{5}\s\d{5}|\d{5}\s\d{5}|\d{10}|\+91\d{10})$/, 'Invalid phone number'),
     college: z.string().min(2, 'College name required'),
-    branch: z.enum(BRANCHES, { errorMap: () => ({ message: 'Branch is required' }) }),
-    yearOfStudy: z.enum(YEARS_OF_STUDY, { errorMap: () => ({ message: 'Year is required' }) }),
+    branch: z.enum(BRANCHES, { message: 'Branch is required' }),
+    yearOfStudy: z.enum(YEARS_OF_STUDY, { message: 'Year is required' }),
 });
 
 // Team member schema (same as participant but used in array)
@@ -90,8 +90,8 @@ const teamMemberSchema = z.object({
     email: z.string().email('Invalid email address'),
     phone: z.string().regex(/^(\+91\s\d{5}\s\d{5}|\d{5}\s\d{5}|\d{10}|\+91\d{10})$/, 'Invalid phone number'),
     college: z.string().min(2, 'College name required'),
-    branch: z.enum(BRANCHES, { errorMap: () => ({ message: 'Branch is required' }) }),
-    yearOfStudy: z.enum(YEARS_OF_STUDY, { errorMap: () => ({ message: 'Year is required' }) }),
+    branch: z.enum(BRANCHES, { message: 'Branch is required' }),
+    yearOfStudy: z.enum(YEARS_OF_STUDY, { message: 'Year is required' }),
 });
 
 // Solo base schema — NO superRefine here (would make it ZodEffects, breaking discriminatedUnion)
@@ -101,9 +101,11 @@ const soloBaseSchema = z.object({
     squadSize: z.literal(1),
     participant: participantSchema.extend({
         collegeCustom: z.string().optional(),
+        branchCustom: z.string().optional(),
+        yearCustom: z.string().optional(),
     }),
     subscribe: z.boolean().optional(),
-    transactionId: z.string({ required_error: 'Transaction ID is required' }).min(1, 'Transaction ID is required'),
+    transactionId: z.string().min(1, 'Transaction ID is required'),
     screenshotUrl: z.string().optional(),
 });
 
@@ -115,12 +117,16 @@ const teamBaseSchema = z.object({
     teamName: z.string().min(2, 'Team name required').max(50, 'Team name too long'),
     teamLeader: participantSchema.extend({
         collegeCustom: z.string().optional(),
+        branchCustom: z.string().optional(),
+        yearCustom: z.string().optional(),
     }),
     teamMembers: z.array(teamMemberSchema.extend({
         collegeCustom: z.string().optional(),
+        branchCustom: z.string().optional(),
+        yearCustom: z.string().optional(),
     })).min(1, 'At least one team member required'),
     subscribe: z.boolean().optional(),
-    transactionId: z.string({ required_error: 'Transaction ID is required' }).min(1, 'Transaction ID is required'),
+    transactionId: z.string().min(1, 'Transaction ID is required'),
     screenshotUrl: z.string().optional(),
     problemStatement: z.string().optional(),
     solution: z.string().optional(),
