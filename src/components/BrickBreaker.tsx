@@ -1,37 +1,50 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw, Trophy, Heart } from 'lucide-react';
 
+interface Particle {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    life: number;
+    color: string;
+    size: number;
+}
+
 const BrickBreaker = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
     const [lives, setLives] = useState(4);
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(0);
+    const [level, setLevel] = useState(1);
+    const [showLevelUp, setShowLevelUp] = useState(false);
+
+    // Screen Shake state
+    const [shake, setShake] = useState(0);
 
     // Game constants
     const CANVAS_WIDTH = 400;
     const CANVAS_HEIGHT = 400;
     const PADDLE_HEIGHT = 10;
-    const PADDLE_WIDTH = 75;
-    const BALL_RADIUS = 5;
+    const PADDLE_WIDTH = 80;
+    const BALL_RADIUS = 6;
     const BRICK_ROW_COUNT = 5;
     const BRICK_COLUMN_COUNT = 7;
-    const BRICK_PADDING = 10;
-    const BRICK_OFFSET_TOP = 80;
-    const BRICK_OFFSET_LEFT = 35;
+    const BRICK_PADDING = 8;
+    const BRICK_OFFSET_TOP = 85;
+    const BRICK_OFFSET_LEFT = 32;
     const BRICK_WIDTH = (CANVAS_WIDTH - (BRICK_OFFSET_LEFT * 2) - (BRICK_PADDING * (BRICK_COLUMN_COUNT - 1))) / BRICK_COLUMN_COUNT;
-    const BRICK_HEIGHT = 15;
+    const BRICK_HEIGHT = 16;
 
-    const [level, setLevel] = useState(1);
-    const [showLevelUp, setShowLevelUp] = useState(false);
-
-    // Game state refs (mutable for animation loop)
-    const ballPos = useRef({ x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 30 });
+    // Game state refs
+    const ballPos = useRef({ x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 35 });
     const ballDir = useRef({ dx: 2, dy: -2 });
     const paddleX = useRef((CANVAS_WIDTH - PADDLE_WIDTH) / 2);
-    const bricks = useRef<{ x: number; y: number; status: number }[][]>([]);
+    const bricks = useRef<{ x: number; y: number; status: number; color: string }[][]>([]);
     const livesRef = useRef(4);
-    const levelRef = useRef(1); // Ref for level to be accessible in draw loop
+    const levelRef = useRef(1);
+    const particles = useRef<Particle[]>([]);
     const reqRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
@@ -40,40 +53,35 @@ const BrickBreaker = () => {
         resetBricks(1);
     }, []);
 
+    const resetBricks = (lvl: number) => {
+        const newBricks: { x: number; y: number; status: number; color: string }[][] = [];
+        for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+            newBricks[c] = [];
+            for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+                const hue = (190 + (lvl * 30) + (r * 15)) % 360;
+                newBricks[c][r] = {
+                    x: 0,
+                    y: 0,
+                    status: getBrickPattern(lvl, c, r),
+                    color: `hsla(${hue}, 100%, 60%, 0.8)`
+                };
+            }
+        }
+        bricks.current = newBricks;
+    };
+
     const getBrickPattern = (lvl: number, col: number, row: number) => {
-        // Level 1: Classic (All bricks)
         if (lvl === 1) return 1;
-
-        // Level 2: Checkerboard
         if (lvl === 2) return (col + row) % 2 === 0 ? 1 : 0;
-
-        // Level 3: Pillars (Vertical bars)
         if (lvl === 3) return col % 2 === 0 ? 1 : 0;
-
-        // Level 4: The Diamond / Pyramid-ish
         if (lvl === 4) {
             const center = Math.floor(BRICK_COLUMN_COUNT / 2);
             return Math.abs(col - center) + row <= center + 1 ? 1 : 0;
         }
-
-        // Level 5: The Fortress (Hard)
-        if (lvl === 5) {
-            // Edges and middle row
+        if (lvl >= 5) {
             return (row === 0 || row === BRICK_ROW_COUNT - 1 || col === 0 || col === BRICK_COLUMN_COUNT - 1 || row === 2) ? 1 : 0;
         }
-
         return 1;
-    };
-
-    const resetBricks = (lvl: number) => {
-        const newBricks: { x: number; y: number; status: number }[][] = [];
-        for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
-            newBricks[c] = [];
-            for (let r = 0; r < BRICK_ROW_COUNT; r++) {
-                newBricks[c][r] = { x: 0, y: 0, status: getBrickPattern(lvl, c, r) };
-            }
-        }
-        bricks.current = newBricks;
     };
 
     const startGame = () => {
@@ -83,19 +91,17 @@ const BrickBreaker = () => {
         setLevel(1);
         livesRef.current = 4;
         levelRef.current = 1;
-
+        particles.current = [];
+        setShake(0);
         resetBallAndPaddle();
         resetBricks(1);
-
         if (reqRef.current) cancelAnimationFrame(reqRef.current);
         draw();
     };
 
     const resetBallAndPaddle = () => {
-        ballPos.current = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 30 };
-        // Constant  base speed for all devices
-        const BALL_SPEED = 3.5 + (levelRef.current - 1) * 0.3;
-        // Random angle between -45deg and -135deg (upward)
+        ballPos.current = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT - 40 };
+        const BALL_SPEED = 3.6 + (levelRef.current - 1) * 0.4;
         const angle = (-Math.PI / 4) - (Math.random() * Math.PI / 2);
         ballDir.current = {
             dx: Math.cos(angle) * BALL_SPEED,
@@ -104,136 +110,150 @@ const BrickBreaker = () => {
         paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
     };
 
-    const nextLevel = () => {
-        if (levelRef.current >= 5) {
-            // Victory or Endless Loop (Loop back to 1 for now but keep score)
-            // Or just stay at level 5 with faster speed? Let's cap at 5 for structure
-            // Let's loop but keep difficulty high?
-            // User asked for "5 different levels". Let's wrap to 5 and keep resetting.
-            levelRef.current = 5; // Stay at 5
-            resetBallAndPaddle();
-            resetBricks(5); // Reset level 5
-            return;
+    const createParticles = (x: number, y: number, color: string, count = 12) => {
+        for (let i = 0; i < count; i++) {
+            particles.current.push({
+                x,
+                y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 1.0,
+                color,
+                size: Math.random() * 3 + 1
+            });
         }
+    };
 
-        levelRef.current += 1;
-        setLevel(levelRef.current);
-        setShowLevelUp(true);
-        setTimeout(() => setShowLevelUp(false), 2000); // Hide message after 2s
-
-        resetBallAndPaddle();
-        resetBricks(levelRef.current);
+    const triggerShake = (amount = 4) => {
+        setShake(amount);
     };
 
     const draw = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
         if (!ctx) return;
 
-        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        // Apply screen shake
+        ctx.save();
+        if (shake > 0) {
+            const dx = (Math.random() - 0.5) * shake;
+            const dy = (Math.random() - 0.5) * shake;
+            ctx.translate(dx, dy);
+            setShake(s => Math.max(0, s * 0.9));
+        }
 
-        // Check if level clear
+        // Deep Ocean Background with trail effect
+        ctx.fillStyle = '#050A14';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // Update & Draw Particles (Bubbles/Debris)
+        particles.current = particles.current.filter(p => p.life > 0);
+        particles.current.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.02;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color.replace('0.8', p.life.toString());
+            ctx.fill();
+        });
+
+        // Draw Bricks (Glassmorphism style)
         let activeBricks = 0;
-
-        // Draw Bricks
         for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
             for (let r = 0; r < BRICK_ROW_COUNT; r++) {
-                if (bricks.current[c][r].status === 1) {
+                const b = bricks.current[c][r];
+                if (b.status === 1) {
                     activeBricks++;
-                    const brickX = (c * (BRICK_WIDTH + BRICK_PADDING)) + BRICK_OFFSET_LEFT;
-                    const brickY = (r * (BRICK_HEIGHT + BRICK_PADDING)) + BRICK_OFFSET_TOP;
-                    bricks.current[c][r].x = brickX;
-                    bricks.current[c][r].y = brickY;
+                    const bx = (c * (BRICK_WIDTH + BRICK_PADDING)) + BRICK_OFFSET_LEFT;
+                    const by = (r * (BRICK_HEIGHT + BRICK_PADDING)) + BRICK_OFFSET_TOP;
+                    b.x = bx;
+                    b.y = by;
 
-                    ctx.beginPath();
-                    ctx.rect(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
-                    // Color based on Level
-                    const hue = (190 + (levelRef.current * 30) + (r * 10)) % 360;
-                    ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-                    ctx.fill();
+                    // Brick Glow
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
-                    ctx.closePath();
+                    ctx.shadowColor = b.color;
+
+                    // Glass body
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                    ctx.fillRect(bx, by, BRICK_WIDTH, BRICK_HEIGHT);
+
+                    // Neon Border
+                    ctx.strokeStyle = b.color;
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(bx, by, BRICK_WIDTH, BRICK_HEIGHT);
+
                     ctx.shadowBlur = 0;
                 }
             }
         }
 
         if (activeBricks === 0 && gameState === 'playing') {
-            nextLevel();
+            triggerShake(12);
+            setShowLevelUp(true);
+            setTimeout(() => setShowLevelUp(false), 2000);
+            levelRef.current = Math.min(5, levelRef.current + 1);
+            setLevel(levelRef.current);
+            resetBallAndPaddle();
+            resetBricks(levelRef.current);
             reqRef.current = requestAnimationFrame(draw);
-            return; // Skip rest of draw frame to avoid glitches
+            ctx.restore();
+            return;
         }
 
-        // Draw Paddle
+        // Draw Ball Trail (Simple)
+        // Draw Paddle (Neon Beam)
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#00D9FF';
+        ctx.fillStyle = '#00D9FF';
         ctx.beginPath();
-        ctx.rect(paddleX.current, CANVAS_HEIGHT - PADDLE_HEIGHT - 10, PADDLE_WIDTH, PADDLE_HEIGHT);
-        ctx.fillStyle = "#06b6d4"; // Cyan
+        ctx.roundRect(paddleX.current, CANVAS_HEIGHT - PADDLE_HEIGHT - 15, PADDLE_WIDTH, PADDLE_HEIGHT, 5);
         ctx.fill();
-        ctx.closePath();
+        ctx.shadowBlur = 0;
 
-        // Draw Ball
+        // Draw Ball (Bioluminescent Orb)
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#fff';
         ctx.beginPath();
         ctx.arc(ballPos.current.x, ballPos.current.y, BALL_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = '#fff';
         ctx.fill();
-        ctx.closePath();
+        ctx.shadowBlur = 0;
+
+        const BALL_SPEED = 3.6 + (levelRef.current - 1) * 0.4;
 
         // Collision Logic
-        // Constant ball speed for consistency across devices
-        const BALL_SPEED = 3.5 + (levelRef.current - 1) * 0.3;
-        const MIN_VERTICAL_SPEED = 1.5; // Prevent horizontal traps
-
-        // Walls
         if (ballPos.current.x + ballDir.current.dx > CANVAS_WIDTH - BALL_RADIUS || ballPos.current.x + ballDir.current.dx < BALL_RADIUS) {
             ballDir.current.dx = -ballDir.current.dx;
-            // Normalize to maintain constant speed
-            const speed = Math.sqrt(ballDir.current.dx ** 2 + ballDir.current.dy ** 2);
-            ballDir.current.dx = (ballDir.current.dx / speed) * BALL_SPEED;
-            ballDir.current.dy = (ballDir.current.dy / speed) * BALL_SPEED;
+            triggerShake(2);
         }
         if (ballPos.current.y + ballDir.current.dy < BALL_RADIUS) {
             ballDir.current.dy = -ballDir.current.dy;
-            // Normalize to maintain constant speed
-            const speed = Math.sqrt(ballDir.current.dx ** 2 + ballDir.current.dy ** 2);
-            ballDir.current.dx = (ballDir.current.dx / speed) * BALL_SPEED;
-            ballDir.current.dy = (ballDir.current.dy / speed) * BALL_SPEED;
-        } else if (ballPos.current.y + ballDir.current.dy > CANVAS_HEIGHT - BALL_RADIUS - 10) { // Bottom area check
-            // Paddle Collision
+            triggerShake(2);
+        } else if (ballPos.current.y + ballDir.current.dy > CANVAS_HEIGHT - BALL_RADIUS - 15) {
             if (ballPos.current.x > paddleX.current && ballPos.current.x < paddleX.current + PADDLE_WIDTH) {
-                // Hit paddle - calculate angle based on hit position
-                const hitPos = (ballPos.current.x - paddleX.current) / PADDLE_WIDTH; // 0 to 1
-                const bounceAngle = (hitPos - 0.5) * (Math.PI / 3); // -60deg to +60deg variation
-
-                ballDir.current.dy = -Math.abs(ballDir.current.dy); // Always bounce upward
+                const hitPos = (ballPos.current.x - paddleX.current) / PADDLE_WIDTH;
+                const bounceAngle = (hitPos - 0.5) * (Math.PI / 2.5);
                 ballDir.current.dx = Math.sin(bounceAngle) * BALL_SPEED;
                 ballDir.current.dy = -Math.cos(bounceAngle) * BALL_SPEED;
-
-                // Ensure minimum vertical speed to prevent horizontal traps
-                if (Math.abs(ballDir.current.dy) < MIN_VERTICAL_SPEED) {
-                    const sign = ballDir.current.dy < 0 ? -1 : 1;
-                    ballDir.current.dy = sign * MIN_VERTICAL_SPEED;
-                    // Recalculate dx to maintain constant speed
-                    const remainingSpeed = Math.sqrt(BALL_SPEED ** 2 - ballDir.current.dy ** 2);
-                    ballDir.current.dx = (ballDir.current.dx > 0 ? 1 : -1) * remainingSpeed;
-                }
+                triggerShake(4);
+                createParticles(ballPos.current.x, ballPos.current.y, '#00D9FF', 6);
             } else if (ballPos.current.y + ballDir.current.dy > CANVAS_HEIGHT - BALL_RADIUS) {
-                // Ball lost logic
                 livesRef.current -= 1;
                 setLives(livesRef.current);
-
+                triggerShake(15);
                 if (livesRef.current <= 0) {
                     setGameState('gameover');
+                    ctx.restore();
                     return;
                 } else {
-                    // Reset ball but keep progress
                     resetBallAndPaddle();
                 }
             }
         }
 
-        // Brick Collision
+        // Brick Collision Logic
         for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
             for (let r = 0; r < BRICK_ROW_COUNT; r++) {
                 const b = bricks.current[c][r];
@@ -241,20 +261,16 @@ const BrickBreaker = () => {
                     if (ballPos.current.x > b.x && ballPos.current.x < b.x + BRICK_WIDTH && ballPos.current.y > b.y && ballPos.current.y < b.y + BRICK_HEIGHT) {
                         ballDir.current.dy = -ballDir.current.dy;
                         b.status = 0;
+                        triggerShake(6);
+                        createParticles(b.x + BRICK_WIDTH / 2, b.y + BRICK_HEIGHT / 2, b.color, 15);
 
-                        // Normalize speed after brick collision
-                        const speed = Math.sqrt(ballDir.current.dx ** 2 + ballDir.current.dy ** 2);
-                        ballDir.current.dx = (ballDir.current.dx / speed) * BALL_SPEED;
-                        ballDir.current.dy = (ballDir.current.dy / speed) * BALL_SPEED;
-
-                        setScore((s) => {
-                            const newScore = s + 10 * levelRef.current; // More points for higher levels
-                            setHighScore(prev => {
-                                const max = Math.max(prev, newScore);
-                                localStorage.setItem('brickBreakerHighScore', max.toString());
-                                return max;
-                            });
-                            return newScore;
+                        setScore(s => {
+                            const ns = s + 10 * levelRef.current;
+                            if (ns > highScore) {
+                                setHighScore(ns);
+                                localStorage.setItem('brickBreakerHighScore', ns.toString());
+                            }
+                            return ns;
                         });
                     }
                 }
@@ -264,48 +280,48 @@ const BrickBreaker = () => {
         ballPos.current.x += ballDir.current.dx;
         ballPos.current.y += ballDir.current.dy;
 
+        ctx.restore();
         reqRef.current = requestAnimationFrame(draw);
     };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (gameState !== 'playing') return;
-        const relativeX = e.clientX - e.currentTarget.getBoundingClientRect().left;
-        if (relativeX > 0 && relativeX < CANVAS_WIDTH) {
-            paddleX.current = relativeX - PADDLE_WIDTH / 2;
-        }
+        const rect = e.currentTarget.getBoundingClientRect();
+        const scaleX = CANVAS_WIDTH / rect.width;
+        const relativeX = (e.clientX - rect.left) * scaleX;
+        paddleX.current = Math.min(CANVAS_WIDTH - PADDLE_WIDTH, Math.max(0, relativeX - PADDLE_WIDTH / 2));
     };
 
-    // Touch support
     const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
         if (gameState !== 'playing') return;
         const rect = e.currentTarget.getBoundingClientRect();
+        const scaleX = CANVAS_WIDTH / rect.width;
         const touch = e.touches[0];
-        const relativeX = touch.clientX - rect.left;
-
-        if (relativeX > 0 && relativeX < CANVAS_WIDTH) {
-            paddleX.current = relativeX - PADDLE_WIDTH / 2;
-        }
+        const relativeX = (touch.clientX - rect.left) * scaleX;
+        paddleX.current = Math.min(CANVAS_WIDTH - PADDLE_WIDTH, Math.max(0, relativeX - PADDLE_WIDTH / 2));
     };
 
     return (
-        <div className="relative w-full h-full flex flex-col items-center justify-center bg-black/40 rounded-3xl overflow-hidden border border-primary/20 shadow-2xl">
-            {/* Header / Score */}
-            <div className="absolute top-0 left-0 right-0 py-4 px-6 flex justify-between items-center text-primary font-mono z-10 pointer-events-none bg-gradient-to-b from-black/80 to-transparent">
-                <div className="flex flex-col">
-                    <span className="text-xs uppercase opacity-70">Score</span>
-                    <span className="text-xl font-bold">{score}</span>
+        <div className="relative w-full h-full flex flex-col bg-[#050A14] rounded-2xl overflow-hidden border border-[#00D9FF]/20 group">
+            {/* Header Overlay */}
+            <div className="absolute top-0 inset-x-0 p-4 flex justify-between items-start z-10 pointer-events-none bg-gradient-to-b from-black/80 to-transparent">
+                <div className="space-y-0.5">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#00D9FF]/60 font-black">Integrity</p>
+                    <div className="flex gap-1">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className={`w-3 h-1.5 rounded-full transition-all duration-500 ${i < lives ? 'bg-[#00D9FF] shadow-[0_0_10px_#00D9FF]' : 'bg-white/10'}`} />
+                        ))}
+                    </div>
                 </div>
-                <div className="flex flex-col items-center">
-                    <span className="text-xs uppercase opacity-70">Level</span>
-                    <span className="text-xl font-bold text-yellow-400">{level}</span>
+                <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-black mb-1">Sector {level}</p>
+                    <div className="px-4 py-1.5 bg-black/40 rounded-full border border-white/10 backdrop-blur-xl">
+                        <span className="text-xl font-black text-white tracking-widest">{score.toLocaleString()}</span>
+                    </div>
                 </div>
-                <div className="flex flex-col items-center">
-                    <span className="text-xs uppercase opacity-70 flex items-center gap-1"><Heart size={10} className="fill-current" /> Lives</span>
-                    <span className="text-xl font-bold">{lives}</span>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="text-xs uppercase opacity-70 flex items-center gap-1"><Trophy size={10} /> Best</span>
-                    <span className="text-xl font-bold">{highScore}</span>
+                <div className="text-right">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-yellow-400/60 font-black">Record</p>
+                    <p className="text-sm font-black text-yellow-400 tracking-wider">{highScore.toLocaleString()}</p>
                 </div>
             </div>
 
@@ -318,41 +334,63 @@ const BrickBreaker = () => {
                 className="w-full h-full cursor-none touch-none"
             />
 
-            {/* Level Up Overlay */}
-            {showLevelUp && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-                    <div className="bg-black/80 px-8 py-4 rounded-xl border border-yellow-400 animate-bounce">
-                        <span className="text-3xl font-display font-bold text-yellow-400">LEVEL {level}</span>
-                    </div>
-                </div>
-            )}
-
             {/* Overlays */}
             {gameState === 'idle' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-20">
-                    <h3 className="font-display text-3xl font-bold text-white mb-2">Neon Breaker</h3>
-                    <p className="text-cyan-300/80 mb-6 text-sm">Move mouse/touch to control paddle</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a192f]/85 backdrop-blur-xl z-20">
+                    <div className="w-24 h-24 rounded-full border-2 border-[#00D9FF] flex items-center justify-center mb-8 relative">
+                        <div className="absolute inset-0 rounded-full border-2 border-[#00D9FF] animate-ping opacity-20" />
+                        <div className="absolute -inset-4 rounded-full border border-[#00D9FF]/10 animate-pulse" />
+                        <Play className="w-12 h-12 text-[#00D9FF] fill-current translate-x-1" />
+                    </div>
+                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter italic mb-2">Abyss Breaker</h3>
+                    <p className="text-[#00D9FF]/60 text-[10px] font-black uppercase tracking-[0.3em] mb-10">Establishing Neural Uplink...</p>
                     <button
                         onClick={startGame}
-                        className="flex items-center gap-2 px-6 py-3 bg-primary text-black font-bold rounded-full hover:scale-105 transition-transform"
+                        className="group relative px-10 py-4 bg-[#00D9FF] text-[#0a192f] font-black uppercase tracking-widest text-xs rounded-xl overflow-hidden active:scale-95 transition-all shadow-[0_0_30px_rgba(0,217,255,0.3)]"
                     >
-                        <Play fill="currentColor" size={18} /> Start Game
+                        <span className="relative z-10">Start Mission</span>
+                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
                     </button>
+                    <p className="mt-8 text-white/20 text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">Touch / Move to control</p>
                 </div>
             )}
 
             {gameState === 'gameover' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md z-20">
-                    <h3 className="font-display text-4xl font-bold text-red-500 mb-2">Game Over</h3>
-                    <p className="text-white/80 mb-2 font-mono">Score: {score}</p>
-                    <p className="text-primary mb-4 font-mono text-sm">Reached Level {level}</p>
-                    {score >= highScore && score > 0 && <p className="text-yellow-400 mb-6 font-bold text-sm">New High Score!</p>}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-3xl z-20">
+                    <div className="mb-8 relative">
+                        <Heart className="w-16 h-16 text-red-500/10" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-red-500 font-black text-4xl animate-pulse">LOST</span>
+                        </div>
+                    </div>
+                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter italic mb-1">Signal Terminated</h3>
+                    <p className="text-red-500/80 text-[10px] font-black uppercase tracking-[0.4em] mb-10">Extraction Failed in Sector {level}</p>
+
+                    <div className="grid grid-cols-2 gap-12 mb-12">
+                        <div className="text-center">
+                            <p className="text-[10px] text-white/30 uppercase font-black tracking-widest mb-1">Yield</p>
+                            <p className="text-3xl font-black text-[#00D9FF]">{score}</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-[10px] text-white/30 uppercase font-black tracking-widest mb-1">Depth</p>
+                            <p className="text-3xl font-black text-yellow-400">{level}</p>
+                        </div>
+                    </div>
+
                     <button
                         onClick={startGame}
-                        className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform mt-4"
+                        className="flex items-center gap-4 px-10 py-4 border-2 border-[#00D9FF] text-[#00D9FF] font-black uppercase tracking-widest text-xs rounded-xl hover:bg-[#00D9FF] hover:text-[#0a192f] transition-all active:scale-95 shadow-[0_0_20px_rgba(0,217,255,0.1)]"
                     >
-                        <RotateCcw size={18} /> Try Again
+                        <RotateCcw className="w-4 h-4" /> Restart
                     </button>
+                </div>
+            )}
+
+            {showLevelUp && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+                    <div className="px-12 py-6 bg-[#00D9FF] rounded-2xl shadow-[0_0_100px_rgba(0,217,255,0.4)] animate-in zoom-in duration-300">
+                        <span className="text-4xl font-black text-[#0a192f] uppercase italic tracking-tighter">Sector {level} Clear</span>
+                    </div>
                 </div>
             )}
         </div>
