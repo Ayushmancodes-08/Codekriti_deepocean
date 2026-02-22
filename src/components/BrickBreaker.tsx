@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, RotateCcw, Trophy, Heart } from 'lucide-react';
+import { RotateCcw, Heart } from 'lucide-react';
 
 interface Particle {
     x: number;
@@ -302,7 +302,7 @@ const BrickBreaker = () => {
     };
 
     return (
-        <div className="relative w-full h-full flex flex-col bg-[#050A14] rounded-2xl overflow-hidden border border-[#00D9FF]/20 group">
+        <div className="relative w-full h-full flex flex-col bg-[#050A14]/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 group">
             {/* Header Overlay */}
             <div className="absolute top-0 inset-x-0 p-4 flex justify-between items-start z-10 pointer-events-none bg-gradient-to-b from-black/80 to-transparent">
                 <div className="space-y-0.5">
@@ -336,22 +336,21 @@ const BrickBreaker = () => {
 
             {/* Overlays */}
             {gameState === 'idle' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a192f]/85 backdrop-blur-xl z-20">
-                    <div className="w-24 h-24 rounded-full border-2 border-[#00D9FF] flex items-center justify-center mb-8 relative">
-                        <div className="absolute inset-0 rounded-full border-2 border-[#00D9FF] animate-ping opacity-20" />
-                        <div className="absolute -inset-4 rounded-full border border-[#00D9FF]/10 animate-pulse" />
-                        <Play className="w-12 h-12 text-[#00D9FF] fill-current translate-x-1" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a192f]/90 backdrop-blur-lg z-20">
+                    <div className="text-center mb-8">
+                        <h3 className="text-xl font-black text-white/90 uppercase tracking-tighter italic mb-1">Abyss Breaker</h3>
+                        <p className="text-[#00D9FF]/40 text-[10px] font-bold uppercase tracking-[0.2em]">Neural Link Standby</p>
                     </div>
-                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter italic mb-2">Abyss Breaker</h3>
-                    <p className="text-[#00D9FF]/60 text-[10px] font-black uppercase tracking-[0.3em] mb-10">Establishing Neural Uplink...</p>
+
                     <button
                         onClick={startGame}
-                        className="group relative px-10 py-4 bg-[#00D9FF] text-[#0a192f] font-black uppercase tracking-widest text-xs rounded-xl overflow-hidden active:scale-95 transition-all shadow-[0_0_30px_rgba(0,217,255,0.3)]"
+                        className="group relative px-8 py-3 bg-transparent border border-[#00D9FF]/30 hover:border-[#00D9FF] text-[#00D9FF] font-black uppercase tracking-widest text-[10px] rounded-lg overflow-hidden active:scale-95 transition-all"
                     >
                         <span className="relative z-10">Start Mission</span>
-                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+                        <div className="absolute inset-0 bg-[#00D9FF] opacity-0 group-hover:opacity-10 transition-opacity" />
                     </button>
-                    <p className="mt-8 text-white/20 text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">Touch / Move to control</p>
+
+                    <p className="mt-8 text-white/10 text-[9px] font-bold uppercase tracking-[0.2em]">Touch / Move to control</p>
                 </div>
             )}
 
