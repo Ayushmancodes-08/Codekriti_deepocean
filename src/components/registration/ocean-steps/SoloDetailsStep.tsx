@@ -97,7 +97,7 @@ const SoloDetailsStep = () => {
                         name="participant.college"
                         render={({ field }) => (
                             <OceanFormItem label="College/University" icon={School}>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
                                     <FormControl>
                                         <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
                                             <SelectValue placeholder="Select College" />
@@ -150,7 +150,7 @@ const SoloDetailsStep = () => {
                         name="participant.branch"
                         render={({ field }) => (
                             <OceanFormItem label="Branch/Department" icon={BookOpen}>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
                                     <FormControl>
                                         <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
                                             <SelectValue placeholder="Select your branch" />
@@ -204,7 +204,7 @@ const SoloDetailsStep = () => {
                         name="participant.yearOfStudy"
                         render={({ field }) => (
                             <OceanFormItem label="Year of Study" icon={Calendar}>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
                                     <FormControl>
                                         <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
                                             <SelectValue placeholder="Select year" />

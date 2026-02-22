@@ -475,11 +475,11 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                             )}
 
                                             {currentStep === 2 && (
-                                                /* Unified Dashboard Layout */
-                                                <div className="h-full flex flex-col lg:grid lg:grid-cols-12 gap-4 p-4 md:p-6 overflow-y-auto lg:overflow-hidden">
+                                                /* Unified Dashboard Layout — each column scrolls independently */
+                                                <div className="h-full flex flex-col lg:grid lg:grid-cols-12 gap-4 p-3 md:p-4 overflow-y-auto lg:overflow-hidden">
 
-                                                    {/* Left Column: Team/Leader Info */}
-                                                    <div className="lg:col-span-4 lg:h-full lg:overflow-y-auto custom-scrollbar pr-2 space-y-6">
+                                                    {/* Left Column: Team/Leader Info — always scrollable */}
+                                                    <div className="lg:col-span-4 lg:h-full lg:overflow-y-auto custom-scrollbar lg:pr-2">
                                                         {isSolo ? (
                                                             <SoloDetailsStep />
                                                         ) : (
@@ -488,17 +488,17 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                     </div>
 
                                                     {/* Middle Column: Team Members (Hidden for Solo) */}
-                                                    <div className={`${isSolo ? 'hidden' : 'lg:col-span-5'} lg:h-full flex flex-col min-h-[400px]`}>
+                                                    <div className={`${isSolo ? 'hidden' : 'lg:col-span-5 lg:h-full lg:overflow-y-auto custom-scrollbar'} flex flex-col min-h-[400px]`}>
                                                         {!isSolo && <TeamMembersStep squadSize={squadSize} />}
                                                     </div>
 
-                                                    {/* Right Column: Live Summary & Submit */}
-                                                    <div className={`${isSolo ? 'lg:col-span-8 lg:grid lg:grid-cols-2 lg:gap-8' : 'lg:col-span-3'} lg:h-full`}>
-                                                        {isSolo && <div className="hidden lg:block border-l border-[#00D9FF]/20" />} {/* Spacer for solo layout */}
-                                                        <div className="h-full">
+                                                    {/* Right Column: Live Summary & Submit — compact, no scroll needed */}
+                                                    <div className={`${isSolo ? 'lg:col-span-8 lg:grid lg:grid-cols-2 lg:gap-6' : 'lg:col-span-3'} lg:h-full`}>
+                                                        {isSolo && <div className="hidden lg:block border-l border-[#00D9FF]/20" />}
+                                                        <div className="h-full flex flex-col">
                                                             <RegistrationSummary
                                                                 isSubmitting={isSubmitting}
-                                                                onSubmit={handleProceedToPayment} // Proceed to Payment with validation
+                                                                onSubmit={handleProceedToPayment}
                                                                 eventName={EVENTS.find(e => e.id === selectedEvent)?.name || ''}
                                                                 buttonText="Proceed to Pay"
                                                             />

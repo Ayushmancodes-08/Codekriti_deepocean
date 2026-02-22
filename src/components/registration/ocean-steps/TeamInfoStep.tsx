@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, EVENTS, EVENT_COLLEGES, type RegistrationFormData } from '@/types/registration';
 import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FormControl, FormField } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { OceanFormItem } from '@/components/ui/ocean-form';
@@ -17,6 +17,8 @@ const TeamInfoStep = () => {
     const eventId = watch('eventId');
     const currentSquadSize = watch('squadSize');
     const teamLeaderCollege = watch('teamLeader.college');
+    const teamLeaderBranch = watch('teamLeader.branch');
+    const teamLeaderYear = watch('teamLeader.yearOfStudy');
     const event = EVENTS.find(e => e.id === eventId);
 
     // Get event-specific colleges
@@ -172,7 +174,7 @@ const TeamInfoStep = () => {
                         name="teamLeader.college"
                         render={({ field }) => (
                             <OceanFormItem label="College" icon={School}>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ''}>
                                     <FormControl>
                                         <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
                                             <SelectValue placeholder="Select College" />
@@ -214,7 +216,10 @@ const TeamInfoStep = () => {
                             name="teamLeader.branch"
                             render={({ field }) => (
                                 <OceanFormItem label="Branch" icon={BookOpen}>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={(val) => {
+                                        field.onChange(val);
+                                        if (val !== 'Other') setValue('teamLeader.branchCustom' as any, '');
+                                    }} value={field.value || ''}>
                                         <FormControl>
                                             <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
                                                 <SelectValue placeholder="Branch" />
@@ -222,7 +227,7 @@ const TeamInfoStep = () => {
                                         </FormControl>
                                         <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
                                             {BRANCHES.map((branch) => (
-                                                <SelectItem key={branch} value={branch}>
+                                                <SelectItem key={branch} value={branch} className={cn(branch === 'Other' && "text-yellow-400 font-bold")}>
                                                     {branch}
                                                 </SelectItem>
                                             ))}
@@ -237,7 +242,10 @@ const TeamInfoStep = () => {
                             name="teamLeader.yearOfStudy"
                             render={({ field }) => (
                                 <OceanFormItem label="Year" icon={Calendar}>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={(val) => {
+                                        field.onChange(val);
+                                        if (val !== 'Other') setValue('teamLeader.yearCustom' as any, '');
+                                    }} value={field.value || ''}>
                                         <FormControl>
                                             <SelectTrigger className="bg-[#1A1A2E]/50 border-2 border-[#00D9FF]/30 text-white focus:ring-0 focus:border-[#00D9FF] h-11">
                                                 <SelectValue placeholder="Year" />
@@ -245,7 +253,7 @@ const TeamInfoStep = () => {
                                         </FormControl>
                                         <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
                                             {YEARS_OF_STUDY.map((year) => (
-                                                <SelectItem key={year} value={year}>
+                                                <SelectItem key={year} value={year} className={cn(year === 'Other' && "text-yellow-400 font-bold")}>
                                                     {year}
                                                 </SelectItem>
                                             ))}
@@ -255,6 +263,62 @@ const TeamInfoStep = () => {
                             )}
                         />
                     </div>
+
+                    {/* Dynamic 'Other' fields for Branch & Year */}
+                    <AnimatePresence>
+                        {teamLeaderBranch === 'Other' && (
+                            <motion.div
+                                key="branch-other"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.25 }}
+                                className="overflow-hidden"
+                            >
+                                <FormField
+                                    control={control}
+                                    name={"teamLeader.branchCustom" as any}
+                                    render={({ field }) => (
+                                        <OceanFormItem label="Specify Branch" icon={BookOpen}>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder="Enter your branch / department"
+                                                    className="bg-[#0a192f]/50 border-2 border-yellow-400/50 text-white focus:border-yellow-400 transition-all placeholder:text-gray-500 h-11"
+                                                />
+                                            </FormControl>
+                                        </OceanFormItem>
+                                    )}
+                                />
+                            </motion.div>
+                        )}
+                        {teamLeaderYear === 'Other' && (
+                            <motion.div
+                                key="year-other"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.25 }}
+                                className="overflow-hidden"
+                            >
+                                <FormField
+                                    control={control}
+                                    name={"teamLeader.yearCustom" as any}
+                                    render={({ field }) => (
+                                        <OceanFormItem label="Specify Year / Course" icon={Calendar}>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder="e.g. 4th Year / PhD / Alumni"
+                                                    className="bg-[#0a192f]/50 border-2 border-yellow-400/50 text-white focus:border-yellow-400 transition-all placeholder:text-gray-500 h-11"
+                                                />
+                                            </FormControl>
+                                        </OceanFormItem>
+                                    )}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
