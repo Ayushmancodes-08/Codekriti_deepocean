@@ -75,21 +75,33 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
         }
     }, [preSelectedEventId, isOpen]);
 
-    // Body scroll lock — Lenis is handled via data-lenis-prevent on the modal element
+    // Body scroll lock — use position:fixed approach to avoid clipping fixed portals (like Select dropdowns) on mobile
     useEffect(() => {
         if (isOpen) {
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
+            const scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
             document.body.classList.add('modal-open');
         } else {
-            document.documentElement.style.overflow = '';
-            document.body.style.overflow = '';
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
             document.body.classList.remove('modal-open');
+            if (scrollY) {
+                window.scrollTo(0, -parseInt(scrollY || '0'));
+            }
         }
         return () => {
-            document.documentElement.style.overflow = '';
-            document.body.style.overflow = '';
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
             document.body.classList.remove('modal-open');
+            if (scrollY) {
+                window.scrollTo(0, -parseInt(scrollY || '0'));
+            }
         };
     }, [isOpen]);
 
@@ -287,7 +299,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     data-lenis-prevent
-                    className="fixed inset-0 bg-black/95 backdrop-blur-md z-[99999] isolate flex items-center justify-center p-0 md:p-4 overflow-hidden"
+                    className="fixed inset-0 bg-black/95 backdrop-blur-md z-[99999] flex items-center justify-center p-0 md:p-4 overflow-hidden"
                     onClick={handleClose}
                 >
                     <motion.div
