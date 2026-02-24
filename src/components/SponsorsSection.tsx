@@ -60,19 +60,19 @@ const SponsorsSection = () => {
                     <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
                     {/* Logos */}
-                    <div className="relative z-10 flex flex-wrap items-center justify-center gap-8 sm:gap-10 md:gap-14">
+                    <div className="relative z-10 flex flex-wrap md:flex-nowrap items-center justify-center gap-6 sm:gap-8 lg:gap-12">
                         {sponsors.map((sponsor, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={isInView ? { opacity: 1, scale: 1 } : {}}
                                 transition={{ duration: 0.5, delay: 0.3 + index * 0.15 }}
-                                className="group flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 hover:scale-110"
+                                className="group flex items-center justify-center p-2 sm:p-3"
                             >
                                 <img
                                     src={sponsor.logo}
                                     alt={sponsor.name}
-                                    className="w-28 sm:w-36 md:w-44 lg:w-52 h-auto object-contain rounded-xl sm:rounded-2xl opacity-50 transition-all duration-300 group-hover:opacity-100"
+                                    className="w-32 sm:w-44 md:w-52 lg:w-60 h-auto object-contain rounded-xl sm:rounded-2xl opacity-80 transition-all duration-300 group-hover:opacity-100 group-hover:scale-110 shadow-lg"
                                 />
                             </motion.div>
                         ))}

@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield, Download, FileText, UploadCloud, Trash2, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
+import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield, Download, FileText, UploadCloud, Trash2, CheckCircle2 } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, EVENTS, EVENT_COLLEGES, type RegistrationFormData } from '@/types/registration';
 import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +15,7 @@ interface TeamInfoStepProps {
     isSubmitting?: boolean;
 }
 
-const TeamInfoStep = ({ onDirectSubmit, isSubmitting = false }: TeamInfoStepProps) => {
+const TeamInfoStep = (_props: TeamInfoStepProps) => {
     const { watch, setValue, control } = useFormContext<RegistrationFormData>();
 
     const eventId = watch('eventId');
