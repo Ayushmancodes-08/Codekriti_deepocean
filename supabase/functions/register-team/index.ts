@@ -46,12 +46,26 @@ const createTransporter = () => {
     }
 
     return nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
         auth: {
             user: user,
             pass: pass,
         },
+        // Strict timeouts to prevent edge function from hanging
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
     });
+};
+
+// Helper to force an overall timeout on sendMail
+const sendMailWithTimeout = async (transporter: any, mailOptions: any) => {
+    const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Email sending timed out after 5 seconds')), 5000)
+    );
+    return Promise.race([transporter.sendMail(mailOptions), timeout]);
 };
 
 Deno.serve(async (req: Request) => {
