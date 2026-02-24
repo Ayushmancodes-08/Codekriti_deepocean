@@ -380,10 +380,10 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                 {/* Dynamic Rulebook/Sponsor Button */}
                                                 {(() => {
                                                     const rulebookMap: Record<string, string> = {
-                                                        'algo-to-code': '/assets/Algo to Code.pdf',
+                                                        'algo-to-code': '/assets/Algo-to-Code.pdf',
                                                         'designathon': '/assets/DESIGNATHON.pdf',
-                                                        'innovation-challenge': '/assets/Innovation Challenge.pdf',
-                                                        'techmaze': '/assets/Tech Maze.pdf',
+                                                        'innovation-challenge': '/assets/Innovation-Challenge.pdf',
+                                                        'techmaze': '/assets/Tech-Maze.pdf',
                                                         'devxtreme': '/assets/DevXtreme.pdf',
                                                     };
 
