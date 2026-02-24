@@ -263,10 +263,28 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                     ? "Will get to you if we shortlist you."
                     : 'Thank you for registering!!!';
 
+                const rulebookMap: Record<string, string> = {
+                    'algo-to-code': '/rulebooks/Algo-to-Code.pdf',
+                    'designathon': '/rulebooks/DESIGNATHON.pdf',
+                    'innovation-challenge': '/rulebooks/Innovation-Challenge.pdf',
+                    'techmaze': '/rulebooks/Tech-Maze.pdf',
+                    'devxtreme': '/rulebooks/DevXtreme.pdf',
+                };
+                const downloadLink = rulebookMap[data.eventId];
+
                 toast.success(successMessage, {
                     icon: <CheckCircle2 className="w-5 h-5 text-[#00D9FF]" />,
                     className: "bg-[#0a192f] border border-[#00D9FF]/30 text-white",
-                    duration: 5000
+                    duration: 5000,
+                    action: downloadLink ? {
+                        label: 'Rulebook',
+                        onClick: () => {
+                            const link = document.createElement('a');
+                            link.href = downloadLink;
+                            link.download = `${data.eventId}-Rulebook.pdf`;
+                            link.click();
+                        }
+                    } : undefined
                 });
                 setTicketData({
                     name: dbData.leaderName,
@@ -380,11 +398,11 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                 {/* Dynamic Rulebook/Sponsor Button */}
                                                 {(() => {
                                                     const rulebookMap: Record<string, string> = {
-                                                        'algo-to-code': '/assets/Algo-to-Code.pdf',
-                                                        'designathon': '/assets/DESIGNATHON.pdf',
-                                                        'innovation-challenge': '/assets/Innovation-Challenge.pdf',
-                                                        'techmaze': '/assets/Tech-Maze.pdf',
-                                                        'devxtreme': '/assets/DevXtreme.pdf',
+                                                        'algo-to-code': '/rulebooks/Algo-to-Code.pdf',
+                                                        'designathon': '/rulebooks/DESIGNATHON.pdf',
+                                                        'innovation-challenge': '/rulebooks/Innovation-Challenge.pdf',
+                                                        'techmaze': '/rulebooks/Tech-Maze.pdf',
+                                                        'devxtreme': '/rulebooks/DevXtreme.pdf',
                                                     };
 
                                                     const currentEventId = selectedEvent;
@@ -395,9 +413,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                     return (
                                                         <a
                                                             href={downloadLink}
-                                                            download
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                            download={`${currentEventId}-Rulebook.pdf`}
                                                             className="block text-center group relative w-full py-4 bg-transparent border-2 border-[#64ffda] text-[#64ffda] font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-[#64ffda] hover:text-[#0a192f] transition-all duration-300 overflow-hidden"
                                                         >
                                                             <span className="relative z-10">Download Rulebook</span>

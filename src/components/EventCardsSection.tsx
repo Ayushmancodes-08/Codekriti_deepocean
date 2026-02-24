@@ -37,7 +37,7 @@ const events = [
         description: 'The ultimate 8-hour hackathon. Build, deploy, and win against the best in the field.',
         prize: '₹500',
         category: 'Hackathon',
-        rulebook_url: '/assets/DevXtreme.pdf',
+        rulebook_url: '/rulebooks/DevXtreme.pdf',
         icon: <Rocket className="w-4 h-4" />,
         contacts: [
             { name: 'Debasish Sahu', phone: '+91 78468 03607' },
@@ -55,7 +55,7 @@ const events = [
         description: 'UI/UX design challenge. Create stunning interfaces and unforgettable user experiences.',
         prize: '₹60',
         category: 'Design',
-        rulebook_url: '/assets/DESIGNATHON.pdf',
+        rulebook_url: '/rulebooks/DESIGNATHON.pdf',
         icon: <Palette className="w-4 h-4" />,
         contacts: [
             { name: 'Subhashree Panda', phone: '+91 63708 40502' },
@@ -73,7 +73,7 @@ const events = [
         description: 'Navigate through a series of technical puzzles and rapid-fire quizzes under pressure.',
         prize: '₹90',
         category: 'Quiz',
-        rulebook_url: '/assets/Tech-Maze.pdf',
+        rulebook_url: '/rulebooks/Tech-Maze.pdf',
         icon: <Puzzle className="w-4 h-4" />,
         contacts: [
             { name: 'Subhashree Panda', phone: '+91 63708 40502' },
@@ -91,7 +91,7 @@ const events = [
         description: 'Pitch your innovative ideas and solutions to real-world problems before a live jury.',
         prize: '₹60',
         category: 'Pitch',
-        rulebook_url: '/assets/Innovation-Challenge.pdf',
+        rulebook_url: '/rulebooks/Innovation-Challenge.pdf',
         icon: <Lightbulb className="w-4 h-4" />,
         contacts: [
             { name: 'Bikash Ranjan Hota', phone: '+91 70086 60169' },
@@ -109,7 +109,7 @@ const events = [
         description: 'Competitive programming contest testing algorithmic thinking and raw coding efficiency.',
         prize: '₹30',
         category: 'Coding',
-        rulebook_url: '/assets/Algo-to-Code.pdf',
+        rulebook_url: '/rulebooks/Algo-to-Code.pdf',
         icon: <Code className="w-4 h-4" />,
         contacts: [
             { name: 'Debasish Sahu', phone: '+91 78468 03607' },
