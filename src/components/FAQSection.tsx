@@ -4,44 +4,32 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
     {
-        question: "What is CodeKriti 4.0?",
-        answer: "CodeKriti 4.0 is a two-day tech battlefield where ideas turn into prototypes, logic turns into code, and teams compete to dominate. Hackathons, coding wars, pitch battles — all in one arena."
+        question: "What is Code Kriti 4.0?",
+        answer: "Code Kriti 4.0 is a two-day tech battlefield where ideas become prototypes, logic becomes code, and teams compete to lead the arena. From hackathons and coding contests to design and innovation challenges, it's the flagship techfest of Parala Maharaja Engineering College."
     },
     {
         question: "When & Where?",
-        answer: "Two high-voltage days at PMEC. From morning coding clashes to the 8-hour hackathon grind — it's non-stop."
-    },
-    {
-        question: "Who can participate?",
-        answer: "Undergraduate students ready to compete. All events are Inter-College and welcome participants from all institutions."
+        answer: "The action unfolds at PMEC on 6th–7th March — two high-voltage days packed with coding clashes, intense competitions, and an 8-hour hackathon grind. Expect non-stop innovation from start to finish."
     },
     {
         question: "What is the team size?",
-        answer: "Hackathon: 3–5 members. Innovation Challenge: 2–3 members. Tech Maze: 2–3 members. Algo to Code: Solo — just you vs the problems."
-    },
-    {
-        question: "Is there a registration fee?",
-        answer: "Yes. Small investment. Serious competition. Registration fees range from ₹30–₹500 depending on the event."
+        answer: "Team size varies by event. The Hackathon (DevXtreme) allows teams of 3–5 members, the Innovation Challenge requires 2 members, and Tech Maze permits teams of 2–3 members. Algo to Code is an individual event (solo participation), while Designathon is also conducted individually focusing on a UI/UX project."
     },
     {
         question: "Will food & accommodation be provided?",
-        answer: "Hackathon participants get refreshments. Work. Code. Repeat."
-    },
-    {
-        question: "What are the themes/tracks?",
-        answer: "Real-world problem statements under a defined theme. No random coding — build solutions that actually matter."
-    },
-    {
-        question: "What should I bring?",
-        answer: "Laptop. Charger. College ID. And the mindset to compete, not just participate."
-    },
-    {
-        question: "Can I use pre-built templates?",
-        answer: "Libraries? Yes. Copy-paste projects? No chance. Originality wins here."
+        answer: "Refreshments will be provided for hackathon participants. Accommodation will not be provided for any participants."
     },
     {
         question: "Will there be prizes?",
-        answer: "Yes. Cash prizes across all events. Up to ₹10,000+ in the hackathon alone. Win money. Win recognition. Win respect."
+        answer: "Yes. Cash prizes worth ₹16,000 across events, along with recognition and certificates for top performers."
+    },
+    {
+        question: "Is prior experience required?",
+        answer: "No prior experience is required. Code Kriti 4.0 welcomes participants of all skill levels — from beginners eager to learn to experienced innovators ready to compete. Enthusiasm, creativity, and the willingness to challenge yourself matter most."
+    },
+    {
+        question: "Can participants join multiple events?",
+        answer: "Yes, participants may register for multiple events provided the schedules do not overlap. They must ensure their availability for each event they choose to participate in."
     }
 ];
 
