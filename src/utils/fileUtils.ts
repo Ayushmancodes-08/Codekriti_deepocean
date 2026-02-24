@@ -11,9 +11,15 @@
  */
 export const triggerDownload = async (url: string, filename: string): Promise<void> => {
     try {
-        // 1. Fetch the file as a blob
-        const response = await fetch(url);
+        // 1. Fetch the file as a blob with no-cache to ensure we hit the real file
+        const response = await fetch(url, { cache: 'no-cache' });
         if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);
+
+        // Defensive check: If Vercel serves the HTML shell instead of the PDF
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('text/html')) {
+            throw new Error('Received HTML shell instead of PDF. Path mismatch or Vercel routing conflict.');
+        }
 
         const blob = await response.blob();
 
@@ -35,8 +41,12 @@ export const triggerDownload = async (url: string, filename: string): Promise<vo
         document.body.removeChild(link);
         window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-        console.error('Failed to trigger download:', err);
-        // Fallback: direct window open if fetch fails
-        window.open(url, '_blank');
+        console.error('Download utility error:', err);
+        // Fallback: direct window open if fetch or blob conversion fails
+        const fallbackLink = document.createElement('a');
+        fallbackLink.href = url;
+        fallbackLink.target = '_blank';
+        fallbackLink.rel = 'noopener noreferrer';
+        fallbackLink.click();
     }
 };
