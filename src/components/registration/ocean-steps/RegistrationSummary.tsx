@@ -52,7 +52,7 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
     const membersComplete = isTeam ? memberCount >= requiredMembers : true;
 
     const isDevXtremeComplete = formData.eventId === 'devxtreme'
-        ? !!((formData as any).problemStatement && (formData as any).solution)
+        ? !!((formData as any).abstractFile)
         : true;
 
     const isReady = hasTeamName && hasLeader && membersComplete && isDevXtremeComplete;
@@ -123,7 +123,7 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
                 <StatusItem active={hasTeamName} label="Base ID" />
                 <StatusItem active={hasLeader} label="Commander" />
                 {isTeam && <StatusItem active={membersComplete} label={`Members (${memberCount}/${requiredMembers})`} />}
-                {formData.eventId === 'devxtreme' && <StatusItem active={isDevXtremeComplete} label="Hackathon PS & Solution" />}
+                {formData.eventId === 'devxtreme' && <StatusItem active={isDevXtremeComplete} label="Hackathon Abstract" />}
             </div>
 
             {/* Action Button - always at bottom, never hidden */}

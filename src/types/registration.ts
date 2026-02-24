@@ -128,8 +128,7 @@ const teamBaseSchema = z.object({
     subscribe: z.boolean().optional(),
     transactionId: z.string().min(1, 'Transaction ID is required'),
     screenshotUrl: z.string().optional(),
-    problemStatement: z.string().optional(),
-    solution: z.string().optional(),
+    abstractFile: z.instanceof(File).optional(),
 });
 
 // Build the discriminated union from plain ZodObject schemas (no superRefine on branches)
@@ -185,19 +184,29 @@ export const registrationSchema = baseUnion.superRefine((data, ctx) => {
         }
         // DevXtreme specific validations
         if (data.eventId === 'devxtreme') {
-            if (!data.problemStatement || data.problemStatement.length < 10) {
+            if (!data.abstractFile) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: 'Problem Statement is required and must be detailed',
-                    path: ['problemStatement'],
+                    message: "A project abstract is required for DevXtreme.",
+                    path: ['abstractFile'],
                 });
-            }
-            if (!data.solution || data.solution.length < 10) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Solution description is required and must be detailed',
-                    path: ['solution'],
-                });
+            } else {
+                const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!validTypes.includes(data.abstractFile.type)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "Abstract must be a PDF or Word document.",
+                        path: ['abstractFile'],
+                    });
+                }
+                const maxSize = 5 * 1024 * 1024;
+                if (data.abstractFile.size > maxSize) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "File size must be less than 5MB.",
+                        path: ['abstractFile'],
+                    });
+                }
             }
         }
     }

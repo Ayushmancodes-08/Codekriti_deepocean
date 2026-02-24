@@ -21,8 +21,7 @@ export interface RegistrationData {
     subscribe: boolean;
     transactionId?: string; // Standardize
     file?: File; // For direct upload
-    problemStatement?: string;
-    solution?: string;
+    abstractFile?: File; // Uploaded abstract for Devxtreme
 }
 
 interface RegistrationResponse {
@@ -59,6 +58,33 @@ export const uploadScreenshot = async (file: File, path: string): Promise<string
     }
 }
 
+// 1.5 Storage Upload Helper for Abstracts
+export const uploadAbstract = async (file: File, path: string): Promise<string | null> => {
+    try {
+        const { error } = await supabase.storage
+            .from('payment-screenshots')
+            .upload(`abstracts/${path}`, file, {
+                cacheControl: '3600',
+                upsert: false // Don't overwrite, fail if exists (unique paths expected)
+            });
+
+        if (error) {
+            console.error("Storage upload error for abstract:", error);
+            throw error;
+        }
+
+        // Get Public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from('payment-screenshots')
+            .getPublicUrl(`abstracts/${path}`);
+
+        return publicUrl;
+    } catch (e) {
+        console.error("Abstract upload failed", e);
+        return null;
+    }
+}
+
 // 2. Updated Registration Submission
 export const submitRegistration = async (data: RegistrationData, screenshotUrl?: string): Promise<RegistrationResponse> => {
     try {
@@ -70,7 +96,8 @@ export const submitRegistration = async (data: RegistrationData, screenshotUrl?:
                 payload: {
                     ...data,
                     utr: data.transactionId, // Map to what backend expects
-                    screenshot_url: screenshotUrl
+                    screenshot_url: screenshotUrl,
+                    abstract_url: data.abstractFile ? await uploadAbstract(data.abstractFile, `${data.teamName.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`) : undefined
                 }
             }
         });

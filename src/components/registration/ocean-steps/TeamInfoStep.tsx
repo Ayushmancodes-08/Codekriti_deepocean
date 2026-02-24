@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield } from 'lucide-react';
+import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield, Download, FileText, UploadCloud, Trash2, CheckCircle2 } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, EVENTS, EVENT_COLLEGES, type RegistrationFormData } from '@/types/registration';
 import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { OceanFormItem } from '@/components/ui/ocean-form';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 const TeamInfoStep = () => {
@@ -327,43 +326,81 @@ const TeamInfoStep = () => {
             {/* DevXtreme Specific Fields */}
             {eventId === 'devxtreme' && (
                 <div className="space-y-4 pt-4 border-t border-[#00D9FF]/10">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                            <BookOpen className="w-4 h-4 text-cyan-400" />
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                                <BookOpen className="w-4 h-4 text-cyan-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-white uppercase tracking-widest">Project Abstract</h3>
+                                <p className="text-cyan-400/50 text-[10px] font-medium uppercase">PDF or Word format only</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Project Proposal</h3>
-                            <p className="text-cyan-400/50 text-[10px] font-medium uppercase">Shortlisting Required</p>
-                        </div>
+                        <a
+                            href="/assets/DevXtreme_Abstract_Template.pdf"
+                            download
+                            className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/30 text-yellow-400 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                        >
+                            <Download className="w-4 h-4" /> Template
+                        </a>
                     </div>
 
                     <FormField
                         control={control}
-                        name="problemStatement"
+                        name="abstractFile"
                         render={({ field }) => (
-                            <OceanFormItem label="Problem Statement" icon={BookOpen}>
+                            <OceanFormItem label="Upload Project Abstract" icon={FileText}>
                                 <FormControl>
-                                    <Textarea
-                                        {...field}
-                                        placeholder="Describe the problem you are solving..."
-                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 min-h-[100px] resize-y"
-                                    />
-                                </FormControl>
-                            </OceanFormItem>
-                        )}
-                    />
+                                    <div className="w-full">
+                                        {field.value ? (
+                                            <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-green-500/50 bg-green-500/10 rounded-xl transition-all relative overflow-hidden group">
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <CheckCircle2 className="w-8 h-8 text-green-400 mb-2" />
+                                                    <p className="text-sm font-semibold text-green-400 truncate max-w-[200px]">{field.value.name}</p>
+                                                    <div className="flex items-center justify-center gap-2 mt-1">
+                                                        <span className="text-xs text-green-400/60">{(field.value.size / 1024 / 1024).toFixed(2)} MB</span>
+                                                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded-sm tracking-wider">Attached</span>
+                                                    </div>
+                                                </div>
 
-                    <FormField
-                        control={control}
-                        name="solution"
-                        render={({ field }) => (
-                            <OceanFormItem label="Proposed Solution" icon={Shield}>
-                                <FormControl>
-                                    <Textarea
-                                        {...field}
-                                        placeholder="Describe your technical solution..."
-                                        className="bg-[#0a192f]/50 border-2 border-[#00D9FF]/30 text-white focus:border-[#00D9FF] transition-all placeholder:text-gray-500 min-h-[120px] resize-y"
-                                    />
+                                                {/* Hover Overlay for Remove */}
+                                                <div className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm z-10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            field.onChange(undefined);
+                                                        }}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-red-500 rounded-lg text-sm font-bold transition-colors cursor-pointer"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" /> Remove Document
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <label
+                                                htmlFor="abstract-upload"
+                                                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all bg-[#0a192f]/50 border-[#00D9FF]/30 hover:bg-[#0a192f] hover:border-[#00D9FF]"
+                                            >
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <UploadCloud className="w-8 h-8 text-[#00D9FF] mb-2" />
+                                                    <p className="mb-2 text-sm text-gray-400"><span className="font-semibold text-white">Click to upload document</span></p>
+                                                    <p className="text-xs text-gray-500">PDF, DOC, DOCX (Max 5MB)</p>
+                                                </div>
+                                                <Input
+                                                    id="abstract-upload"
+                                                    type="file"
+                                                    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        const f = e.target.files?.[0];
+                                                        if (f) field.onChange(f);
+                                                    }}
+                                                />
+                                            </label>
+                                        )}
+                                    </div>
                                 </FormControl>
                             </OceanFormItem>
                         )}

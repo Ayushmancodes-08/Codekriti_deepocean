@@ -81,7 +81,8 @@ Deno.serve(async (req: Request) => {
                 event,
                 utr,
                 payment_screenshot_url,
-                screenshot_url
+                screenshot_url,
+                abstract_url
             } = payload;
 
             const supabaseAdmin = createClient(
@@ -100,7 +101,8 @@ Deno.serve(async (req: Request) => {
                 status: 'pending',
                 payment_txn_id: utr,
                 payment_screenshot_url: screenshot_url || payment_screenshot_url,
-                check_in_status: false
+                check_in_status: false,
+                abstract_url: abstract_url || null
             };
 
             const { data: insertedData, error: dbError } = await supabaseAdmin

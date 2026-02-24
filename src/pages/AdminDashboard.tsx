@@ -25,8 +25,7 @@ interface Registration {
     payment_screenshot_url: string;
     screenshot_url?: string;
     amount: number;
-    problem_statement?: string;
-    solution?: string;
+    abstract_url?: string;
     members?: {
         name: string;
         email: string;
@@ -886,23 +885,19 @@ const AdminDashboard = () => {
                                                         </div>
 
                                                         {/* Proposal (DevXtreme) */}
-                                                        {(reg.problem_statement || reg.solution) && (
-                                                            <div className="bg-[#08172e]/60 p-4 rounded-xl border border-orange-500/20">
-                                                                <p className="text-[10px] text-orange-400/80 uppercase tracking-widest font-bold mb-3 flex items-center gap-1.5">
-                                                                    <BookOpen className="w-3 h-3" /> Project Proposal
+                                                        {reg.abstract_url && (
+                                                            <div className="bg-[#08172e]/60 p-4 rounded-xl border border-cyan-500/20">
+                                                                <p className="text-[10px] text-cyan-400/80 uppercase tracking-widest font-bold mb-3 flex items-center gap-1.5">
+                                                                    <BookOpen className="w-3 h-3" /> Project Abstract
                                                                 </p>
-                                                                {reg.problem_statement && (
-                                                                    <div className="mb-2">
-                                                                        <p className="text-[10px] text-slate-600 uppercase tracking-wider mb-1">Problem</p>
-                                                                        <p className="text-xs text-slate-300 bg-[#0a192f] p-3 rounded-lg border border-white/5">{reg.problem_statement}</p>
-                                                                    </div>
-                                                                )}
-                                                                {reg.solution && (
-                                                                    <div>
-                                                                        <p className="text-[10px] text-slate-600 uppercase tracking-wider mb-1">Solution</p>
-                                                                        <p className="text-xs text-slate-300 bg-[#0a192f] p-3 rounded-lg border border-white/5">{reg.solution}</p>
-                                                                    </div>
-                                                                )}
+                                                                <a
+                                                                    href={reg.abstract_url}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-semibold transition-colors"
+                                                                >
+                                                                    <ExternalLink className="w-4 h-4" /> View Abstract Document
+                                                                </a>
                                                             </div>
                                                         )}
 
