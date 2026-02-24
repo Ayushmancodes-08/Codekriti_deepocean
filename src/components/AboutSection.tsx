@@ -18,7 +18,7 @@ const useIntersectionObserver = (options = {}) => {
 
 const stats = [
     { icon: <Users   className="w-5 h-5" />, value: '500+',  label: 'Participants' },
-    { icon: <Trophy  className="w-5 h-5" />, value: '₹10K+', label: 'Prize Pool'    },
+    { icon: <Trophy  className="w-5 h-5" />, value: '₹15K+', label: 'Prize Pool'    },
     { icon: <Calendar className="w-5 h-5"/>, value: '2',     label: 'Days'         },
     { icon: <Zap     className="w-5 h-5" />, value: '5',     label: 'Events'       },
 ];
