@@ -342,8 +342,8 @@ const TeamInfoStep = ({ onDirectSubmit, isSubmitting = false }: TeamInfoStepProp
                             </div>
                         </div>
                         <a
-                            href="/assets/DevXtreme_Abstract_Template.pdf"
-                            download
+                            href="/rulebooks/DevXtreme_Abstract_Template.pdf"
+                            download="DevXtreme_Abstract_Template.pdf"
                             className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/30 text-yellow-400 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                         >
                             <Download className="w-4 h-4" /> Template
@@ -406,42 +406,7 @@ const TeamInfoStep = ({ onDirectSubmit, isSubmitting = false }: TeamInfoStepProp
                                             </label>
                                         )}
 
-                                        {/* Direct Submit Button for DevXtreme */}
-                                        {onDirectSubmit && (
-                                            <div className="mt-4 w-full">
-                                                <Button
-                                                    type="button"
-                                                    onClick={onDirectSubmit}
-                                                    disabled={isSubmitting || !field.value}
-                                                    className={cn(
-                                                        "w-full h-12 relative overflow-hidden rounded-xl font-black uppercase tracking-[0.25em] text-xs transition-all duration-500 group",
-                                                        field.value && !isSubmitting
-                                                            ? "bg-[#00D9FF] text-[#0a192f] shadow-[0_0_25px_rgba(0,217,255,0.4)] hover:shadow-[0_0_40px_rgba(0,217,255,0.6)] hover:scale-[1.02]"
-                                                            : "bg-gray-800 text-gray-500 opacity-40 grayscale"
-                                                    )}
-                                                >
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                                                    <div className="relative flex items-center justify-center gap-2">
-                                                        {isSubmitting ? (
-                                                            <>
-                                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                                <span className="italic">PROCESSING...</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <span className="italic">Submit Abstract & Register</span>
-                                                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </Button>
-                                                {!field.value && !isSubmitting && (
-                                                    <p className="text-[9px] text-center text-red-400/60 mt-2 font-bold uppercase tracking-widest animate-pulse italic">
-                                                        Abstract upload required to submit
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
+                                        {/* The old 'Submit Abstract & Register' block was removed so the user uses the standard RegistrationSummary right column */}
 
                                     </div>
                                 </FormControl>

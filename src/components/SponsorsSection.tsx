@@ -9,6 +9,10 @@ const sponsors = [
     {
         name: "CGR International",
         logo: "/sponsors/CGR_Oointernational.png",
+    },
+    {
+        name: "Bharat Infocom",
+        logo: "/sponsors/BharatInfo.png",
     }
 ];
 
@@ -68,7 +72,7 @@ const SponsorsSection = () => {
                                 <img
                                     src={sponsor.logo}
                                     alt={sponsor.name}
-                                    className="w-28 sm:w-36 md:w-44 lg:w-52 h-auto object-contain rounded-xl sm:rounded-2xl opacity-50 transition-opacity duration-300 group-hover:opacity-100"
+                                    className="w-28 sm:w-36 md:w-44 lg:w-52 h-auto object-contain rounded-xl sm:rounded-2xl opacity-50 transition-all duration-300 group-hover:opacity-100"
                                 />
                             </motion.div>
                         ))}
