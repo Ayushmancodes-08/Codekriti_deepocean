@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { OceanFormItem } from '@/components/ui/ocean-form';
 import { cn } from '@/lib/utils';
 
-// REPLACE THIS WITH YOUR ACTUAL MERCHANT UPI ID
-const UPI_ID = "8480496340@upi";
+const UPI_ID = "7846803607-2@ybl";
 
 interface PaymentUploadStepProps {
     amount: string;
