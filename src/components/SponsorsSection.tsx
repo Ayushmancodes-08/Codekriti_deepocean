@@ -13,6 +13,10 @@ const sponsors = [
     {
         name: "Bharat Infocom",
         logo: "/sponsors/BharatInfo.png",
+    },
+    {
+        name: "SARBIX Growth Agency",
+        logo: "/sponsors/sarbix.png",
     }
 ];
 
