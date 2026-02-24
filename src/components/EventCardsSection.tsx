@@ -238,9 +238,7 @@ const EventCard = ({
                 </button>
                 <a
                     href={event.rulebook_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
+                    download={`${event.id}-Rulebook.pdf`}
                     title="Download Rulebook"
                     className="w-11 h-11 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-400 hover:text-white transition-all duration-300 active:scale-95 flex-shrink-0"
                 >

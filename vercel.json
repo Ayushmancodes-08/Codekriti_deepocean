@@ -1,7 +1,7 @@
 {
     "headers": [
         {
-            "source": "/assets/(.*\\.pdf)",
+            "source": "/(.*\\.pdf)",
             "headers": [
                 {
                     "key": "Content-Disposition",

@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield, Download, FileText, UploadCloud, Trash2, CheckCircle2 } from 'lucide-react';
+import { Users, User, Mail, Phone, School, BookOpen, Calendar, Shield, Download, FileText, UploadCloud, Trash2, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
 import { BRANCHES, YEARS_OF_STUDY, EVENTS, EVENT_COLLEGES, type RegistrationFormData } from '@/types/registration';
 import { capitalizeName, formatStrictPhone, preventNonNumeric } from '@/utils/formUtils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,7 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-const TeamInfoStep = () => {
+interface TeamInfoStepProps {
+    onDirectSubmit?: () => void;
+    isSubmitting?: boolean;
+}
+
+const TeamInfoStep = ({ onDirectSubmit, isSubmitting = false }: TeamInfoStepProps) => {
     const { watch, setValue, control } = useFormContext<RegistrationFormData>();
 
     const eventId = watch('eventId');
@@ -400,6 +405,44 @@ const TeamInfoStep = () => {
                                                 />
                                             </label>
                                         )}
+
+                                        {/* Direct Submit Button for DevXtreme */}
+                                        {onDirectSubmit && (
+                                            <div className="mt-4 w-full">
+                                                <Button
+                                                    type="button"
+                                                    onClick={onDirectSubmit}
+                                                    disabled={isSubmitting || !field.value}
+                                                    className={cn(
+                                                        "w-full h-12 relative overflow-hidden rounded-xl font-black uppercase tracking-[0.25em] text-xs transition-all duration-500 group",
+                                                        field.value && !isSubmitting
+                                                            ? "bg-[#00D9FF] text-[#0a192f] shadow-[0_0_25px_rgba(0,217,255,0.4)] hover:shadow-[0_0_40px_rgba(0,217,255,0.6)] hover:scale-[1.02]"
+                                                            : "bg-gray-800 text-gray-500 opacity-40 grayscale"
+                                                    )}
+                                                >
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                                    <div className="relative flex items-center justify-center gap-2">
+                                                        {isSubmitting ? (
+                                                            <>
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                                <span className="italic">PROCESSING...</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span className="italic">Submit Abstract & Register</span>
+                                                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </Button>
+                                                {!field.value && !isSubmitting && (
+                                                    <p className="text-[9px] text-center text-red-400/60 mt-2 font-bold uppercase tracking-widest animate-pulse italic">
+                                                        Abstract upload required to submit
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+
                                     </div>
                                 </FormControl>
                             </OceanFormItem>

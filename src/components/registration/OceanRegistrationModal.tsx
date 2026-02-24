@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, CheckCircle2, PartyPopper } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { registrationSchema, EVENTS, type RegistrationFormData } from '@/types/registration';
 import EventSelectionStep from './ocean-steps/EventSelectionStep';
@@ -486,31 +487,54 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                 <div className="h-full flex flex-col lg:grid lg:grid-cols-12 gap-4 p-3 md:p-4 overflow-y-auto lg:overflow-hidden">
 
                                                     {/* Left Column: Team/Leader Info — always scrollable */}
-                                                    <div className="lg:col-span-4 lg:h-full lg:overflow-y-auto custom-scrollbar lg:pr-2">
+                                                    <div className={cn(
+                                                        "lg:h-full lg:overflow-y-auto custom-scrollbar lg:pr-2",
+                                                        selectedEvent === 'devxtreme' ? "lg:col-span-6" : "lg:col-span-4"
+                                                    )}>
                                                         {isSolo ? (
                                                             <SoloDetailsStep />
                                                         ) : (
-                                                            <TeamInfoStep />
+                                                            <TeamInfoStep
+                                                                onDirectSubmit={
+                                                                    selectedEvent === 'devxtreme'
+                                                                        ? handleSubmit(
+                                                                            (data) => processRegistration(data),
+                                                                            (errors) => {
+                                                                                console.error("Registration Validation Errors:", errors);
+                                                                                toast.error("Please check your details", {
+                                                                                    description: "Some required fields are missing or invalid."
+                                                                                });
+                                                                            }
+                                                                        )
+                                                                        : undefined
+                                                                }
+                                                                isSubmitting={isSubmitting}
+                                                            />
                                                         )}
                                                     </div>
 
                                                     {/* Middle Column: Team Members (Hidden for Solo) */}
-                                                    <div className={`${isSolo ? 'hidden' : 'lg:col-span-5 lg:h-full lg:overflow-y-auto custom-scrollbar'} flex flex-col min-h-[400px]`}>
+                                                    <div className={cn(
+                                                        "flex flex-col min-h-[400px]",
+                                                        isSolo ? "hidden" : (selectedEvent === 'devxtreme' ? "lg:col-span-6 lg:h-full lg:overflow-y-auto custom-scrollbar" : "lg:col-span-5 lg:h-full lg:overflow-y-auto custom-scrollbar")
+                                                    )}>
                                                         {!isSolo && <TeamMembersStep squadSize={squadSize} />}
                                                     </div>
 
-                                                    {/* Right Column: Live Summary & Submit — compact, no scroll needed */}
-                                                    <div className={`${isSolo ? 'lg:col-span-8 lg:grid lg:grid-cols-2 lg:gap-6' : 'lg:col-span-3'} lg:h-full`}>
-                                                        {isSolo && <div className="hidden lg:block border-l border-[#00D9FF]/20" />}
-                                                        <div className="h-full flex flex-col">
-                                                            <RegistrationSummary
-                                                                isSubmitting={isSubmitting}
-                                                                onSubmit={handleProceedToPayment}
-                                                                eventName={EVENTS.find(e => e.id === selectedEvent)?.name || ''}
-                                                                buttonText="Proceed to Pay"
-                                                            />
+                                                    {/* Right Column: Live Summary & Submit — hidden for DevXtreme */}
+                                                    {selectedEvent !== 'devxtreme' && (
+                                                        <div className={`${isSolo ? 'lg:col-span-8 lg:grid lg:grid-cols-2 lg:gap-6' : 'lg:col-span-3'} lg:h-full`}>
+                                                            {isSolo && <div className="hidden lg:block border-l border-[#00D9FF]/20" />}
+                                                            <div className="h-full flex flex-col">
+                                                                <RegistrationSummary
+                                                                    isSubmitting={isSubmitting}
+                                                                    onSubmit={handleProceedToPayment}
+                                                                    eventName={EVENTS.find(e => e.id === selectedEvent)?.name || ''}
+                                                                    buttonText="Proceed to Pay"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
 
                                                 </div>
                                             )}
