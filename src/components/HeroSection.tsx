@@ -111,7 +111,7 @@ const HeroSection = () => {
                             type="button"
                             onClick={() => {
                                 if (window.innerWidth < 640) {
-                                    triggerDownload('/downloads/CodeKriti_Brochure.pdf', 'CodeKriti_4_0_Brochure.pdf');
+                                    triggerDownload('/rulebooks/brochure.pdf', 'CodeKriti_4_0_Brochure.pdf');
                                 } else {
                                     smoothScrollTo('about', { duration: 350, easing: 'easeInOutQuart' });
                                 }

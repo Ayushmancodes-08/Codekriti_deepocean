@@ -106,7 +106,7 @@ const Navbar = () => {
 
                     <div className="hidden md:block">
                         <button
-                            onClick={() => triggerDownload('/downloads/CodeKriti_Brochure.pdf', 'CodeKriti_Brochure.pdf')}
+                            onClick={() => triggerDownload('/rulebooks/brochure.pdf', 'CodeKriti_Brochure.pdf')}
                             className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 inline-block"
                         >
                             <span className="relative z-10 text-white">Download Brochure</span>
@@ -180,7 +180,7 @@ const Navbar = () => {
                 <div className="p-5 border-t border-white/5 flex-shrink-0">
                     <button
                         onClick={() => {
-                            triggerDownload('/downloads/CodeKriti_Brochure.pdf', 'CodeKriti_Brochure.pdf');
+                            triggerDownload('/rulebooks/brochure.pdf', 'CodeKriti_Brochure.pdf');
                             closeDrawer();
                         }}
                         className="flex items-center justify-center w-full h-12 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-transform touch-manipulation"

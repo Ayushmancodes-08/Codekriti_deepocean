@@ -1,36 +1,42 @@
 /**
  * Force a file download in the browser by creating a temporary anchor element.
  * This bypasses React Router and internal SPA routing to ensure external 
- * static files are correctly served and downloaded, especially on 
- * platforms like Vercel.
+ * Force a file download in the browser by fetching the file as a blob.
+ * This is the most robust method for SPAs on platforms like Vercel, as it
+ * ensures the file is fully retrieved before the browser triggers the 
+ * "save" dialog, bypassing any potential route interception.
  * 
  * @param url - The relative or absolute path to the file.
  * @param filename - The name to save the file as.
  */
-export const triggerDownload = (url: string, filename: string): void => {
+export const triggerDownload = async (url: string, filename: string): Promise<void> => {
     try {
+        // 1. Fetch the file as a blob
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);
+
+        const blob = await response.blob();
+
+        // 2. Create a temporary URL for the blob
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        // 3. Create a temporary anchor and trigger the download
         const link = document.createElement('a');
-        link.href = url;
+        link.href = blobUrl;
         link.download = filename;
 
-        // Use visibility: hidden and position: absolute to ensure the link 
-        // is technically "visible" and "present" in the layout, which 
-        // some browsers (like Safari/Firefox) require for programmatic clicks.
-        link.style.visibility = 'hidden';
-        link.style.position = 'absolute';
-        link.style.width = '0px';
-        link.style.height = '0px';
-
+        // Ensure visibility requirements for some browsers
+        link.style.display = 'none';
         document.body.appendChild(link);
+
         link.click();
 
-        // Give the browser a moment to register the click before removing
-        setTimeout(() => {
-            if (link.parentNode) {
-                document.body.removeChild(link);
-            }
-        }, 150);
+        // 4. Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
         console.error('Failed to trigger download:', err);
+        // Fallback: direct window open if fetch fails
+        window.open(url, '_blank');
     }
 };
