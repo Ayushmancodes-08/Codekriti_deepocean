@@ -186,7 +186,7 @@ Deno.serve(async (req: Request) => {
                         </div>
                     `,
                 };
-                await transporter.sendMail(mailOptions);
+                await sendMailWithTimeout(transporter, mailOptions);
             } catch (emailError: any) {
                 console.error("Failed to send pending email:", emailError);
             }
@@ -287,7 +287,7 @@ Deno.serve(async (req: Request) => {
                         </div>
                     `,
                 };
-                await transporter.sendMail(mailOptions);
+                await sendMailWithTimeout(transporter, mailOptions);
                 emailSent = true;
             } catch (emailError: any) {
                 console.error("Failed to send confirmation email:", emailError);
@@ -464,7 +464,7 @@ Deno.serve(async (req: Request) => {
                     `,
                 };
 
-                await transporter.sendMail(mailOptions);
+                await sendMailWithTimeout(transporter, mailOptions);
             } catch (emailError: any) {
                 console.error("Failed to send contact email:", emailError);
             }
