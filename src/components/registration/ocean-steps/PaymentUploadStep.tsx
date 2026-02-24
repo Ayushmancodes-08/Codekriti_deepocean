@@ -42,7 +42,7 @@ const PaymentUploadStep = ({ amount, onPaymentComplete, isUploading = false }: P
         const reader = new FileReader();
         reader.onload = (e) => {
             const base64String = e.target?.result as string;
-            // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
+           // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
             const base64Content = base64String.split(',')[1];
 
             onPaymentComplete(txnId, {
