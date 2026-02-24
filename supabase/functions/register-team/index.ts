@@ -30,11 +30,8 @@ const corsHeaders = {
 // Result: Logo ALWAYS displays without failures ✓
 // ============================================================================
 
-// Cloudinary logo URL (reliable CDN)
-const LOGO_URL = "https://res.cloudinary.com/dlanrr3jl/image/upload/f_auto,q_auto,w_150,h_150,c_fill/v1769794945/sea_yyeaix.jpg";
-
-// Fallback logos for maximum email client compatibility
-const LOGO_SVG = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzBhMTkyZiIvPjxjaXJjbGUgY3g9Ijc1IiBjeT0iNzUiIHI9IjcwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMEQ5RkYiIHN0cm9rZS13aWR0aD0iNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjU2IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMDBEOUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Q0s8L3RleHQ+PC9zdmc+";
+// Reliable CodeKriti logo URL
+const LOGO_URL = "https://codekriti.tech/Codefusion_Logo_final.png";
 
 // Helper to get SMTP User (with fallback)
 const getSmtpUser = () => Deno.env.get('SMTP_USER') || "codingclubpmec@gmail.com";
@@ -128,7 +125,7 @@ Deno.serve(async (req: Request) => {
                                 
                                 <!-- Header -->
                                 <div style="background-color: #0a192f; padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
-                                    <img src="${LOGO_SVG}" srcset="${LOGO_URL} 1x" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover; display: block; margin: 0 auto; background-color: #0a192f;" />
+                                    <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: contain; display: block; margin: 0 auto; background-color: #0a192f;" />
                                     <h1 style="color: #ccd6f6; margin: 15px 0 0; font-size: 24px; letter-spacing: 1px;">CodeKriti</h1>
                                     <p style="color: #64ffda; margin: 5px 0 0; font-size: 12px;">🌊 Dive Into Innovation 🌊</p>
                                 </div>
@@ -228,7 +225,7 @@ Deno.serve(async (req: Request) => {
                                 
                                 <!-- Header with Wave Effect (Simulated via gradient) -->
                                 <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
-                                    <img src="${LOGO_SVG}" srcset="${LOGO_URL} 1x" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover; display: block; margin: 0 auto; background-color: #0a192f;" />
+                                    <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #64ffda; object-fit: contain; display: block; margin: 0 auto; background-color: #0a192f;" />
                                     <h1 style="color: #64ffda; margin: 15px 0 0; font-size: 28px; letter-spacing: 2px; text-transform: uppercase;">Ticket Confirmed</h1>
                                     <p style="color: #8892b0; font-size: 12px; margin: 8px 0 0;">🎟️ Your registration is approved</p>
                                 </div>
@@ -421,7 +418,7 @@ Deno.serve(async (req: Request) => {
                                 
                                 <!-- Header -->
                                 <div style="background: linear-gradient(180deg, #172a45 0%, #0a192f 100%); padding: 30px; text-align: center; border-bottom: 1px solid #233554;">
-                                    <img src="${LOGO_SVG}" srcset="${LOGO_URL} 1x" alt="CodeKriti Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #64ffda; object-fit: cover; display: block; margin: 0 auto; background-color: #0a192f;" />
+                                    <img src="${LOGO_URL}" alt="CodeKriti Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #64ffda; object-fit: contain; display: block; margin: 0 auto; background-color: #0a192f;" />
                                     <h1 style="color: #ccd6f6; margin: 15px 0 0; font-size: 24px; letter-spacing: 1px;">New Inquiry</h1>
                                 </div>
     

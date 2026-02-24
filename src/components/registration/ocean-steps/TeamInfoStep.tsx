@@ -226,11 +226,12 @@ const TeamInfoStep = () => {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
-                                            {BRANCHES.map((branch) => (
-                                                <SelectItem key={branch} value={branch} className={cn(branch === 'Other' && "text-yellow-400 font-bold")}>
+                                            {BRANCHES.filter(branch => branch !== 'Other').map((branch) => (
+                                                <SelectItem key={branch} value={branch}>
                                                     {branch}
                                                 </SelectItem>
                                             ))}
+                                            <SelectItem value="Other" className="text-yellow-400 font-bold">Other (Specify)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </OceanFormItem>
@@ -252,11 +253,12 @@ const TeamInfoStep = () => {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="bg-[#1A1A2E] border-[#00D9FF]/30 text-white">
-                                            {YEARS_OF_STUDY.map((year) => (
-                                                <SelectItem key={year} value={year} className={cn(year === 'Other' && "text-yellow-400 font-bold")}>
+                                            {YEARS_OF_STUDY.filter(year => year !== 'Other').map((year) => (
+                                                <SelectItem key={year} value={year}>
                                                     {year}
                                                 </SelectItem>
                                             ))}
+                                            <SelectItem value="Other" className="text-yellow-400 font-bold">Other (Specify)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </OceanFormItem>

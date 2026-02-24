@@ -17,7 +17,7 @@ const faqs = [
     },
     {
         question: "What is the team size?",
-        answer: "Hackathon: 3–5 members. Innovation Challenge: 2–3 members. Tech Maze: 3 members. Algo to Code: Solo — just you vs the problems."
+        answer: "Hackathon: 3–5 members. Innovation Challenge: 2–3 members. Tech Maze: 2–3 members. Algo to Code: Solo — just you vs the problems."
     },
     {
         question: "Is there a registration fee?",

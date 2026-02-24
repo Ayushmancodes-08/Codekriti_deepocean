@@ -23,7 +23,7 @@ export const EVENTS = [
     {
         id: 'techmaze',
         name: 'Tech Maze',
-        minTeamSize: 3,
+        minTeamSize: 2,
         maxTeamSize: 3,
         description: 'Fun Technical Event',
         entryFee: '₹90',
@@ -63,7 +63,7 @@ export const BRANCHES = [
 ] as const;
 
 // Year of study
-export const YEARS_OF_STUDY = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Other'] as const;
+export const YEARS_OF_STUDY = ['1st', '2nd', '3rd', '4th', 'Other'] as const;
 
 // Event-specific college options
 export const EVENT_COLLEGES: Record<EventId, string[]> = {

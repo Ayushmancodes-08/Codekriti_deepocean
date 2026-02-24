@@ -326,12 +326,12 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent className="bg-[#0a192f] border-[#00D9FF]/20 text-white">
-                                                                {BRANCHES.map((b) => (
+                                                                {BRANCHES.filter(b => b !== 'Other').map((b) => (
                                                                     <SelectItem key={b} value={b} className="hover:bg-cyan-500/10 focus:bg-cyan-500/10 cursor-pointer text-xs">
                                                                         {b}
                                                                     </SelectItem>
                                                                 ))}
-                                                                <SelectItem value="Other" className="hover:bg-cyan-500/10 focus:bg-cyan-500/10 cursor-pointer text-xs">Other</SelectItem>
+                                                                <SelectItem value="Other" className="hover:bg-cyan-500/10 focus:bg-cyan-500/10 cursor-pointer text-xs font-bold text-yellow-400">Other (Specify)</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </OceanFormItem>
@@ -350,12 +350,12 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent className="bg-[#0a192f] border-[#00D9FF]/20 text-white">
-                                                                {YEARS_OF_STUDY.map((y) => (
+                                                                {YEARS_OF_STUDY.filter(y => y !== 'Other').map((y) => (
                                                                     <SelectItem key={y} value={y} className="hover:bg-cyan-500/10 focus:bg-cyan-500/10 cursor-pointer text-xs">
                                                                         {y} Year
                                                                     </SelectItem>
                                                                 ))}
-                                                                <SelectItem value="Other" className="hover:bg-cyan-500/10 focus:bg-cyan-500/10 cursor-pointer text-xs">Other</SelectItem>
+                                                                <SelectItem value="Other" className="hover:bg-cyan-500/10 focus:bg-cyan-500/10 cursor-pointer text-xs font-bold text-yellow-400">Other (Specify)</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </OceanFormItem>

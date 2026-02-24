@@ -14,12 +14,12 @@ const ParallaxParticle = ({ index, left, top, delay, duration, scrollY }: {
 }) => {
     const springScroll = useSpring(scrollY, { stiffness: 40, damping: 15 });
     const speed = (index % 4) * 0.3 + 0.1;
-    const dirY  = index % 2 === 0 ? -1 : 0.5;
-    const dirX  = (index % 3 - 1) * 0.5;
+    const dirY = index % 2 === 0 ? -1 : 0.5;
+    const dirX = (index % 3 - 1) * 0.5;
     const y = useTransform(springScroll, [0, 1000], [0, dirY * speed * 400]);
     const x = useTransform(springScroll, [0, 1000], [0, dirX * speed * 200]);
     const floatDuration = parseFloat(duration) || 5;
-    const delaySec      = parseFloat(delay)    || 0;
+    const delaySec = parseFloat(delay) || 0;
 
     return (
         <motion.div style={{ left, top, y, x, opacity: index % 3 === 0 ? 0.3 : 0.5, scale: (index % 5) * 0.2 + 0.8, zIndex: 1 }} className="absolute">
@@ -28,7 +28,7 @@ const ParallaxParticle = ({ index, left, top, delay, duration, scrollY }: {
                 transition={{ duration: floatDuration, delay: delaySec, repeat: Infinity, ease: 'easeInOut' }}
                 className={`rounded-full ${index % 2 === 0 ? 'bg-cyan-400' : 'bg-primary'} blur-[3px]`}
                 style={{
-                    width:  (index % 3 + 2) * 3 + 'px',
+                    width: (index % 3 + 2) * 3 + 'px',
                     height: (index % 3 + 2) * 3 + 'px',
                     boxShadow: `0 0 ${10 + index}px ${index % 2 === 0 ? 'rgba(6,182,212,0.4)' : 'rgba(255,107,53,0.4)'}`,
                 }}
@@ -42,7 +42,7 @@ const HeroSection = () => {
     const { scrollY } = useScroll();
 
     const particleCount = IS_TOUCH ? 0 : (performanceTier === 'low' ? 15 : 40);
-    const decorCount    = IS_TOUCH ? 0 : (performanceTier === 'low' ? 6  : 20);
+    const decorCount = IS_TOUCH ? 0 : (performanceTier === 'low' ? 6 : 20);
 
     return (
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden ray-effect">
@@ -56,7 +56,7 @@ const HeroSection = () => {
                         className="font-body text-sm sm:text-base md:text-lg text-cyan-300/90 font-bold tracking-[0.2em] uppercase mb-4 md:mb-6 animate-fade-in-up opacity-0 fill-mode-forwards drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                         style={{ animationDelay: '0.3s' }}
                     >
-                        Descend into the Digital Depths
+                        Explore the Depths of Innovation
                     </p>
 
                     {/* Main title — clamp via responsive classes (no tailwind config needed) */}
@@ -134,18 +134,18 @@ const HeroSection = () => {
                             onClick={() => smoothScrollTo('events', { duration: 350, easing: 'easeInOutQuart' })}
                             className="group w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-full text-white font-display font-bold text-base md:text-lg flex items-center justify-center gap-2 cursor-pointer min-h-[48px] transition-all duration-300 hover:scale-105 active:scale-95"
                             style={{
-                                background:   'rgba(6,182,212,0.08)',
-                                border:       '1.5px solid rgba(6,182,212,0.45)',
+                                background: 'rgba(6,182,212,0.08)',
+                                border: '1.5px solid rgba(6,182,212,0.45)',
                             }}
                             onMouseEnter={e => {
-                                (e.currentTarget as HTMLButtonElement).style.background   = 'rgba(6,182,212,0.18)';
-                                (e.currentTarget as HTMLButtonElement).style.borderColor  = 'rgba(6,182,212,0.9)';
-                                (e.currentTarget as HTMLButtonElement).style.boxShadow   = '0 0 22px rgba(6,182,212,0.22)';
+                                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(6,182,212,0.18)';
+                                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(6,182,212,0.9)';
+                                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 22px rgba(6,182,212,0.22)';
                             }}
                             onMouseLeave={e => {
-                                (e.currentTarget as HTMLButtonElement).style.background   = 'rgba(6,182,212,0.08)';
-                                (e.currentTarget as HTMLButtonElement).style.borderColor  = 'rgba(6,182,212,0.45)';
-                                (e.currentTarget as HTMLButtonElement).style.boxShadow   = 'none';
+                                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(6,182,212,0.08)';
+                                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(6,182,212,0.45)';
+                                (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
                             }}
                         >
                             <Play className="w-4 h-4 text-cyan-400 fill-cyan-400/20 group-hover:fill-cyan-400/50 transition-all duration-200" aria-hidden="true" />

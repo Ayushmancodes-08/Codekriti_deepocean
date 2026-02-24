@@ -38,11 +38,11 @@ const RegisterSection = () => {
           <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="absolute top-0 right-0 p-8 text-primary/10 hidden sm:block">
-              <Seaweed className="w-32 h-48 rotate-12" />
-            </div>
-            <div className="absolute bottom-0 left-0 p-8 text-accent/10 hidden sm:block">
-              <Seaweed className="w-24 h-36 -rotate-12" />
-            </div>
+            <Seaweed className="w-32 h-48 rotate-12" />
+          </div>
+          <div className="absolute bottom-0 left-0 p-8 text-accent/10 hidden sm:block">
+            <Seaweed className="w-24 h-36 -rotate-12" />
+          </div>
 
           <div className="text-center relative z-10">
             {/* Title */}
@@ -62,7 +62,7 @@ const RegisterSection = () => {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="font-body text-base md:text-lg text-foreground/70 mb-8 max-w-2xl mx-auto"
             >
-              Registration closes March 5, 2026. Don't miss your chance to be part of history.
+              Registration closes March 4, 2026. Don't miss your chance to be part of history.
             </motion.p>
 
             {/* REGISTER NOW Button */}
@@ -119,9 +119,9 @@ const RegisterSection = () => {
           className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
         >
           {[
-            { label: 'Venue',   value: 'PMEC ACADEMIC BLOCK',       icon: <MapPin       className="w-4 h-4 text-cyan-400" /> },
-            { label: 'Dates',   value: 'March 6–7, 2026',           icon: <CalendarDays className="w-4 h-4 text-cyan-400" /> },
-            { label: 'Contact', value: 'codingclubpmec@gmail.com',  icon: <Mail         className="w-4 h-4 text-cyan-400" /> },
+            { label: 'Venue', value: 'PMEC ACADEMIC BLOCK', icon: <MapPin className="w-4 h-4 text-cyan-400" /> },
+            { label: 'Dates', value: 'March 6–7, 2026', icon: <CalendarDays className="w-4 h-4 text-cyan-400" /> },
+            { label: 'Contact', value: 'codingclubpmec@gmail.com', icon: <Mail className="w-4 h-4 text-cyan-400" /> },
           ].map((item) => (
             <div key={item.label} className="glass-card rounded-2xl p-4 sm:p-6 border border-white/5 text-center flex flex-col items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
