@@ -330,7 +330,34 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVC3XHSW" height="0" width="0"
       style="display:none;visibility:hidden"></iframe></noscript>
 
-  <!-- DevTools Protection removed for screen sharing -->
+  <script>
+    // Disable Right Click
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    // Disable DevTools Keyboard Shortcuts
+    document.addEventListener("keydown", (e) => {
+      // F12
+      if (e.key === "F12") {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+I / Cmd+Option+I (DevTools)
+      if (e.ctrlKey && e.shiftKey && e.key === "I") {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+J / Cmd+Option+J (Console)
+      if (e.ctrlKey && e.shiftKey && e.key === "J") {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+C / Cmd+Option+C (Element Inspector)
+      if (e.ctrlKey && e.shiftKey && e.key === "C") {
+        e.preventDefault();
+      }
+      // Ctrl+U / Cmd+Option+U (View Source)
+      if (e.ctrlKey && e.key === "U") {
+        e.preventDefault();
+      }
+    });
+  </script>
 
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
