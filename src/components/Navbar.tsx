@@ -4,17 +4,17 @@ import { Menu, X } from 'lucide-react';
 import { ASSETS } from '@/config/assets';
 
 const navItems = [
-    { name: 'Home',     href: '#hero',     id: 'hero' },
-    { name: 'About',    href: '#about',    id: 'about' },
-    { name: 'Events',   href: '#events',   id: 'events' },
+    { name: 'Home', href: '#hero', id: 'hero' },
+    { name: 'About', href: '#about', id: 'about' },
+    { name: 'Events', href: '#events', id: 'events' },
     { name: 'Timeline', href: '#schedule', id: 'schedule' },
     { name: 'Register', href: '#register', id: 'register' },
 ];
 
 const Navbar = () => {
-    const [scrolled, setScrolled]         = useState(false);
-    const [drawerOpen, setDrawerOpen]     = useState(false);
-    const { activeSectionId }             = useScrollProgress();
+    const [scrolled, setScrolled] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const { activeSectionId } = useScrollProgress();
 
     /* ── scroll detection ── */
     useEffect(() => {
@@ -47,16 +47,15 @@ const Navbar = () => {
         return () => document.removeEventListener('keydown', onKey);
     }, []);
 
-    const openDrawer  = useCallback(() => setDrawerOpen(true),  []);
+    const openDrawer = useCallback(() => setDrawerOpen(true), []);
     const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
     return (
         <>
             <header
-                    className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-out ${
-                        scrolled
-                            ? 'glass-card py-2 shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-cyan-500/10'
-                            : 'py-4 md:py-6'
+                className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-out ${scrolled
+                        ? 'glass-card py-2 shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-cyan-500/10'
+                        : 'py-4 md:py-6'
                     }`}
             >
                 <nav className="container mx-auto px-4 md:px-6 flex items-center justify-between h-14 md:h-auto">
@@ -90,17 +89,15 @@ const Navbar = () => {
                                 <a
                                     key={item.name}
                                     href={item.href}
-                                    className={`relative font-body text-sm font-medium transition-all duration-300 group px-2 py-1.5 rounded focus:outline-none ${
-                                        isActive
+                                    className={`relative font-body text-sm font-medium transition-all duration-300 group px-2 py-1.5 rounded focus:outline-none ${isActive
                                             ? 'text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]'
                                             : 'text-foreground/80 hover:text-primary'
-                                    }`}
+                                        }`}
                                     aria-current={isActive ? 'page' : undefined}
                                 >
                                     {item.name}
-                                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 ${
-                                        isActive ? 'w-full' : 'w-0 group-hover:w-full'
-                                    }`} />
+                                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                                        }`} />
                                 </a>
                             );
                         })}
@@ -109,7 +106,7 @@ const Navbar = () => {
                     {/* Desktop CTA */}
                     <div className="hidden md:block">
                         <a
-                            href="/assets/Brochurecokekriti.pdf"
+                            href="/rulebooks/BrochureCodekriti.pdf"
                             download="CodeKriti_Brochure.pdf"
                             className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 inline-block"
                         >
@@ -135,9 +132,8 @@ const Navbar = () => {
             <div
                 id="mobile-drawer-backdrop"
                 onClick={closeDrawer}
-                className={`md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-                    drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-                }`}
+                className={`md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                    }`}
                 aria-hidden="true"
             />
 
@@ -147,9 +143,8 @@ const Navbar = () => {
                 role="dialog"
                 aria-modal="true"
                 aria-label="Navigation menu"
-                className={`md:hidden fixed top-0 right-0 bottom-0 z-50 w-72 max-w-[85vw] flex flex-col bg-[#050A14]/98 border-l border-cyan-500/20 backdrop-blur-xl shadow-2xl transition-transform duration-300 ease-out ${
-                    drawerOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}
+                className={`md:hidden fixed top-0 right-0 bottom-0 z-50 w-72 max-w-[85vw] flex flex-col bg-[#050A14]/98 border-l border-cyan-500/20 backdrop-blur-xl shadow-2xl transition-transform duration-300 ease-out ${drawerOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}
             >
                 {/* Drawer header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 flex-shrink-0">
@@ -172,11 +167,10 @@ const Navbar = () => {
                                 key={item.name}
                                 href={item.href}
                                 onClick={closeDrawer}
-                                className={`flex items-center min-h-[52px] px-5 py-3 font-display font-medium text-base tracking-wide transition-colors duration-200 border-l-[3px] ${
-                                    isActive
+                                className={`flex items-center min-h-[52px] px-5 py-3 font-display font-medium text-base tracking-wide transition-colors duration-200 border-l-[3px] ${isActive
                                         ? 'text-cyan-400 bg-cyan-950/30 border-l-cyan-400'
                                         : 'text-white/80 hover:text-white hover:bg-white/5 border-l-transparent'
-                                }`}
+                                    }`}
                             >
                                 {item.name}
                             </a>
@@ -187,7 +181,7 @@ const Navbar = () => {
                 {/* Drawer footer CTA */}
                 <div className="p-5 border-t border-white/5 flex-shrink-0">
                     <a
-                        href="/assets/Brochurecokekriti.pdf"
+                        href="/rulebooks/BrochureCodekriti.pdf"
                         download="CodeKriti_Brochure.pdf"
                         onClick={closeDrawer}
                         className="flex items-center justify-center w-full h-12 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-transform touch-manipulation"

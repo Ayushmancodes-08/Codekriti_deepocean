@@ -111,7 +111,7 @@ const HeroSection = () => {
                             onClick={() => {
                                 if (window.innerWidth < 640) {
                                     const a = document.createElement('a');
-                                    a.href = '/assets/Brochurecokekriti.pdf';
+                                    a.href = '/rulebooks/BrochureCodekriti.pdf';
                                     a.download = 'CodeKriti_4_0_Brochure.pdf';
                                     document.body.appendChild(a);
                                     a.click();
