@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useScrollProgress } from '@/hooks/useScrollProgress';
 import { Menu, X } from 'lucide-react';
 import { ASSETS } from '@/config/assets';
+import { triggerDownload } from '@/utils/fileUtils';
 
 const navItems = [
     { name: 'Home', href: '#hero', id: 'hero' },
@@ -54,8 +55,8 @@ const Navbar = () => {
         <>
             <header
                 className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-out ${scrolled
-                        ? 'glass-card py-2 shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-cyan-500/10'
-                        : 'py-4 md:py-6'
+                    ? 'glass-card py-2 shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-cyan-500/10'
+                    : 'py-4 md:py-6'
                     }`}
             >
                 <nav className="container mx-auto px-4 md:px-6 flex items-center justify-between h-14 md:h-auto">
@@ -90,8 +91,8 @@ const Navbar = () => {
                                     key={item.name}
                                     href={item.href}
                                     className={`relative font-body text-sm font-medium transition-all duration-300 group px-2 py-1.5 rounded focus:outline-none ${isActive
-                                            ? 'text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]'
-                                            : 'text-foreground/80 hover:text-primary'
+                                        ? 'text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]'
+                                        : 'text-foreground/80 hover:text-primary'
                                         }`}
                                     aria-current={isActive ? 'page' : undefined}
                                 >
@@ -103,15 +104,13 @@ const Navbar = () => {
                         })}
                     </div>
 
-                    {/* Desktop CTA */}
                     <div className="hidden md:block">
-                        <a
-                            href="/rulebooks/BrochureCodekriti.pdf"
-                            download="CodeKriti_Brochure.pdf"
+                        <button
+                            onClick={() => triggerDownload('/rulebooks/BrochureCodekriti.pdf', 'CodeKriti_Brochure.pdf')}
                             className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 inline-block"
                         >
                             <span className="relative z-10 text-white">Download Brochure</span>
-                        </a>
+                        </button>
                     </div>
 
                     {/* Mobile hamburger — min 44×44 touch target */}
@@ -168,8 +167,8 @@ const Navbar = () => {
                                 href={item.href}
                                 onClick={closeDrawer}
                                 className={`flex items-center min-h-[52px] px-5 py-3 font-display font-medium text-base tracking-wide transition-colors duration-200 border-l-[3px] ${isActive
-                                        ? 'text-cyan-400 bg-cyan-950/30 border-l-cyan-400'
-                                        : 'text-white/80 hover:text-white hover:bg-white/5 border-l-transparent'
+                                    ? 'text-cyan-400 bg-cyan-950/30 border-l-cyan-400'
+                                    : 'text-white/80 hover:text-white hover:bg-white/5 border-l-transparent'
                                     }`}
                             >
                                 {item.name}
@@ -178,16 +177,16 @@ const Navbar = () => {
                     })}
                 </div>
 
-                {/* Drawer footer CTA */}
                 <div className="p-5 border-t border-white/5 flex-shrink-0">
-                    <a
-                        href="/rulebooks/BrochureCodekriti.pdf"
-                        download="CodeKriti_Brochure.pdf"
-                        onClick={closeDrawer}
+                    <button
+                        onClick={() => {
+                            triggerDownload('/rulebooks/BrochureCodekriti.pdf', 'CodeKriti_Brochure.pdf');
+                            closeDrawer();
+                        }}
                         className="flex items-center justify-center w-full h-12 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-transform touch-manipulation"
                     >
                         Download Brochure
-                    </a>
+                    </button>
                 </div>
             </nav>
         </>

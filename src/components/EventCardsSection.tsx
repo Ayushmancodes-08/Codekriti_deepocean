@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Calendar, Users, Target, Code, Rocket, Lightbulb, Puzzle, Palette, FileText, Clock, MapPin, Phone } from 'lucide-react';
 import OceanRegistrationModal from '@/components/registration/OceanRegistrationModal';
 import { ASSETS } from '@/config/assets';
+import { triggerDownload } from '@/utils/fileUtils';
 
 const useIntersectionObserver = (options = {}) => {
     const [isIntersecting, setIsIntersecting] = useState(false);
@@ -236,14 +237,13 @@ const EventCard = ({
                     <Rocket className="w-3.5 h-3.5" aria-hidden="true" />
                     Register
                 </button>
-                <a
-                    href={event.rulebook_url}
-                    download={`${event.id}-Rulebook.pdf`}
+                <button
+                    onClick={() => triggerDownload(event.rulebook_url, `${event.id}-Rulebook.pdf`)}
                     title="Download Rulebook"
                     className="w-11 h-11 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-400 hover:text-white transition-all duration-300 active:scale-95 flex-shrink-0"
                 >
                     <FileText className="w-4 h-4" />
-                </a>
+                </button>
             </div>
         </div>
 

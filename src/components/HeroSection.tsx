@@ -4,6 +4,7 @@ import { Play, Send, Download } from 'lucide-react';
 import { usePerformanceTier } from '@/hooks/use-mobile';
 import { smoothScrollTo } from '@/lib/smoothScroll';
 import { TextReveal } from '@/components/ui/text-reveal';
+import { triggerDownload } from '@/utils/fileUtils';
 import { motion, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 
 /* ── tiny touch detection (runs once at module level — no hook) ── */
@@ -110,12 +111,7 @@ const HeroSection = () => {
                             type="button"
                             onClick={() => {
                                 if (window.innerWidth < 640) {
-                                    const a = document.createElement('a');
-                                    a.href = '/rulebooks/BrochureCodekriti.pdf';
-                                    a.download = 'CodeKriti_4_0_Brochure.pdf';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
+                                    triggerDownload('/rulebooks/BrochureCodekriti.pdf', 'CodeKriti_4_0_Brochure.pdf');
                                 } else {
                                     smoothScrollTo('about', { duration: 350, easing: 'easeInOutQuart' });
                                 }
