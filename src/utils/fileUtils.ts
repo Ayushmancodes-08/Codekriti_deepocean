@@ -13,16 +13,23 @@ export const triggerDownload = (url: string, filename: string): void => {
         link.href = url;
         link.download = filename;
 
-        // This ensures the link isn't visible in the DOM
-        link.style.display = 'none';
+        // Use visibility: hidden and position: absolute to ensure the link 
+        // is technically "visible" and "present" in the layout, which 
+        // some browsers (like Safari/Firefox) require for programmatic clicks.
+        link.style.visibility = 'hidden';
+        link.style.position = 'absolute';
+        link.style.width = '0px';
+        link.style.height = '0px';
 
         document.body.appendChild(link);
         link.click();
 
-        // Clean up
+        // Give the browser a moment to register the click before removing
         setTimeout(() => {
-            document.body.removeChild(link);
-        }, 100);
+            if (link.parentNode) {
+                document.body.removeChild(link);
+            }
+        }, 150);
     } catch (err) {
         console.error('Failed to trigger download:', err);
     }
