@@ -112,12 +112,8 @@ export const submitRegistration = async (
             }
         }
 
-        // Use the Vercel proxy to bypass PC/college network blocks.
-        // Proxy runs on Vercel's servers which have unrestricted internet access.
-        const proxyResponse = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+        const { data: result, error } = await supabase.functions.invoke('register-team', {
+            body: {
                 action: 'REGISTER',
                 payload: {
                     ...data,
@@ -128,15 +124,11 @@ export const submitRegistration = async (
                     abstract_base64: abstractBase64,
                     abstract_mime: abstractMime,
                 }
-            })
+            }
         });
 
-        if (!proxyResponse.ok) {
-            const errData = await proxyResponse.json().catch(() => ({}));
-            throw new Error(errData.message || `Proxy returned ${proxyResponse.status}`);
-        }
+        if (error) throw error;
 
-        const result = await proxyResponse.json();
         return result as RegistrationResponse;
 
     } catch (error: any) {
