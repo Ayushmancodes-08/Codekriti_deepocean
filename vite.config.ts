@@ -32,6 +32,19 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    // Proxy /api/register to Supabase Edge Function during local dev
+    // In production, Vercel's serverless function at /api/register.ts handles this
+    proxy: {
+      '/api/register': {
+        target: 'https://iorulrnihsjouawhvcyt.supabase.co/functions/v1/register-team',
+        changeOrigin: true,
+        rewrite: () => '',
+        timeout: 60000, // 60 second timeout for large image uploads
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvcnVscm5paHNqb3Vhd2h2Y3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwODQ3MTMsImV4cCI6MjA4NjY2MDcxM30.JmSmWlS3_xESGBc34SS0SIyLkLvJRMOZABWFwUXUkjs',
+        },
+      },
+    },
     // Pre-warm critical-path files so the first browser request is instant
     warmup: {
       clientFiles: [

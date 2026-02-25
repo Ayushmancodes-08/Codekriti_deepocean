@@ -32,7 +32,7 @@ interface RegistrationResponse {
 }
 
 // 1. Storage Upload Helper
-export const uploadScreenshot = async (file: File, path: string): Promise<string | null> => {
+export const uploadScreenshot = async (file: File, path: string): Promise<string> => {
     try {
         const { error } = await supabase.storage
             .from('payment-screenshots')
@@ -54,12 +54,12 @@ export const uploadScreenshot = async (file: File, path: string): Promise<string
         return publicUrl;
     } catch (e) {
         console.error("Upload failed", e);
-        return null;
+        throw e;
     }
 }
 
 // 1.5 Storage Upload Helper for Abstracts
-export const uploadAbstract = async (file: File, path: string): Promise<string | null> => {
+export const uploadAbstract = async (file: File, path: string): Promise<string> => {
     try {
         const { error } = await supabase.storage
             .from('payment-screenshots')
@@ -81,30 +81,63 @@ export const uploadAbstract = async (file: File, path: string): Promise<string |
         return publicUrl;
     } catch (e) {
         console.error("Abstract upload failed", e);
-        return null;
+        throw e;
     }
 }
 
-// 2. Updated Registration Submission
-export const submitRegistration = async (data: RegistrationData, screenshotUrl?: string): Promise<RegistrationResponse> => {
+// 2. Registration Submission — Uses Supabase client (works reliably)
+export const submitRegistration = async (
+    data: RegistrationData,
+    screenshotUrl?: string,
+    screenshotBase64?: string,
+    screenshotMime?: string
+): Promise<RegistrationResponse> => {
     try {
         console.log("Submitting to Supabase...", data);
 
-        const { data: result, error } = await supabase.functions.invoke('register-team', {
-            body: {
+        let abstractBase64;
+        let abstractMime;
+
+        // Process abstract file to base64 if exists
+        if (data.abstractFile) {
+            try {
+                const buffer = await data.abstractFile.arrayBuffer();
+                const bytes = new Uint8Array(buffer);
+                let binary = '';
+                for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                abstractBase64 = btoa(binary);
+                abstractMime = data.abstractFile.type;
+            } catch (e: any) {
+                console.warn("Failed to convert abstract to base64", e);
+            }
+        }
+
+        // Use the Vercel proxy to bypass PC/college network blocks.
+        // Proxy runs on Vercel's servers which have unrestricted internet access.
+        const proxyResponse = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 action: 'REGISTER',
                 payload: {
                     ...data,
-                    utr: data.transactionId, // Map to what backend expects
+                    utr: data.transactionId,
                     screenshot_url: screenshotUrl,
-                    abstract_url: data.abstractFile ? await uploadAbstract(data.abstractFile, `${data.teamName.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`) : undefined
+                    screenshot_base64: screenshotBase64,
+                    screenshot_mime: screenshotMime,
+                    abstract_base64: abstractBase64,
+                    abstract_mime: abstractMime,
                 }
-            }
+            })
         });
 
-        if (error) throw error;
+        if (!proxyResponse.ok) {
+            const errData = await proxyResponse.json().catch(() => ({}));
+            throw new Error(errData.message || `Proxy returned ${proxyResponse.status}`);
+        }
 
-        return result;
+        const result = await proxyResponse.json();
+        return result as RegistrationResponse;
 
     } catch (error: any) {
         console.error("Supabase Registration Error", error);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Upload, CheckCircle, Hash, Smartphone, Loader2 } from 'lucide-react';
 import QRCode from "react-qr-code";
 import { toast } from 'sonner';
+import imageCompression from 'browser-image-compression';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { OceanFormItem } from '@/components/ui/ocean-form';
@@ -32,30 +33,65 @@ const PaymentUploadStep = ({ amount, onPaymentComplete, isUploading = false }: P
         }
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (!txnId || !file) {
             toast.error("Please provide both Transaction ID and Screenshot.");
             return;
         }
 
-        // Convert file to Base64
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64String = e.target?.result as string;
-           // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
-            const base64Content = base64String.split(',')[1];
+        let fileToUpload = file;
 
-            onPaymentComplete(txnId, {
-                base64: base64Content,
-                mimeType: file.type,
-                fileName: file.name,
-                fileObject: file // Pass raw file for Supabase Storage
+        try {
+            // Compress the image aggressively to make uploads fast and avoid network timeouts
+            const options = {
+                maxSizeMB: 0.15, // 150KB - smaller for faster uploads
+                maxWidthOrHeight: 1000,
+                useWebWorker: true,
+                initialQuality: 0.8,
+            };
+            const compressedBlob = await imageCompression(file, options);
+            fileToUpload = new File([compressedBlob], file.name, {
+                type: compressedBlob.type,
+                lastModified: Date.now(),
             });
-        };
-        reader.onerror = () => {
-            toast.error("Failed to process file.");
-        };
-        reader.readAsDataURL(file);
+            console.log(`Image compressed: ${(file.size / 1024).toFixed(1)}KB → ${(compressedBlob.size / 1024).toFixed(1)}KB`);
+        } catch (error) {
+            console.error("Image compression failed, proceeding with original", error);
+        }
+
+        // Convert file to Base64 using Promise for proper async handling
+        try {
+            const fileData = await new Promise<{ base64: string, mimeType: string, fileName: string, fileObject: File }>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64String = e.target?.result as string;
+                    if (!base64String) {
+                        reject(new Error("Failed to read file"));
+                        return;
+                    }
+                    // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
+                    // Handle edge case where comma might be in the data itself by splitting only at the first comma
+                    const commaIndex = base64String.indexOf(',');
+                    const base64Content = commaIndex !== -1 ? base64String.slice(commaIndex + 1) : base64String;
+
+                    resolve({
+                        base64: base64Content,
+                        mimeType: fileToUpload.type,
+                        fileName: fileToUpload.name,
+                        fileObject: fileToUpload
+                    });
+                };
+                reader.onerror = () => {
+                    reject(new Error("Failed to process file"));
+                };
+                reader.readAsDataURL(fileToUpload);
+            });
+
+            onPaymentComplete(txnId, fileData);
+        } catch (error) {
+            console.error("File processing error:", error);
+            toast.error("Failed to process file. Please try again.");
+        }
     };
 
     return (
@@ -159,6 +195,7 @@ const PaymentUploadStep = ({ amount, onPaymentComplete, isUploading = false }: P
 
                     <div className="space-y-4">
                         <Button
+                            type="button"
                             onClick={handleConfirm}
                             disabled={isUploading || !txnId || !file}
                             className={cn(

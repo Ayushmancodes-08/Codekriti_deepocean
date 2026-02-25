@@ -96,13 +96,62 @@ Deno.serve(async (req: Request) => {
                 utr,
                 payment_screenshot_url,
                 screenshot_url,
-                abstract_url
+                screenshot_base64,
+                screenshot_mime,
+                abstract_url,
+                abstract_base64,
+                abstract_mime
             } = payload;
 
             const supabaseAdmin = createClient(
                 Deno.env.get('SUPABASE_URL') ?? '',
                 Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
             );
+
+            // 1. Process Base64 Files natively in the Edge to bypass PC firewall drops
+            let final_screenshot_url = screenshot_url || payment_screenshot_url;
+            let final_abstract_url = abstract_url;
+
+            if (screenshot_base64 && screenshot_mime) {
+                try {
+                    const binaryString = atob(screenshot_base64);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+
+                    const filename = `${teamName.replace(/\s+/g, '-').toLowerCase()}-payment-${Date.now()}.jpeg`;
+                    const { error: uploadError } = await supabaseAdmin.storage.from('payment-screenshots').upload(filename, bytes, {
+                        contentType: screenshot_mime,
+                        upsert: false
+                    });
+                    if (uploadError) throw new Error(`Backend storage upload failed: ${uploadError.message}`);
+
+                    const { data: { publicUrl } } = supabaseAdmin.storage.from('payment-screenshots').getPublicUrl(filename);
+                    final_screenshot_url = publicUrl;
+                } catch (e: any) {
+                    throw new Error(`Failed processing screenshot on edge: ${e.message}`);
+                }
+            }
+
+            if (abstract_base64 && abstract_mime) {
+                try {
+                    const binaryString = atob(abstract_base64);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+
+                    const filename = `abstracts/${teamName.replace(/\s+/g, '-').toLowerCase()}-abstract-${Date.now()}.pdf`;
+                    const { error: uploadError } = await supabaseAdmin.storage.from('payment-screenshots').upload(filename, bytes, {
+                        contentType: abstract_mime,
+                        upsert: false
+                    });
+                    if (uploadError) throw new Error(`Backend abstract storage upload failed: ${uploadError.message}`);
+
+                    const { data: { publicUrl } } = supabaseAdmin.storage.from('payment-screenshots').getPublicUrl(filename);
+                    final_abstract_url = publicUrl;
+                } catch (e: any) {
+                    throw new Error(`Failed processing abstract on edge: ${e.message}`);
+                }
+            }
+
 
             const dbData = {
                 event_id: event,
@@ -114,9 +163,9 @@ Deno.serve(async (req: Request) => {
                 members: members,
                 status: 'pending',
                 payment_txn_id: utr,
-                payment_screenshot_url: screenshot_url || payment_screenshot_url,
+                payment_screenshot_url: final_screenshot_url,
                 check_in_status: false,
-                abstract_url: abstract_url || null
+                abstract_url: final_abstract_url || null
             };
 
             const { data: insertedData, error: dbError } = await supabaseAdmin

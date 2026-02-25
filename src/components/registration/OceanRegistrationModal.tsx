@@ -46,9 +46,18 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
         resolver: zodResolver(registrationSchema),
         mode: 'onChange', // Real-time validation for the dashboard
         defaultValues: {
+            registrationType: 'team',
+            teamName: '',
+            teamLeader: {
+                name: '', email: '', phone: '', college: '', branch: '' as any, yearOfStudy: '' as any
+            },
+            participant: {
+                name: '', email: '', phone: '', college: '', branch: '' as any, yearOfStudy: '' as any
+            },
             teamMembers: [],
-            registrationType: 'team'
-        }
+            transactionId: '',
+            subscribe: false,
+        } as any
     });
 
     const { handleSubmit, setValue, reset, watch } = methods;
@@ -187,23 +196,15 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                 return college;
             };
 
-            // 1. Upload Screenshot first if exists
-            let screenshotUrl = '';
-            if (finalFile && finalFile.fileObject) {
-                // Generate unique path: event/teamName_timestamp.ext
-                const cleanName = (data.registrationType === 'team' ? data.teamName : data.participant.name).replace(/[^a-zA-Z0-9]/g, '_');
-                const timestamp = Date.now();
-                const ext = finalFile.fileName.split('.').pop() || 'png';
-                const path = `${data.eventId}/${cleanName}_${timestamp}.${ext}`;
+            // 1. BYPASS PC FIREWALLS AND ISP DROPS
+            // Send Base64 payload securely to edge function instead of hitting Storage directly from client
+            let screenshotUrl = undefined;
+            let screenshotBase64 = undefined;
+            let screenshotMime = undefined;
 
-                const url = await uploadScreenshot(finalFile.fileObject, path);
-                if (url) screenshotUrl = url;
-            } else if (finalFile && finalFile.base64) {
-                // Fallback if we only have base64 (should be rare if direct upload is used, but for compatibility)
-                // Convert base64 to File/Blob? For now, we optimized for fileObject in PaymentUploadStep
-                // If PaymentUploadStep doesn't provide fileObject, we might need a utility.
-                // Assuming PaymentUploadStep is updated to provide fileObject too.
-                console.warn("Only base64 file data available, upload might fail if not handled.");
+            if (finalFile && finalFile.base64) {
+                screenshotBase64 = finalFile.base64;
+                screenshotMime = finalFile.mimeType;
             }
 
             // Structure data for Supabase
@@ -256,7 +257,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                 };
             }
 
-            const response = await submitRegistration(dbData, screenshotUrl);
+            const response = await submitRegistration(dbData, screenshotUrl, screenshotBase64, screenshotMime);
 
             if (response.status === 'success') {
                 const successMessage = data.eventId === 'devxtreme'

@@ -129,6 +129,7 @@ const RegistrationSummary = ({ isSubmitting, onSubmit, eventName, buttonText = "
             {/* Action Button - always at bottom, never hidden */}
             <div className="mt-auto shrink-0 pt-1">
                 <Button
+                    type="button"
                     onClick={onSubmit}
                     disabled={isSubmitting || !isReady}
                     className={cn(
