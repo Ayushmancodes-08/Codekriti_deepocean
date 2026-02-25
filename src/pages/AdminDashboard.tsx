@@ -204,18 +204,21 @@ const AdminDashboard = () => {
         setIsLoading(true);
         try {
             console.log("[Admin] Fetching registrations...");
-            const response = await fetch('/api/admin/registrations');
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(text);
+            // Call the edge function which has access to the database and bypasses PC REST API block
+            const { data: responseData, error } = await supabase.functions.invoke('register-team', {
+                body: { action: 'GET_REGISTRATIONS' }
+            });
+
+            if (error) {
+                console.error("[Admin] Supabase error:", error);
+                throw error;
             }
-            const responseData = await response.json();
 
             if (responseData && responseData.status === 'error') {
                 throw new Error(responseData.message);
             }
 
-            const data = responseData;
+            const data = responseData.data;
 
             if (!data || data.length === 0) {
                 console.warn("[Admin] No data returned from Supabase");
@@ -241,7 +244,7 @@ const AdminDashboard = () => {
         if (!isAuthenticated) return;
 
         const channel = supabase
-            .channel("admin_registrations_rt")
+            .channel(`admin_registrations_rt_${Date.now()}`)
             .on(
                 "postgres_changes",
                 { event: "INSERT", schema: "public", table: "registrations" },
@@ -270,9 +273,17 @@ const AdminDashboard = () => {
                     if (id) setRegistrations(prev => prev.filter(x => x.id !== id));
                 }
             )
-            .subscribe();
+            .subscribe((status, err) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log('[Admin] Realtime connected');
+                } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    console.warn(`[Admin] Realtime subscription failed (${status}). This is expected if your PC blocks direct Supabase WebSocket connections. The dashboard will use polling/refresh instead.`, err);
+                }
+            });
 
-        return () => { supabase.removeChannel(channel); };
+        return () => {
+            supabase.removeChannel(channel).catch(e => console.warn("Failed to remove channel", e));
+        };
     }, [isAuthenticated]);
 
     // ─── Actions ───────────────────────────────────────────────────────────────
@@ -292,16 +303,15 @@ const AdminDashboard = () => {
     const doApprove = async (reg: Registration) => {
         const tid = toast.loading(`Approving ${reg.team_name}…`);
         try {
-            const response = await fetch('/api/admin/action', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const { data, error } = await supabase.functions.invoke('register-team', {
+                body: {
                     action: "APPROVE",
                     payload: { id: reg.id, email: reg.email, event: reg.event_id, leaderName: reg.leader_name, teamName: reg.team_name, utr: reg.payment_txn_id }
-                })
+                }
             });
-            const data = await response.json();
-            if (!response.ok || data.status === 'error') throw new Error(data.message || data.error?.message || 'Approval failed');
+
+            if (error) throw error;
+            if (data?.status === 'error') throw new Error(data.message || 'Approval failed');
             toast.dismiss(tid);
             toast.success("Approved & confirmation email sent!");
             setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, status: "success" } : r));
@@ -314,13 +324,12 @@ const AdminDashboard = () => {
     const doReject = async (id: string) => {
         const tid = toast.loading("Rejecting…");
         try {
-            const response = await fetch('/api/admin/action', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "REJECT", payload: { id } })
+            const { data, error } = await supabase.functions.invoke('register-team', {
+                body: { action: "REJECT", payload: { id } }
             });
-            const data = await response.json();
-            if (!response.ok || data.status === 'error') throw new Error(data.message || data.error?.message || 'Rejection failed');
+
+            if (error) throw error;
+            if (data?.status === 'error') throw new Error(data.message || 'Rejection failed');
             toast.dismiss(tid);
             toast.success("Registration rejected");
             setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status: "rejected" } : r));
