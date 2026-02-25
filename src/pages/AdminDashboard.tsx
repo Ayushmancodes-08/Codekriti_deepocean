@@ -85,14 +85,15 @@ const CopyField = ({ value, label }: { value: string; label?: string }) => {
 
 /** Status badge */
 const StatusBadge = ({ status }: { status: string }) => {
+    const effectiveStatus = status || "pending";
     const cfg: Record<string, string> = {
         success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
         pending: "bg-amber-500/10 text-amber-400 border-amber-500/25",
         rejected: "bg-red-500/10 text-red-400 border-red-500/25",
     };
     return (
-        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${cfg[status] ?? "bg-slate-500/10 text-slate-400 border-slate-500/25"}`}>
-            {status}
+        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${cfg[effectiveStatus] ?? "bg-slate-500/10 text-slate-400 border-slate-500/25"}`}>
+            {effectiveStatus}
         </span>
     );
 };
@@ -202,13 +203,29 @@ const AdminDashboard = () => {
     const fetchRegistrations = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data, error } = await supabase
-                .from("registrations")
-                .select("*")
-                .order("created_at", { ascending: false });
-            if (error) throw error;
+            console.log("[Admin] Fetching registrations...");
+            const response = await fetch('/api/admin/registrations');
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text);
+            }
+            const responseData = await response.json();
+
+            if (responseData && responseData.status === 'error') {
+                throw new Error(responseData.message);
+            }
+
+            const data = responseData;
+
+            if (!data || data.length === 0) {
+                console.warn("[Admin] No data returned from Supabase");
+            } else {
+                console.log(`[Admin] Loaded ${data.length} registrations`);
+            }
+
             setRegistrations(data || []);
         } catch (err: any) {
+            console.error("[Admin] Fetch error:", err);
             toast.error("Failed to load: " + err.message);
         } finally {
             setIsLoading(false);
@@ -275,13 +292,16 @@ const AdminDashboard = () => {
     const doApprove = async (reg: Registration) => {
         const tid = toast.loading(`Approving ${reg.team_name}…`);
         try {
-            const { error } = await supabase.functions.invoke("register-team", {
-                body: {
+            const response = await fetch('/api/admin/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     action: "APPROVE",
                     payload: { id: reg.id, email: reg.email, event: reg.event_id, leaderName: reg.leader_name, teamName: reg.team_name, utr: reg.payment_txn_id }
-                }
+                })
             });
-            if (error) throw error;
+            const data = await response.json();
+            if (!response.ok || data.status === 'error') throw new Error(data.message || data.error?.message || 'Approval failed');
             toast.dismiss(tid);
             toast.success("Approved & confirmation email sent!");
             setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, status: "success" } : r));
@@ -294,10 +314,13 @@ const AdminDashboard = () => {
     const doReject = async (id: string) => {
         const tid = toast.loading("Rejecting…");
         try {
-            const { error } = await supabase.functions.invoke("register-team", {
-                body: { action: "REJECT", payload: { id } }
+            const response = await fetch('/api/admin/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "REJECT", payload: { id } })
             });
-            if (error) throw error;
+            const data = await response.json();
+            if (!response.ok || data.status === 'error') throw new Error(data.message || data.error?.message || 'Rejection failed');
             toast.dismiss(tid);
             toast.success("Registration rejected");
             setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status: "rejected" } : r));
@@ -329,7 +352,7 @@ const AdminDashboard = () => {
 
     const stats = {
         total: registrations.length,
-        pending: registrations.filter(r => r.status === "pending").length,
+        pending: registrations.filter(r => (r.status || "pending") === "pending").length,
         approved: registrations.filter(r => r.status === "success").length,
         rejected: registrations.filter(r => r.status === "rejected").length,
         revenue: registrations.filter(r => r.status === "success").reduce((s, r) => s + (r.amount || 0), 0),
@@ -346,7 +369,7 @@ const AdminDashboard = () => {
 
     // Filtered + sorted list for registrations view
     const filtered = registrations
-        .filter(r => statusFilter === "all" || r.status === statusFilter)
+        .filter(r => statusFilter === "all" || (r.status || "pending") === statusFilter)
         .filter(r => eventFilter === "all" || r.event_id === eventFilter)
         .filter(r => {
             if (!search) return true;
@@ -953,7 +976,7 @@ const AdminDashboard = () => {
                                                 {/* Right: screenshot + actions */}
                                                 <div className="flex flex-row lg:flex-col items-start gap-3 lg:w-44 shrink-0">
                                                     {/* Approve / Reject */}
-                                                    {reg.status === "pending" && (
+                                                    {(reg.status || "pending") === "pending" && (
                                                         <div className="flex lg:flex-col gap-2 w-full">
                                                             <button
                                                                 onClick={() => setConfirmModal({ id: reg.id, name: reg.team_name, action: "approve", reg })}
