@@ -528,6 +528,26 @@ Deno.serve(async (req: Request) => {
             );
         }
 
+        // --- ACTION: GET_REGISTRATIONS ---
+        if (action === 'GET_REGISTRATIONS') {
+            const supabaseAdmin = createClient(
+                Deno.env.get('SUPABASE_URL') ?? '',
+                Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+            );
+
+            const { data, error } = await supabaseAdmin
+                .from('registrations')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            return new Response(
+                JSON.stringify({ status: 'success', data }),
+                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
         throw new Error('Invalid action');
 
     } catch (error: any) {

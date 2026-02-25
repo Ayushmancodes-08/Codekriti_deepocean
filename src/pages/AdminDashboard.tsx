@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
+
+// API Proxy URL - uses same-origin proxy to bypass PC firewall blocks
+const API_PROXY_URL = '/api/register';
 import {
     CheckCircle, XCircle, Search, RefreshCw, Lock, Eye, EyeOff,
     Image as ImageIcon, CreditCard, ChevronDown, ChevronUp, BookOpen,
@@ -38,6 +41,44 @@ interface Registration {
 
 type SortKey = "date" | "name" | "amount";
 type AdminView = "dashboard" | "registrations";
+
+// ─── API Helper ──────────────────────────────────────────────────────────────
+// Uses the Vercel proxy to bypass PC firewall blocks on direct Supabase calls
+// Falls back to direct Supabase call if proxy fails (for local dev)
+const apiCall = async (action: string, payload: any): Promise<any> => {
+    try {
+        // Try proxy first
+        const response = await fetch(API_PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, payload }),
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API Error ${response.status}: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        if (data.status === 'error') {
+            throw new Error(data.message || 'API returned error');
+        }
+        
+        return data;
+    } catch (proxyError: any) {
+        console.warn('[Admin] Proxy failed, falling back to direct Supabase:', proxyError.message);
+        
+        // Fallback: use Supabase client directly
+        const { data: responseData, error } = await supabase.functions.invoke('register-team', {
+            body: { action, payload }
+        });
+        
+        if (error) throw error;
+        if (responseData?.status === 'error') throw new Error(responseData.message);
+        
+        return responseData;
+    }
+};
 
 // ─── Utility ─────────────────────────────────────────────────────────────────
 const formatDate = (iso: string) =>
@@ -203,25 +244,14 @@ const AdminDashboard = () => {
     const fetchRegistrations = useCallback(async () => {
         setIsLoading(true);
         try {
-            console.log("[Admin] Fetching registrations...");
-            // Call the edge function which has access to the database and bypasses PC REST API block
-            const { data: responseData, error } = await supabase.functions.invoke('register-team', {
-                body: { action: 'GET_REGISTRATIONS' }
-            });
-
-            if (error) {
-                console.error("[Admin] Supabase error:", error);
-                throw error;
-            }
-
-            if (responseData && responseData.status === 'error') {
-                throw new Error(responseData.message);
-            }
-
-            const data = responseData.data;
+            console.log("[Admin] Fetching registrations via proxy...");
+            // Use the Vercel proxy to bypass PC firewall blocks
+            const result = await apiCall('GET_REGISTRATIONS', {});
+            
+            const data = result.data || result;
 
             if (!data || data.length === 0) {
-                console.warn("[Admin] No data returned from Supabase");
+                console.warn("[Admin] No data returned");
             } else {
                 console.log(`[Admin] Loaded ${data.length} registrations`);
             }
@@ -303,15 +333,15 @@ const AdminDashboard = () => {
     const doApprove = async (reg: Registration) => {
         const tid = toast.loading(`Approving ${reg.team_name}…`);
         try {
-            const { data, error } = await supabase.functions.invoke('register-team', {
-                body: {
-                    action: "APPROVE",
-                    payload: { id: reg.id, email: reg.email, event: reg.event_id, leaderName: reg.leader_name, teamName: reg.team_name, utr: reg.payment_txn_id }
-                }
+            await apiCall('APPROVE', { 
+                id: reg.id, 
+                email: reg.email, 
+                event: reg.event_id, 
+                leaderName: reg.leader_name, 
+                teamName: reg.team_name, 
+                utr: reg.payment_txn_id 
             });
-
-            if (error) throw error;
-            if (data?.status === 'error') throw new Error(data.message || 'Approval failed');
+            
             toast.dismiss(tid);
             toast.success("Approved & confirmation email sent!");
             setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, status: "success" } : r));
@@ -324,12 +354,8 @@ const AdminDashboard = () => {
     const doReject = async (id: string) => {
         const tid = toast.loading("Rejecting…");
         try {
-            const { data, error } = await supabase.functions.invoke('register-team', {
-                body: { action: "REJECT", payload: { id } }
-            });
-
-            if (error) throw error;
-            if (data?.status === 'error') throw new Error(data.message || 'Rejection failed');
+            await apiCall('REJECT', { id });
+            
             toast.dismiss(tid);
             toast.success("Registration rejected");
             setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status: "rejected" } : r));
