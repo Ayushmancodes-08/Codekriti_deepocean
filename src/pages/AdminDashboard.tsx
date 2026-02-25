@@ -48,30 +48,48 @@ type AdminView = "dashboard" | "registrations";
 // ─── API Helper ──────────────────────────────────────────────────────────────
 // Uses the Vercel proxy to bypass PC firewall blocks on direct Supabase calls
 // Falls back to direct Supabase call if proxy fails (for local dev)
-const apiCall = async (action: string, payload: any): Promise<any> => {
+const apiCall = async (action: string, payload: any, retries = 2): Promise<any> => {
+    const errors: string[] = [];
+    
+    // Try proxy first (production path)
+    for (let i = 0; i < retries; i++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+            
+            const response = await fetch(API_PROXY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, payload }),
+                signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                await response.text(); // consume body to prevent memory leak
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.status === 'error') {
+                throw new Error(data.message || 'Request failed');
+            }
+
+            return data;
+        } catch (err: any) {
+            const msg = err.name === 'AbortError' ? 'Request timed out' : err.message;
+            console.warn(`[Admin] Proxy attempt ${i + 1} failed:`, msg);
+            errors.push(`Proxy: ${msg}`);
+            
+            if (i < retries - 1) {
+                await new Promise(r => setTimeout(r, 1000 * (i + 1))); // Exponential backoff
+            }
+        }
+    }
+    
+    // Fallback: direct Supabase (local dev path)
+    console.log('[Admin] Trying direct Supabase fallback...');
     try {
-        // Try proxy first
-        const response = await fetch(API_PROXY_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, payload }),
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API Error ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
-        if (data.status === 'error') {
-            throw new Error(data.message || 'API returned error');
-        }
-
-        return data;
-    } catch (proxyError: any) {
-        console.warn('[Admin] Proxy failed, falling back to direct Supabase:', proxyError.message);
-
-        // Fallback: use Supabase client directly
         const { data: responseData, error } = await supabase.functions.invoke('register-team', {
             body: { action, payload }
         });
@@ -80,6 +98,23 @@ const apiCall = async (action: string, payload: any): Promise<any> => {
         if (responseData?.status === 'error') throw new Error(responseData.message);
 
         return responseData;
+    } catch (supabaseError: any) {
+        console.error('[Admin] Supabase fallback failed:', supabaseError);
+        errors.push(`Direct: ${supabaseError.message}`);
+        
+        // Provide helpful error message
+        const isNetworkError = errors.some(e => 
+            e.includes('fetch') || 
+            e.includes('timeout') || 
+            e.includes('network') ||
+            e.includes('Failed')
+        );
+        
+        if (isNetworkError) {
+            throw new Error('Network connection failed. Please check your internet connection and try again.');
+        }
+        
+        throw new Error(`Request failed: ${errors.join(' → ')}`);
     }
 };
 
@@ -244,25 +279,41 @@ const AdminDashboard = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     // ─── Fetch ─────────────────────────────────────────────────────────────────
-    const fetchRegistrations = useCallback(async () => {
+    const fetchRegistrations = useCallback(async (showToast = true) => {
         setIsLoading(true);
         try {
-            console.log("[Admin] Fetching registrations via proxy...");
-            // Use the Vercel proxy to bypass PC firewall blocks
+            console.log("[Admin] Fetching registrations...");
             const result = await apiCall('GET_REGISTRATIONS', {});
-
             const data = result.data || result;
 
-            if (!data || data.length === 0) {
-                console.warn("[Admin] No data returned");
-            } else {
-                console.log(`[Admin] Loaded ${data.length} registrations`);
+            if (!data || !Array.isArray(data)) {
+                console.warn("[Admin] Invalid data format received:", data);
+                setRegistrations([]);
+                if (showToast) toast.error("Invalid data received from server");
+                return;
             }
 
-            setRegistrations(data || []);
+            console.log(`[Admin] Loaded ${data.length} registrations`);
+            setRegistrations(data);
+            
+            if (showToast && data.length > 0) {
+                toast.success(`Loaded ${data.length} registrations`);
+            }
         } catch (err: any) {
             console.error("[Admin] Fetch error:", err);
-            toast.error("Failed to load: " + err.message);
+            const errorMsg = err.message || "Failed to load registrations";
+            
+            // Show user-friendly error
+            if (errorMsg.includes('Network') || errorMsg.includes('connection') || errorMsg.includes('timeout')) {
+                toast.error("Connection failed. Please check your internet and try again.", {
+                    description: "If the problem persists, try refreshing the page.",
+                    duration: 5000,
+                });
+            } else {
+                toast.error(errorMsg);
+            }
+            
+            setRegistrations([]);
         } finally {
             setIsLoading(false);
         }
@@ -350,7 +401,13 @@ const AdminDashboard = () => {
             setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, status: "success" } : r));
         } catch (err: any) {
             toast.dismiss(tid);
-            toast.error("Approve failed: " + err.message);
+            const errorMsg = err.message || "Approval failed";
+            
+            if (errorMsg.includes('Network') || errorMsg.includes('connection') || errorMsg.includes('timeout')) {
+                toast.error("Connection failed. Please check your internet and try again.");
+            } else {
+                toast.error("Approve failed: " + errorMsg);
+            }
         }
     };
 
@@ -364,7 +421,13 @@ const AdminDashboard = () => {
             setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status: "rejected" } : r));
         } catch (err: any) {
             toast.dismiss(tid);
-            toast.error("Reject failed: " + err.message);
+            const errorMsg = err.message || "Rejection failed";
+            
+            if (errorMsg.includes('Network') || errorMsg.includes('connection') || errorMsg.includes('timeout')) {
+                toast.error("Connection failed. Please check your internet and try again.");
+            } else {
+                toast.error("Reject failed: " + errorMsg);
+            }
         }
     };
 
@@ -828,7 +891,7 @@ const AdminDashboard = () => {
                                             {sortAsc ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                         </button>
                                         {/* Refresh */}
-                                        <button onClick={fetchRegistrations} className="p-2.5 bg-[#0a192f] border border-white/10 rounded-xl text-slate-400 hover:text-[#00D9FF] hover:border-[#00D9FF]/30 transition-all">
+                                        <button onClick={() => fetchRegistrations()} className="p-2.5 bg-[#0a192f] border border-white/10 rounded-xl text-slate-400 hover:text-[#00D9FF] hover:border-[#00D9FF]/30 transition-all">
                                             <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
                                         </button>
                                     </div>
