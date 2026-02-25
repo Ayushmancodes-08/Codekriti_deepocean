@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
-
-// API Proxy URL - uses same-origin proxy to bypass PC firewall blocks
-const API_PROXY_URL = '/api/register';
 import {
     CheckCircle, XCircle, Search, RefreshCw, Lock, Eye, EyeOff,
     Image as ImageIcon, CreditCard, ChevronDown, ChevronUp, BookOpen,
@@ -13,6 +10,12 @@ import {
     AlertTriangle, Inbox
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// API Proxy URL - uses same-origin proxy to bypass PC firewall blocks
+const API_PROXY_URL = '/api/register';
+
+// Helper to proxy image URLs to bypass PC firewall drops to Supabase Storage
+const getProxyImageUrl = (url?: string) => url ? `/api/proxy-image?url=${encodeURIComponent(url)}` : undefined;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Registration {
@@ -53,29 +56,29 @@ const apiCall = async (action: string, payload: any): Promise<any> => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, payload }),
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`API Error ${response.status}: ${errorText}`);
         }
-        
+
         const data = await response.json();
         if (data.status === 'error') {
             throw new Error(data.message || 'API returned error');
         }
-        
+
         return data;
     } catch (proxyError: any) {
         console.warn('[Admin] Proxy failed, falling back to direct Supabase:', proxyError.message);
-        
+
         // Fallback: use Supabase client directly
         const { data: responseData, error } = await supabase.functions.invoke('register-team', {
             body: { action, payload }
         });
-        
+
         if (error) throw error;
         if (responseData?.status === 'error') throw new Error(responseData.message);
-        
+
         return responseData;
     }
 };
@@ -247,7 +250,7 @@ const AdminDashboard = () => {
             console.log("[Admin] Fetching registrations via proxy...");
             // Use the Vercel proxy to bypass PC firewall blocks
             const result = await apiCall('GET_REGISTRATIONS', {});
-            
+
             const data = result.data || result;
 
             if (!data || data.length === 0) {
@@ -333,15 +336,15 @@ const AdminDashboard = () => {
     const doApprove = async (reg: Registration) => {
         const tid = toast.loading(`Approving ${reg.team_name}…`);
         try {
-            await apiCall('APPROVE', { 
-                id: reg.id, 
-                email: reg.email, 
-                event: reg.event_id, 
-                leaderName: reg.leader_name, 
-                teamName: reg.team_name, 
-                utr: reg.payment_txn_id 
+            await apiCall('APPROVE', {
+                id: reg.id,
+                email: reg.email,
+                event: reg.event_id,
+                leaderName: reg.leader_name,
+                teamName: reg.team_name,
+                utr: reg.payment_txn_id
             });
-            
+
             toast.dismiss(tid);
             toast.success("Approved & confirmation email sent!");
             setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, status: "success" } : r));
@@ -355,7 +358,7 @@ const AdminDashboard = () => {
         const tid = toast.loading("Rejecting…");
         try {
             await apiCall('REJECT', { id });
-            
+
             toast.dismiss(tid);
             toast.success("Registration rejected");
             setRegistrations(prev => prev.map(r => r.id === id ? { ...r, status: "rejected" } : r));
@@ -1033,13 +1036,13 @@ const AdminDashboard = () => {
                                                         className="w-full lg:flex-1 relative group/img overflow-hidden rounded-xl bg-[#08172e] border border-white/8 aspect-video lg:aspect-auto lg:min-h-[90px] flex items-center justify-center cursor-pointer hover:border-[#00D9FF]/30 transition-all"
                                                         onClick={() => {
                                                             const url = reg.payment_screenshot_url || reg.screenshot_url;
-                                                            if (url) setSelectedImage(url);
+                                                            if (url) setSelectedImage(getProxyImageUrl(url) as string);
                                                         }}
                                                     >
                                                         {(reg.payment_screenshot_url || reg.screenshot_url) ? (
                                                             <>
                                                                 <img
-                                                                    src={reg.payment_screenshot_url || reg.screenshot_url}
+                                                                    src={getProxyImageUrl(reg.payment_screenshot_url || reg.screenshot_url)}
                                                                     alt="Payment proof"
                                                                     className="w-full h-full object-cover opacity-75 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-500"
                                                                 />
