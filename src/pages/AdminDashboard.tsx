@@ -375,7 +375,7 @@ const AdminDashboard = () => {
         e.preventDefault();
         setLoginLoading(true);
         await new Promise(r => setTimeout(r, 500));
-        if (loginEmail === "pmec@2045" && loginPassword === "4024") {
+        if (loginEmail === "admin@codekriti" && loginPassword === "CK2025#Secure") {
             setIsAuthenticated(true);
             toast.success("Access Granted");
         } else {
