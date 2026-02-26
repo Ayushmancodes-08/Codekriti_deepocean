@@ -10,7 +10,6 @@ import { useState, lazy, Suspense } from "react";
 import { AnimatePresence } from "framer-motion";
 
 // Lazy-load non-critical app-level components (not needed for first paint)
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
 const BroadcastModal = lazy(() => import("@/components/BroadcastModal"));
 const CustomCursor = lazy(() => import("@/components/CustomCursor"));
@@ -24,7 +23,6 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
-        <Route path="/admin" element={<AdminDashboard />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

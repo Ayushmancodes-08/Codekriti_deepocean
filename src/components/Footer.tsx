@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '@/utils/supabaseClient';
 import { ASSETS } from '@/config/assets';
-import { Mail, Twitter, Instagram, Linkedin, Lock } from 'lucide-react';
+import { Mail, Twitter, Instagram, Linkedin } from 'lucide-react';
 
 const Footer = () => {
-  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -150,27 +148,6 @@ const Footer = () => {
 
           <div className="flex items-center gap-1 text-xs sm:text-sm">
             Made with <span className="text-red-500 animate-pulse">❤</span> by CDD Web Team
-            {/* Admin Trigger (Lock Icon) - Subtle & Right Side */}
-            <button
-              onClick={() => {
-                const pass = prompt("Enter Access Protocol:");
-                if (!pass) return;
-                const cleanPass = pass.trim();
-
-                if (cleanPass === "deep-dive-admin") {
-                  window.dispatchEvent(new CustomEvent('OPEN_BROADCAST_MODAL', { detail: cleanPass }));
-                } else if (cleanPass === "2025") {
-                  console.log("Admin access granted");
-                  navigate('/admin');
-                } else {
-                  console.log("Access denied");
-                }
-              }}
-              className="ml-2 w-6 h-6 rounded bg-white/5 flex items-center justify-center text-gray-600 hover:text-cyan-400 hover:bg-cyan-900/20 transition-all opacity-50 hover:opacity-100"
-              aria-label="Admin Access"
-            >
-              <Lock className="w-3 h-3" />
-            </button>
           </div>
         </div>
       </div>
