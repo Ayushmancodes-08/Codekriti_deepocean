@@ -85,7 +85,7 @@ export const uploadAbstract = async (file: File, path: string): Promise<string> 
     }
 }
 
-// 2. Registration Submission — Uses Supabase client (works reliably)
+// 2. Registration Submission — Routes through Vercel Proxy to bypass local network blocks
 export const submitRegistration = async (
     data: RegistrationData,
     screenshotUrl?: string,
@@ -93,7 +93,7 @@ export const submitRegistration = async (
     screenshotMime?: string
 ): Promise<RegistrationResponse> => {
     try {
-        console.log("Submitting to Supabase...", data);
+        console.log("Submitting to Proxy...", data);
 
         let abstractBase64;
         let abstractMime;
@@ -112,8 +112,13 @@ export const submitRegistration = async (
             }
         }
 
-        const { data: result, error } = await supabase.functions.invoke('register-team', {
-            body: {
+        // Use fetch to call our Vercel Serverless Function proxy
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 action: 'REGISTER',
                 payload: {
                     ...data,
@@ -124,18 +129,22 @@ export const submitRegistration = async (
                     abstract_base64: abstractBase64,
                     abstract_mime: abstractMime,
                 }
-            }
+            })
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Network response was not ok' }));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
 
+        const result = await response.json();
         return result as RegistrationResponse;
 
     } catch (error: any) {
-        console.error("Supabase Registration Error", error);
+        console.error("Registration Error (via Proxy):", error);
         return {
             status: 'error',
-            message: error.message || "Failed to register via Supabase."
+            message: error.message || "Failed to register via proxy. Please check your connection."
         };
     }
 };
