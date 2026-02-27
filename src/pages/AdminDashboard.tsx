@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
 import {
-    CheckCircle, XCircle, Search, RefreshCw, Lock, Eye, EyeOff,
+    CheckCircle, XCircle, Search, RefreshCw, Eye, EyeOff,
     Image as ImageIcon, CreditCard, ChevronDown, ChevronUp, BookOpen,
     Copy, Check, ExternalLink, Download, Users, TrendingUp,
     Clock, BarChart2, Activity, LogOut, X, LayoutDashboard,
@@ -521,13 +521,10 @@ const AdminDashboard = () => {
                     initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
                     className="bg-[#0d1f3c]/90 backdrop-blur-xl p-8 rounded-3xl border border-[#00D9FF]/20 shadow-[0_0_60px_rgba(0,217,255,0.12)] max-w-sm w-full relative z-10"
                 >
-                    <div className="flex justify-center mb-6">
-                        <div className="p-4 bg-[#00D9FF]/10 rounded-2xl border border-[#00D9FF]/20 shadow-[0_0_20px_rgba(0,217,255,0.15)]">
-                            <Lock className="w-8 h-8 text-[#00D9FF]" />
-                        </div>
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-bold text-white mb-2">Admin Login</h2>
+                        <p className="text-slate-500 text-sm">CodeKriti 4.0 Dashboard</p>
                     </div>
-                    <h2 className="text-2xl font-bold text-center text-white mb-1">Restricted Access</h2>
-                    <p className="text-center text-slate-500 mb-8 text-sm">Authorized Personnel Only</p>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         {/* Email */}
