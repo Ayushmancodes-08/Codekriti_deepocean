@@ -17,13 +17,14 @@ const CustomCursor = lazy(() => import("@/components/CustomCursor"));
 
 const queryClient = new QueryClient();
 
-// Secret admin access hook - type "admin" anywhere or long-press for 5s on mobile
+// Secret admin access hook - type "admin" on desktop, triple-tap on mobile
 const useSecretAdminAccess = (onAccess: () => void) => {
   const [keyBuffer, setKeyBuffer] = useState("");
-  const touchStartTime = useRef<number | null>(null);
-  const touchTimer = useRef<NodeJS.Timeout | null>(null);
+  const tapCount = useRef(0);
+  const lastTapTime = useRef(0);
 
   useEffect(() => {
+    // Desktop: Type "admin"
     const handleKeyDown = (e: KeyboardEvent) => {
       const newBuffer = (keyBuffer + e.key.toLowerCase()).slice(-5);
       setKeyBuffer(newBuffer);
@@ -34,40 +35,31 @@ const useSecretAdminAccess = (onAccess: () => void) => {
       }
     };
 
-    const handleTouchStart = () => {
-      touchStartTime.current = Date.now();
+    // Mobile: Triple-tap anywhere (3 taps within 1 second)
+    const handleTouch = () => {
+      const now = Date.now();
       
-      // Show a subtle hint after 3 seconds
-      if (touchTimer.current) clearTimeout(touchTimer.current);
-      touchTimer.current = setTimeout(() => {
-        // Optional: could show a subtle visual cue here
-      }, 3000);
-    };
-
-    const handleTouchEnd = () => {
-      if (touchTimer.current) {
-        clearTimeout(touchTimer.current);
-        touchTimer.current = null;
+      // Reset if more than 1 second between taps
+      if (now - lastTapTime.current > 1000) {
+        tapCount.current = 0;
       }
       
-      if (touchStartTime.current) {
-        const duration = Date.now() - touchStartTime.current;
-        if (duration >= 5000) { // 5 seconds long press
-          onAccess();
-        }
-        touchStartTime.current = null;
+      tapCount.current++;
+      lastTapTime.current = now;
+      
+      // Triple tap detected
+      if (tapCount.current >= 3) {
+        tapCount.current = 0;
+        onAccess();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchend", handleTouch, { passive: true });
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-      if (touchTimer.current) clearTimeout(touchTimer.current);
+      window.removeEventListener("touchend", handleTouch);
     };
   }, [keyBuffer, onAccess]);
 };
