@@ -24,13 +24,9 @@ interface OceanRegistrationModalProps {
 
 const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRegistrationModalProps) => {
     // Stage 1: Selection, Stage 2: Registration Dashboard
-    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const savedStateStr = typeof window !== 'undefined' && isMobile ? localStorage.getItem('codekriti_registration') : null;
-    const savedState = savedStateStr ? JSON.parse(savedStateStr) : null;
-
-    const [currentStep, setCurrentStep] = useState(savedState?.step || 1);
-    const [selectedEvent, setSelectedEvent] = useState<string | null>(savedState?.eventId || null);
-    const [squadSize, setSquadSize] = useState<number>(savedState?.squadSize || 1);
+    const [currentStep, setCurrentStep] = useState(1);
+    const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+    const [squadSize, setSquadSize] = useState<number>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [ticketData, setTicketData] = useState<any>(null);
     const [uploadedFile, setUploadedFile] = useState<{ base64: string, mimeType: string, fileName: string, fileObject?: File } | null>(null); // Added fileObject
@@ -40,7 +36,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
     const methods = useForm<RegistrationFormData>({
         resolver: zodResolver(registrationSchema),
         mode: 'onChange', // Real-time validation for the dashboard
-        defaultValues: savedState?.formData || {
+        defaultValues: {
             registrationType: 'team',
             teamName: '',
             teamLeader: {
@@ -101,6 +97,34 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
             localStorage.setItem('codekriti_registration', JSON.stringify(stateToSave));
         }
     }, [currentStep, selectedEvent, squadSize, formValues, isOpen, methods]);
+
+    // Hydrate form from localStorage when modal opens (Mobile only restore)
+    useEffect(() => {
+        if (isOpen) {
+            const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const savedStateStr = typeof window !== 'undefined' && isMobile ? localStorage.getItem('codekriti_registration') : null;
+            if (savedStateStr) {
+                try {
+                    const savedState = JSON.parse(savedStateStr);
+                    if (savedState?.formData) {
+                        // Crucial: Use reset to completely overwrite React Hook Form state
+                        methods.reset(savedState.formData);
+                    }
+                    if (savedState?.step) setCurrentStep(savedState.step);
+                    if (savedState?.eventId) setSelectedEvent(savedState.eventId);
+                    if (savedState?.squadSize) setSquadSize(savedState.squadSize);
+
+                    // Display a tiny subtle toast so the user knows their session was cleanly restored
+                    toast.success("Registration recovered", {
+                        description: "Your typed responses were gracefully preserved."
+                    });
+                } catch (e) {
+                    // Fail silently, clear corrupt cache
+                    localStorage.removeItem('codekriti_registration');
+                }
+            }
+        }
+    }, [isOpen, methods]);
 
     // Handle pre-selected event
     useEffect(() => {
