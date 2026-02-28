@@ -24,28 +24,23 @@ interface OceanRegistrationModalProps {
 
 const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRegistrationModalProps) => {
     // Stage 1: Selection, Stage 2: Registration Dashboard
-    const [currentStep, setCurrentStep] = useState(1);
-    const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-    const [squadSize, setSquadSize] = useState<number>(1);
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const savedStateStr = typeof window !== 'undefined' && isMobile ? localStorage.getItem('codekriti_registration') : null;
+    const savedState = savedStateStr ? JSON.parse(savedStateStr) : null;
+
+    const [currentStep, setCurrentStep] = useState(savedState?.step || 1);
+    const [selectedEvent, setSelectedEvent] = useState<string | null>(savedState?.eventId || null);
+    const [squadSize, setSquadSize] = useState<number>(savedState?.squadSize || 1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [ticketData, setTicketData] = useState<any>(null);
     const [uploadedFile, setUploadedFile] = useState<{ base64: string, mimeType: string, fileName: string, fileObject?: File } | null>(null); // Added fileObject
-
-    // Helper to close and reset state
-    const handleClose = () => {
-        setTicketData(null);
-        setUploadedFile(null); // Reset file
-        setCurrentStep(1);
-        setSelectedEvent(null);
-        onClose();
-    };
 
     const isSolo = squadSize === 1;
 
     const methods = useForm<RegistrationFormData>({
         resolver: zodResolver(registrationSchema),
         mode: 'onChange', // Real-time validation for the dashboard
-        defaultValues: {
+        defaultValues: savedState?.formData || {
             registrationType: 'team',
             teamName: '',
             teamLeader: {
@@ -61,6 +56,20 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
     });
 
     const { handleSubmit, setValue, reset, watch } = methods;
+
+    // Helper to close and reset state only if already registered or forced
+    const handleClose = () => {
+        if (ticketData) {
+            setTicketData(null);
+            setUploadedFile(null); // Reset file
+            setCurrentStep(1);
+            setSelectedEvent(null);
+            reset();
+            localStorage.removeItem('codekriti_registration');
+        }
+        onClose();
+    };
+
     const watchedSquadSize = watch('squadSize');
 
     // Keep local squadSize in sync with form for layout logic
@@ -78,12 +87,31 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
         }
     }, [watchedSquadSize, squadSize, setValue]);
 
+    // Sync state to localStorage to persist across generic page reloads/app switches (e.g. UPI)
+    const formValues = watch();
+    useEffect(() => {
+        const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isOpen && currentStep > 1 && isMobile) {
+            const stateToSave = {
+                step: currentStep,
+                eventId: selectedEvent,
+                squadSize,
+                formData: methods.getValues()
+            };
+            localStorage.setItem('codekriti_registration', JSON.stringify(stateToSave));
+        }
+    }, [currentStep, selectedEvent, squadSize, formValues, isOpen, methods]);
+
     // Handle pre-selected event
     useEffect(() => {
         if (preSelectedEventId && isOpen) {
-            handleEventSelection(preSelectedEventId, getEventSize(preSelectedEventId));
+            // Only force event selection if different from what we are currently resuming,
+            // or if we're on step 1 (where we haven't actively started filling a form)
+            if (preSelectedEventId !== selectedEvent || currentStep === 1) {
+                handleEventSelection(preSelectedEventId, getEventSize(preSelectedEventId));
+            }
         }
-    }, [preSelectedEventId, isOpen]);
+    }, [preSelectedEventId, isOpen, selectedEvent, currentStep]);
 
     // Body scroll lock — use position:fixed approach to avoid clipping fixed portals (like Select dropdowns) on mobile
     useEffect(() => {
@@ -128,7 +156,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
         setValue('registrationType', size === 1 ? 'solo' : 'team');
 
         // Reset form when changing events to avoid stale data
-        if (currentStep === 1) {
+        if (currentStep === 1 || eventId !== selectedEvent) {
             // Keep eventId and basic config, reset user input
             reset({
                 eventId,
@@ -175,6 +203,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
     const handleBackToSelection = () => {
         setCurrentStep(1);
         setSelectedEvent(null);
+        localStorage.removeItem('codekriti_registration');
     };
 
     // Unified submission logic
@@ -287,6 +316,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                         }
                     } : undefined
                 });
+                localStorage.removeItem('codekriti_registration');
                 setTicketData({
                     name: dbData.leaderName,
                     teamName: dbData.teamName,
