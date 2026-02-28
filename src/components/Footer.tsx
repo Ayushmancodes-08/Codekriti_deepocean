@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { subscribeNewsletter } from '@/utils/supabaseClient';
 import { ASSETS } from '@/config/assets';
 import { Mail, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [cornerClicks, setCornerClicks] = useState(0);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +163,22 @@ const Footer = () => {
             "radial-gradient(circle at 50% 100%, rgba(6,182,212,0.15) 0%, rgba(0,0,0,0) 60%)",
         }}
       />
-    </footer >
+      
+      {/* Hidden Admin Button - Top Right Corner (barely visible) */}
+      <button
+        onClick={() => {
+          const newCount = cornerClicks + 1;
+          setCornerClicks(newCount);
+          if (newCount >= 5) {
+            navigate('/admin');
+            setCornerClicks(0);
+          }
+        }}
+        className="absolute top-0 right-0 w-8 h-8 bg-transparent hover:bg-white/5 transition-colors cursor-pointer z-20"
+        aria-label="Admin access"
+        title=""
+      />
+    </footer>
   );
 };
 export default Footer;

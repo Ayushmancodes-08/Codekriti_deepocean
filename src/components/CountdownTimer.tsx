@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const TARGET_DATE = new Date('2026-03-06T17:00:00');
 
@@ -17,8 +18,11 @@ const calculateTimeLeft = () => {
 };
 
 const CountdownTimer = () => {
+    const navigate = useNavigate();
     const [state, setState]       = useState(calculateTimeLeft);
     const [prevState, setPrevState] = useState(calculateTimeLeft);
+    const daysClickCount = useRef(0);
+    const lastDaysClick = useRef(0);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -50,7 +54,27 @@ const CountdownTimer = () => {
             {/* Responsive row — sizes driven by clamp() so no custom breakpoints needed */}
             <div className="flex items-center justify-center gap-3 sm:gap-5 md:gap-8 lg:gap-12 w-full">
                 {units.map((unit, index) => (
-                    <div key={unit.label} className="relative flex flex-col items-center">
+                    <div 
+                        key={unit.label} 
+                        className="relative flex flex-col items-center"
+                        onClick={() => {
+                            // Admin access: tap "Days" 3 times
+                            if (unit.label === 'Days' || unit.label === 'Days Since') {
+                                const now = Date.now();
+                                if (now - lastDaysClick.current > 2000) {
+                                    daysClickCount.current = 0;
+                                }
+                                daysClickCount.current++;
+                                lastDaysClick.current = now;
+                                
+                                if (daysClickCount.current >= 3) {
+                                    navigate('/admin');
+                                    daysClickCount.current = 0;
+                                }
+                            }
+                        }}
+                        style={{ cursor: (unit.label === 'Days' || unit.label === 'Days Since') ? 'pointer' : 'default' }}
+                    >
                         <FlipCard value={unit.value} prevValue={unit.prev} />
                         <span
                             className="font-display font-bold text-cyan-400/80 uppercase tracking-[0.15em] whitespace-nowrap text-center mt-2 sm:mt-3"
