@@ -17,11 +17,11 @@ const CustomCursor = lazy(() => import("@/components/CustomCursor"));
 
 const queryClient = new QueryClient();
 
-// Secret admin access hook - type "admin" on desktop, triple-tap on mobile
+// Secret admin access hook - type "admin" on desktop, tap corner 5x on mobile
 const useSecretAdminAccess = (onAccess: () => void) => {
   const [keyBuffer, setKeyBuffer] = useState("");
-  const tapCount = useRef(0);
-  const lastTapTime = useRef(0);
+  const cornerTaps = useRef(0);
+  const lastCornerTap = useRef(0);
 
   useEffect(() => {
     // Desktop: Type "admin"
@@ -35,22 +35,34 @@ const useSecretAdminAccess = (onAccess: () => void) => {
       }
     };
 
-    // Mobile: Triple-tap anywhere (3 taps within 1 second)
-    const handleTouch = () => {
-      const now = Date.now();
+    // Mobile: Tap top-right corner 5 times
+    const handleTouch = (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
       
-      // Reset if more than 1 second between taps
-      if (now - lastTapTime.current > 1000) {
-        tapCount.current = 0;
-      }
+      // Check if touch is in top-right corner (within 60px of top-right)
+      const isTopRightCorner = (
+        touch.clientX > screenWidth - 60 &&
+        touch.clientY < 60
+      );
       
-      tapCount.current++;
-      lastTapTime.current = now;
-      
-      // Triple tap detected
-      if (tapCount.current >= 3) {
-        tapCount.current = 0;
-        onAccess();
+      if (isTopRightCorner) {
+        const now = Date.now();
+        
+        // Reset if more than 2 seconds between taps
+        if (now - lastCornerTap.current > 2000) {
+          cornerTaps.current = 0;
+        }
+        
+        cornerTaps.current++;
+        lastCornerTap.current = now;
+        
+        // 5 taps in corner opens admin
+        if (cornerTaps.current >= 5) {
+          cornerTaps.current = 0;
+          onAccess();
+        }
       }
     };
 
