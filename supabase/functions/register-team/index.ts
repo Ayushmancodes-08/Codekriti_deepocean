@@ -7,31 +7,19 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Configurable Logo URL via Environment Variable (Recommended for ease of change)
+const LOGO_URL = Deno.env.get('LOGO_URL') || "https://www.codekriti-4-0.tech/logo_circle.png";
+
 // ============================================================================
 // EMAIL LOGO CONFIGURATION - MAXIMUM RELIABILITY STRATEGY
 // ============================================================================
 // Issue: Email clients have varying support for external images
-// Solution: Hybrid approach with guaranteed fallback
-//
-// Strategy:
-// 1. Primary Source: SVG Base64 (LOGO_SVG)
-//    - Always works in all email clients
-//    - No external dependencies
-//    - Lightweight and fast
+// Solution: Robust fallback using direct URL and alt text
 // 
-// 2. Fallback Source: Cloudinary CDN (LOGO_URL)
-//    - Modern email clients load this via srcset
-//    - Optimized, cached image
-//    - Better visual quality than SVG
-//
-// Implementation in HTML:
-// <img src="${LOGO_SVG}" srcset="${LOGO_URL} 1x" alt="CodeKriti Logo" ... />
-//
-// Result: Logo ALWAYS displays without failures ✓
+// Strategy:
+// 1. Primary Source: LOGO_URL (CDN-backed)
+// 2. Fallback: Styled alt text and background for consistent branding
 // ============================================================================
-
-// Reliable CodeKriti logo URL
-const LOGO_URL = "https://www.codekriti-4-0.tech/logo_circle.png";
 
 // Helper to get SMTP User (with fallback)
 const getSmtpUser = () => Deno.env.get('SMTP_USER') || "codingclubpmec@gmail.com";
