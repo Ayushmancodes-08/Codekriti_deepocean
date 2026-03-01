@@ -109,7 +109,7 @@ const Navbar = () => {
                             onClick={() => triggerDownload('/assets/docs/codekriti_brochure.pdf', 'CodeKriti_Brochure.pdf')}
                             className="dive-in-btn relative px-6 py-2.5 rounded-full font-display font-semibold text-sm overflow-hidden group touch-manipulation cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 inline-block"
                         >
-                            <span className="relative z-10 text-white">Download Brochure</span>
+                            <span className="relative z-10 text-white">View Brochure</span>
                         </button>
                     </div>
 
@@ -185,7 +185,7 @@ const Navbar = () => {
                         }}
                         className="flex items-center justify-center w-full h-12 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-display font-bold text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-transform touch-manipulation"
                     >
-                        Download Brochure
+                        View Brochure
                     </button>
                 </div>
             </nav>

@@ -333,10 +333,7 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                     action: downloadLink ? {
                         label: 'Rulebook',
                         onClick: () => {
-                            const link = document.createElement('a');
-                            link.href = downloadLink;
-                            link.download = `${data.eventId}-Rulebook.pdf`;
-                            link.click();
+                            window.open(downloadLink, '_blank', 'noopener,noreferrer');
                         }
                     } : undefined
                 });
@@ -468,10 +465,11 @@ const OceanRegistrationModal = ({ isOpen, onClose, preSelectedEventId }: OceanRe
                                                     return (
                                                         <a
                                                             href={downloadLink}
-                                                            download={`${currentEventId}-Rulebook.pdf`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
                                                             className="block text-center group relative w-full py-4 bg-transparent border-2 border-[#64ffda] text-[#64ffda] font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-[#64ffda] hover:text-[#0a192f] transition-all duration-300 overflow-hidden"
                                                         >
-                                                            <span className="relative z-10">Download Rulebook</span>
+                                                            <span className="relative z-10">View Rulebook</span>
                                                             <div className="absolute inset-x-0 bottom-0 h-0 bg-white group-hover:h-full transition-all duration-300 opacity-10" />
                                                         </a>
                                                     );

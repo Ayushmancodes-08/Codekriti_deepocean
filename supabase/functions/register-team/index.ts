@@ -217,7 +217,7 @@ Deno.serve(async (req: Request) => {
                                     ${(typeof event === 'string' && event.toLowerCase().includes('designathon')) ? `
                                     <p style="font-size: 16px; line-height: 1.6; color: #8892b0; margin-top: 20px;">
                                         In the meanwhile, check the problem statements given by our Sponsors: 
-                                        <a href="https://codekriti.tech/rulebooks/DESIGNATHON.pdf" style="color: #64ffda; font-weight: bold; text-decoration: underline;">View Problem Statements</a>
+                                        <a href="https://drive.google.com/file/d/19wOWZPQ6IMbUn4RDyBp3XCgyimeAbSIA/view?pli=1" style="color: #64ffda; font-weight: bold; text-decoration: underline;">View Problem Statements</a>
                                     </p>
                                     ` : ''}
     
