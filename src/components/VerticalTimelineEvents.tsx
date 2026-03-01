@@ -64,7 +64,7 @@ const VerticalTimelineEvents = () => {
                     title: 'DevXtreme',
                     time: '08:00 AM',
                     venue: 'PMEC ACADEMIC BLOCK - 413B & 413A',
-                    teamSize: 'Team of 3-5',
+                    teamSize: 'Team of 3-4',
                     description: '8-hour hackathon working on real-world problem statements.',
                     fee: '₹400 / ₹500',
                     category: 'Inter-College',

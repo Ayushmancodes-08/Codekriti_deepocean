@@ -48,7 +48,7 @@ const EventsSection = () => {
       date: 'March 7, 2026',
       time: '08:00 AM',
       venue: 'PMEC ACADEMIC BLOCK - 413B & 413A',
-      teamSize: 'Team of 3-5',
+      teamSize: 'Team of 3-4',
       image: ASSETS.DEVXTREME_POSTER,
       description: '8-hour hackathon working on real-world problem statements.',
       prize: '₹400 / ₹500',

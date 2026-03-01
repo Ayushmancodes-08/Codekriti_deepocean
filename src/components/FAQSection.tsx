@@ -13,7 +13,7 @@ const faqs = [
     },
     {
         question: "What is the team size?",
-        answer: "Team size varies by event. The Hackathon (DevXtreme) allows teams of 3–5 members, the Innovation Challenge requires 2 members, and Tech Maze permits teams of 2–3 members. Algo to Code is an individual event (solo participation), while Designathon is also conducted individually focusing on a UI/UX project."
+        answer: "Team size varies by event. The Hackathon (DevXtreme) allows teams of 3–4 members, the Innovation Challenge requires 2 members, and Tech Maze permits teams of 2–3 members. Algo to Code is an individual event (solo participation), while Designathon is also conducted individually focusing on a UI/UX project."
     },
     {
         question: "Will food & accommodation be provided?",
