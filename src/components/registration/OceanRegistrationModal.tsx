@@ -13,7 +13,7 @@ import TeamInfoStep from './ocean-steps/TeamInfoStep';
 import TeamMembersStep from './ocean-steps/TeamMembersStep';
 import RegistrationSummary from './ocean-steps/RegistrationSummary';
 import PaymentUploadStep from './ocean-steps/PaymentUploadStep';
-import { submitRegistration, uploadScreenshot } from '@/utils/supabaseClient';
+import { submitRegistration } from '@/utils/supabaseClient';
 import { ASSETS } from '@/config/assets';
 
 interface OceanRegistrationModalProps {
