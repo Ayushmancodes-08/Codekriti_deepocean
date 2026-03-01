@@ -28,7 +28,7 @@ const useSecretAdminAccess = (onAccess: () => void) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const newBuffer = (keyBuffer + e.key.toLowerCase()).slice(-5);
       setKeyBuffer(newBuffer);
-      
+
       if (newBuffer === "admin") {
         onAccess();
         setKeyBuffer("");
@@ -39,25 +39,24 @@ const useSecretAdminAccess = (onAccess: () => void) => {
     const handleTouch = (e: TouchEvent) => {
       const touch = e.changedTouches[0];
       const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-      
+
       // Check if touch is in top-right corner (within 60px of top-right)
       const isTopRightCorner = (
         touch.clientX > screenWidth - 60 &&
         touch.clientY < 60
       );
-      
+
       if (isTopRightCorner) {
         const now = Date.now();
-        
+
         // Reset if more than 2 seconds between taps
         if (now - lastCornerTap.current > 2000) {
           cornerTaps.current = 0;
         }
-        
+
         cornerTaps.current++;
         lastCornerTap.current = now;
-        
+
         // 5 taps in corner opens admin
         if (cornerTaps.current >= 5) {
           cornerTaps.current = 0;
@@ -79,7 +78,7 @@ const useSecretAdminAccess = (onAccess: () => void) => {
 const AnimatedRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   useSecretAdminAccess(() => {
     navigate("/admin");
   });

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Upload, CheckCircle, Hash, Smartphone, Loader2 } from 'lucide-react';
-import QRCode from "react-qr-code";
 import { toast } from 'sonner';
 import imageCompression from 'browser-image-compression';
 import { Input } from '@/components/ui/input';
@@ -116,14 +115,17 @@ const PaymentUploadStep = ({ amount, onPaymentComplete, isUploading = false }: P
                     <div className="relative z-10">
                         <div className="bg-white p-6 rounded-3xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform duration-500 group-hover:scale-[1.02] relative overflow-hidden">
                             {/* Scanning Animation Effect */}
-                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-[scan_3s_linear_infinite] z-20 shadow-[0_0_15px_rgba(6,182,212,0.8)]" />
-
-                            <QRCode
-                                value={`upi://pay?pa=${UPI_ID}&pn=Codekriti&am=${amount}&cu=INR`}
-                                size={200}
-                                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                                viewBox={`0 0 256 256`}
-                                level="H"
+                            {/* Static PhonePe QR Image */}
+                            <img
+                                src="/phonepe-qr.png"
+                                alt="PhonePe QR Code"
+                                className="w-[200px] h-[200px] object-contain rounded-xl"
+                                onError={(e) => {
+                                    // Fallback if they haven't added the image yet
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null; // Prevent infinite loop
+                                    target.src = "/placeholder.svg"; // Fallback placeholder
+                                }}
                             />
                         </div>
 
