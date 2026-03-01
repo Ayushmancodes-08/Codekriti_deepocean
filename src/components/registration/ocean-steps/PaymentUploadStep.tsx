@@ -117,7 +117,7 @@ const PaymentUploadStep = ({ amount, onPaymentComplete, isUploading = false }: P
                             {/* Scanning Animation Effect */}
                             {/* Static PhonePe QR Image */}
                             <img
-                                src="/phonepe-qr.png"
+                                src="/phonpe-qr.png"
                                 alt="PhonePe QR Code"
                                 className="w-[200px] h-[200px] object-contain rounded-xl"
                                 onError={(e) => {
