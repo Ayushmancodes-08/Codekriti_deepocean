@@ -82,11 +82,11 @@ const DigitalTicket = ({ data, onClose }: DigitalTicketProps) => {
                                 <p className="font-mono text-xl text-white font-bold">{data.id}</p>
                             </div>
                             {/* Placeholder QR if library missing, else logic would be here */}
-                            <div className="bg-white p-2 rounded-lg">
+                            <div className="bg-white p-2 rounded-xl shadow-lg border border-blue-500/20">
                                 <img
-                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.qrPayload || JSON.stringify(data))}`}
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qrPayload || JSON.stringify(data))}`}
                                     alt="QR"
-                                    className="w-16 h-16"
+                                    className="w-24 h-24"
                                     crossOrigin="anonymous"
                                 />
                             </div>
