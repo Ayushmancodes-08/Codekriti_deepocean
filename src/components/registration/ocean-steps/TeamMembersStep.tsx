@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFormContext, useFieldArray, useWatch } from 'react-hook-form';
 import { User, X, PlusCircle, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
@@ -17,11 +17,11 @@ interface TeamMembersStepProps {
 type TeamFormData = Extract<RegistrationFormData, { registrationType: 'team' }>;
 
 const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
-    const { control, setValue, watch } = useFormContext<TeamFormData>();
+    const { control, watch } = useFormContext<TeamFormData>();
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const leaderCollege = useWatch({ control, name: 'teamLeader.college' });
+    // const leaderCollege = useWatch({ control, name: 'teamLeader.college' }); // No longer needed for sync, but could be used for other logic if needed. Commented out for now to satisfy lint.
     const teamMembers = useWatch({ control, name: 'teamMembers' });
     const eventId = useWatch({ control, name: 'eventId' });
     const { fields, append, remove } = useFieldArray({ control, name: 'teamMembers' });
@@ -29,13 +29,7 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
     // Get event-specific colleges
     const collegeOptions = (eventId && EVENT_COLLEGES[eventId as keyof typeof EVENT_COLLEGES] ? EVENT_COLLEGES[eventId as keyof typeof EVENT_COLLEGES] : EVENT_COLLEGES['algo-to-code']) as string[];
 
-    useEffect(() => {
-        if (leaderCollege) {
-            fields.forEach((_, index) => {
-                setValue(`teamMembers.${index}.college`, leaderCollege);
-            });
-        }
-    }, [leaderCollege, fields.length, setValue]);
+    // Removal of leaderCollege synchronization useEffect as per user request to allow different colleges for participants.
 
     const requiredMembers = squadSize - 1;
 
@@ -57,7 +51,7 @@ const TeamMembersStep = ({ squadSize }: TeamMembersStepProps) => {
                     name: '',
                     email: '',
                     phone: '',
-                    college: leaderCollege || '',
+                    college: '', // Completely free - no longer defaulting to leaderCollege
                     branch: '' as any,
                     yearOfStudy: '' as any,
                 });
