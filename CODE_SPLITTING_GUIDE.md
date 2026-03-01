@@ -33,7 +33,6 @@ rollupOptions: {
       if (id.includes("node_modules/react-hook-form")) return "vendor-forms";
       
       // Component chunks
-      if (id.includes("components/JellyfishLogo")) return "chunk-3d-components";
       if (id.includes("components/RegistrationFlow")) return "chunk-registration";
       if (id.includes("components/VideoOptimization")) return "chunk-media";
     }
@@ -55,7 +54,7 @@ rollupOptions: {
 - **vendor-utils**: Utility libraries (~10KB gzipped)
 
 #### Component Chunks
-- **chunk-3d-components**: JellyfishLogo, StoneModal, Bubbles (~80KB gzipped)
+- **chunk-3d-components**: StoneModal, Bubbles (~80KB gzipped)
 - **chunk-registration**: RegistrationFlow, forms, event selection (~40KB gzipped)
 - **chunk-media**: Video and image optimization components (~15KB gzipped)
 - **chunk-state**: Contexts and hooks (~5KB gzipped)
@@ -87,17 +86,6 @@ const LazyBubbles = lazyLoadComponent(
 
 ### Components Using Lazy Loading
 
-1. **Navbar.tsx**
-   - Lazy loads: JellyfishLogo (3D component)
-   - Reason: Heavy Three.js dependency
-   - Load time: ~200-300ms on first load
-
-2. **RegisterSection.tsx**
-   - Lazy loads: StoneModal (3D physics component)
-   - Reason: Heavy Three.js + Cannon-es dependencies
-   - Load time: ~300-400ms on first load
-
-3. **StoneModal.tsx**
    - Lazy loads: RegistrationFlow (form components)
    - Reason: Heavy form validation and UI components
    - Load time: ~100-150ms on first load

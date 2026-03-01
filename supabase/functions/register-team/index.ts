@@ -31,7 +31,7 @@ const corsHeaders = {
 // ============================================================================
 
 // Reliable CodeKriti logo URL
-const LOGO_URL = "https://codekriti.tech/Codefusion_Logo_final.png";
+const LOGO_URL = "https://www.codekriti-4-0.tech/logo_circle.png";
 
 // Helper to get SMTP User (with fallback)
 const getSmtpUser = () => Deno.env.get('SMTP_USER') || "codingclubpmec@gmail.com";
