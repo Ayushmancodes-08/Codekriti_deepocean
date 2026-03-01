@@ -93,24 +93,45 @@ export function deserializeRegistration(json: string): RegistrationData {
 }
 
 /**
- * Store registration data in local storage
+ * Store registration data in local storage with a timestamp
  */
 export function storeRegistrationData(key: string, data: RegistrationData): void {
   try {
-    localStorage.setItem(key, serializeRegistration(data));
+    const storageItem = {
+      data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(key, JSON.stringify(storageItem));
   } catch (error) {
     console.error('Failed to store registration data:', error);
   }
 }
 
 /**
- * Retrieve registration data from local storage
+ * Retrieve registration data from local storage, checking for expiration (6 minutes)
  */
 export function retrieveRegistrationData(key: string): RegistrationData | null {
   try {
     const json = localStorage.getItem(key);
     if (!json) return null;
-    return deserializeRegistration(json);
+
+    const storageItem = JSON.parse(json);
+
+    // Check if it's the old format (directly RegistrationData) or new format (with timestamp)
+    if (!storageItem.timestamp) {
+      return storageItem as RegistrationData;
+    }
+
+    const EXPIRY_TIME = 6 * 60 * 1000; // 6 minutes in milliseconds
+    const now = Date.now();
+
+    if (now - storageItem.timestamp > EXPIRY_TIME) {
+      console.log('Registration draft expired, clearing...');
+      clearRegistrationData(key);
+      return null;
+    }
+
+    return storageItem.data as RegistrationData;
   } catch (error) {
     console.error('Failed to retrieve registration data:', error);
     return null;
