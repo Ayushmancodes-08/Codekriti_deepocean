@@ -33,7 +33,7 @@ const events = [
         date: 'March 7, 2026',
         time: '08:00 AM',
         venue: 'Main Auditorium (413B & 413A)',
-        teamSize: 'Team of 3–4',
+        teamSize: 'Team of 3–5',
         image: ASSETS.DEVXTREME_POSTER || 'https://images.unsplash.com/photo-1504384308090-c54be3855833?q=80&w=800&auto=format&fit=crop',
         description: 'The ultimate 8-hour hackathon. Build, deploy, and win against the best in the field.',
         prize: '₹500',

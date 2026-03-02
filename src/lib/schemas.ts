@@ -47,7 +47,7 @@ export const eventConfigs: Record<EventType, EventConfig> = {
     name: 'Dev Xtreme',
     type: 'team',
     minParticipants: 3,
-    maxParticipants: 4,
+    maxParticipants: 5,
     description: 'Team-based development competition',
   },
 };

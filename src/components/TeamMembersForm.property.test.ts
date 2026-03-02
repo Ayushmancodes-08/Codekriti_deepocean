@@ -5,7 +5,7 @@ import { TeamMemberSchema, TeamMember, eventConfigs } from '../lib/schemas';
 /**
  * Property 3: Team Member Count Enforcement
  * For any team event, the number of registered members must be within
- * the event's participant range (TechMaze: 1-3, Dev Xtreme: 3-4).
+ * the event's participant range (TechMaze: 1-3, Dev Xtreme: 3-5).
  * Validates: Requirements 9.1, 9.2, 9.3, 9.4, 10.1, 10.2, 10.3, 10.4, 10.5
  */
 describe('TeamMembersForm - Property 3: Team Member Count Enforcement', () => {
@@ -94,10 +94,10 @@ describe('TeamMembersForm - Property 3: Team Member Count Enforcement', () => {
     );
   });
 
-  it('should validate that Dev Xtreme team has 3-4 members', () => {
+  it('should validate that Dev Xtreme team has 3-5 members', () => {
     const devXtremeConfig = eventConfigs['dev-xtreme'];
     expect(devXtremeConfig.minParticipants).toBe(3);
-    expect(devXtremeConfig.maxParticipants).toBe(4);
+    expect(devXtremeConfig.maxParticipants).toBe(5);
 
     fc.assert(
       fc.property(
