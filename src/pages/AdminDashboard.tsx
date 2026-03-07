@@ -50,13 +50,13 @@ type AdminView = "dashboard" | "registrations";
 // Falls back to direct Supabase call if proxy fails (for local dev)
 const apiCall = async (action: string, payload: any, retries = 2): Promise<any> => {
     const errors: string[] = [];
-    
+
     // Try proxy first (production path)
     for (let i = 0; i < retries; i++) {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-            
+
             const response = await fetch(API_PROXY_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -80,13 +80,13 @@ const apiCall = async (action: string, payload: any, retries = 2): Promise<any> 
             const msg = err.name === 'AbortError' ? 'Request timed out' : err.message;
             console.warn(`[Admin] Proxy attempt ${i + 1} failed:`, msg);
             errors.push(`Proxy: ${msg}`);
-            
+
             if (i < retries - 1) {
                 await new Promise(r => setTimeout(r, 1000 * (i + 1))); // Exponential backoff
             }
         }
     }
-    
+
     // Fallback: direct Supabase (local dev path)
     console.log('[Admin] Trying direct Supabase fallback...');
     try {
@@ -101,19 +101,19 @@ const apiCall = async (action: string, payload: any, retries = 2): Promise<any> 
     } catch (supabaseError: any) {
         console.error('[Admin] Supabase fallback failed:', supabaseError);
         errors.push(`Direct: ${supabaseError.message}`);
-        
+
         // Provide helpful error message
-        const isNetworkError = errors.some(e => 
-            e.includes('fetch') || 
-            e.includes('timeout') || 
+        const isNetworkError = errors.some(e =>
+            e.includes('fetch') ||
+            e.includes('timeout') ||
             e.includes('network') ||
             e.includes('Failed')
         );
-        
+
         if (isNetworkError) {
             throw new Error('Network connection failed. Please check your internet connection and try again.');
         }
-        
+
         throw new Error(`Request failed: ${errors.join(' → ')}`);
     }
 };
@@ -137,6 +137,52 @@ const exportCSV = (rows: Registration[]) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = `codekriti_registrations_${Date.now()}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+};
+
+const exportDevXtremeTeams = (rows: Registration[]) => {
+    // Filter out only devxtreme registrations
+    const devXtremeTeams = rows.filter(r => r.event_id === 'devxtreme' && r.status === 'success');
+
+    // Header for the specific format requested
+    const header = ["TEAM NAME", "NAME", "ROLE", "SIGNATURE"];
+
+    const lines = devXtremeTeams.flatMap(r => {
+        const teamRows = [];
+
+        // Add Leader row
+        teamRows.push(
+            [
+                r.team_name,
+                r.leader_name,
+                "Leader",
+                "" // Blank cell for signature
+            ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")
+        );
+
+        // Add Member rows
+        (r.members || []).forEach(m => {
+            teamRows.push(
+                [
+                    r.team_name,
+                    m.name,
+                    "Member",
+                    "" // Blank cell for signature
+                ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")
+            );
+        });
+
+        // Add an empty row after each team for spacing
+        teamRows.push(["", "", "", ""].join(","));
+
+        return teamRows;
+    });
+
+    const csv = [header.join(","), ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `devxtreme_teams_${Date.now()}.csv`;
     a.click(); URL.revokeObjectURL(url);
 };
 
@@ -295,14 +341,14 @@ const AdminDashboard = () => {
 
             console.log(`[Admin] Loaded ${data.length} registrations`);
             setRegistrations(data);
-            
+
             if (showToast && data.length > 0) {
                 toast.success(`Loaded ${data.length} registrations`);
             }
         } catch (err: any) {
             console.error("[Admin] Fetch error:", err);
             const errorMsg = err.message || "Failed to load registrations";
-            
+
             // Show user-friendly error
             if (errorMsg.includes('Network') || errorMsg.includes('connection') || errorMsg.includes('timeout')) {
                 toast.error("Connection failed. Please check your internet and try again.", {
@@ -312,7 +358,7 @@ const AdminDashboard = () => {
             } else {
                 toast.error(errorMsg);
             }
-            
+
             setRegistrations([]);
         } finally {
             setIsLoading(false);
@@ -402,7 +448,7 @@ const AdminDashboard = () => {
         } catch (err: any) {
             toast.dismiss(tid);
             const errorMsg = err.message || "Approval failed";
-            
+
             if (errorMsg.includes('Network') || errorMsg.includes('connection') || errorMsg.includes('timeout')) {
                 toast.error("Connection failed. Please check your internet and try again.");
             } else {
@@ -422,7 +468,7 @@ const AdminDashboard = () => {
         } catch (err: any) {
             toast.dismiss(tid);
             const errorMsg = err.message || "Rejection failed";
-            
+
             if (errorMsg.includes('Network') || errorMsg.includes('connection') || errorMsg.includes('timeout')) {
                 toast.error("Connection failed. Please check your internet and try again.");
             } else {
@@ -930,12 +976,20 @@ const AdminDashboard = () => {
                                     {filtered.length === 0 ? "No results" : `${filtered.length} result${filtered.length > 1 ? "s" : ""}`}
                                     {search && <span className="text-slate-600"> for "<span className="text-slate-400">{search}</span>"</span>}
                                 </p>
-                                <button
-                                    onClick={() => exportCSV(filtered)}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-[#0a192f] border border-white/10 hover:border-[#00D9FF]/30 text-slate-300 hover:text-[#00D9FF] rounded-xl text-xs font-semibold transition-all"
-                                >
-                                    <Download className="w-3.5 h-3.5" /> Export CSV
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => exportDevXtremeTeams(registrations)}
+                                        className="flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 rounded-xl text-xs font-semibold transition-all"
+                                    >
+                                        <Download className="w-3.5 h-3.5" /> DevXtreme Teams
+                                    </button>
+                                    <button
+                                        onClick={() => exportCSV(filtered)}
+                                        className="flex items-center gap-1.5 px-4 py-2 bg-[#0a192f] border border-white/10 hover:border-[#00D9FF]/30 text-slate-300 hover:text-[#00D9FF] rounded-xl text-xs font-semibold transition-all"
+                                    >
+                                        <Download className="w-3.5 h-3.5" /> Export CSV
+                                    </button>
+                                </div>
                             </div>
 
                             {/* ── Registration cards ─────────────────────────── */}

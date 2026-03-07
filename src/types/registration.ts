@@ -7,7 +7,7 @@ export const EVENTS = [
         name: 'DevXtreme',
         minTeamSize: 3,
         maxTeamSize: 5,
-        description: 'Overnight Hackathon',
+        description: '8-hour Hackathon',
         entryFee: '₹400 (PMEC) / ₹500 (Outside)',
         category: 'Inter-College',
     },
