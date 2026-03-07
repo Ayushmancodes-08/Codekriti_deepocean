@@ -141,11 +141,11 @@ const exportCSV = (rows: Registration[]) => {
 };
 
 const exportDevXtremeTeams = (rows: Registration[]) => {
-    // Filter out only devxtreme registrations
-    const devXtremeTeams = rows.filter(r => r.event_id === 'devxtreme' && r.status === 'success');
+    // Filter out devxtreme registrations (including pending ones for the signature sheet)
+    const devXtremeTeams = rows.filter(r => (r.event_id || '').toLowerCase() === 'devxtreme');
 
     // Header for the specific format requested
-    const header = ["TEAM NAME", "NAME", "ROLE", "SIGNATURE"];
+    const header = ["TEAM NAME", "LEADER", "MEMBERS", "SIGNATURE"];
 
     const lines = devXtremeTeams.flatMap(r => {
         const teamRows = [];
@@ -155,7 +155,7 @@ const exportDevXtremeTeams = (rows: Registration[]) => {
             [
                 r.team_name,
                 r.leader_name,
-                "Leader",
+                "", // Blank for members
                 "" // Blank cell for signature
             ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")
         );
@@ -165,8 +165,8 @@ const exportDevXtremeTeams = (rows: Registration[]) => {
             teamRows.push(
                 [
                     r.team_name,
+                    "", // Blank for leader
                     m.name,
-                    "Member",
                     "" // Blank cell for signature
                 ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")
             );
