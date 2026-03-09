@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 import {
     CheckCircle, XCircle, Search, RefreshCw, Eye, EyeOff,
     Image as ImageIcon, CreditCard, ChevronDown, ChevronUp, BookOpen,
@@ -184,6 +185,73 @@ const exportDevXtremeTeams = (rows: Registration[]) => {
     const a = document.createElement("a");
     a.href = url; a.download = `devxtreme_teams_${Date.now()}.csv`;
     a.click(); URL.revokeObjectURL(url);
+};
+
+const exportFullTeamDetailsExcel = (rows: Registration[], eventFilter: string) => {
+    const teams = eventFilter === "all" ? rows : rows.filter(r => r.event_id === eventFilter);
+
+    const wbData: any[][] = [];
+
+    wbData.push([
+        "TEAM NAME", "EVENT", "ROLE", "NAME", "EMAIL", "PHONE",
+        "COLLEGE", "BRANCH", "YEAR", "STATUS", "PAYMENT UTR", "AMOUNT", "REG DATE"
+    ]);
+
+    teams.forEach(r => {
+        wbData.push([
+            r.team_name || "N/A",
+            r.event_id || "N/A",
+            "Leader",
+            r.leader_name || "N/A",
+            r.email || "N/A",
+            r.phone || "N/A",
+            "N/A",
+            "N/A",
+            "N/A",
+            r.status || "pending",
+            r.payment_txn_id || "N/A",
+            r.amount || 0,
+            formatDate(r.created_at)
+        ]);
+
+        if (r.members && r.members.length > 0) {
+            r.members.forEach(m => {
+                wbData.push([
+                    r.team_name || "N/A",
+                    r.event_id || "N/A",
+                    "Member",
+                    m.name || "N/A",
+                    m.email || "N/A",
+                    m.phone || "N/A",
+                    m.college || "N/A",
+                    m.branch || "N/A",
+                    m.year || "N/A",
+                    r.status || "pending",
+                    "",
+                    "",
+                    ""
+                ]);
+            });
+        }
+
+        wbData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wbData);
+
+    ws['!cols'] = [
+        { wch: 20 }, { wch: 15 }, { wch: 10 }, { wch: 20 },
+        { wch: 30 }, { wch: 15 }, { wch: 25 }, { wch: 15 },
+        { wch: 10 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 20 }
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Team Details");
+
+    // Remove spaces/special characters from filename
+    const safeEventFilter = eventFilter === "all" ? "All" : eventFilter.replace(/[^a-z0-9]/gi, '_');
+    const fileName = `Detailed_Teams_${safeEventFilter}_${Date.now()}.xlsx`;
+    XLSX.writeFile(wb, fileName);
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -989,6 +1057,34 @@ const AdminDashboard = () => {
                                     >
                                         <Download className="w-3.5 h-3.5" /> Export CSV
                                     </button>
+                                </div>
+                            </div>
+
+                            {/* Detailed Team Downloads (Excel) */}
+                            <div className="bg-[#0d1f3c]/80 border border-[#00D9FF]/20 rounded-2xl p-5 space-y-4 shadow-lg shadow-[#00D9FF]/5 relative overflow-hidden">
+                                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                                <div className="flex items-center gap-2 relative z-10">
+                                    <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                        <Users className="w-4 h-4 text-emerald-400" />
+                                    </div>
+                                    <h3 className="text-base font-bold text-white">Download Detailed Excel Reports</h3>
+                                </div>
+                                <div className="flex flex-wrap gap-3 relative z-10">
+                                    <button
+                                        onClick={() => exportFullTeamDetailsExcel(registrations, "all")}
+                                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/30 text-emerald-400 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.25)] min-w-[140px]"
+                                    >
+                                        <Download className="w-4 h-4" /> All Events
+                                    </button>
+                                    {allEvents.filter(e => e !== "all").map(ev => (
+                                        <button
+                                            key={ev}
+                                            onClick={() => exportFullTeamDetailsExcel(registrations, ev)}
+                                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0a192f] border border-white/10 hover:border-emerald-500/40 text-slate-300 hover:text-emerald-400 rounded-xl text-sm font-semibold transition-all min-w-[120px]"
+                                        >
+                                            <Download className="w-4 h-4" /> {ev}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
