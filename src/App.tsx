@@ -9,6 +9,7 @@ import WebsiteLoader from "@/components/WebsiteLoader";
 import { useState, lazy, Suspense, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import AdminDashboard from "./pages/AdminDashboard";
+import ClosedBoard from "@/components/ClosedBoard";
 
 // Lazy-load non-critical app-level components (not needed for first paint)
 const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
@@ -110,7 +111,10 @@ const App = () => {
           <CustomCursor />
         </Suspense>
 
-        <AnimatePresence mode="wait">
+        {/* ===== SITE CLOSED: show this board to all visitors ===== */}
+        <ClosedBoard />
+        {/* Remove the line above and restore the block below to reopen */}
+        {/* <AnimatePresence mode="wait">
           {isLoading ? (
             <WebsiteLoader key="loader" onFinish={() => setIsLoading(false)} />
           ) : (
@@ -123,7 +127,7 @@ const App = () => {
               <AnimatedRoutes />
             </BrowserRouter>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </TooltipProvider>
     </QueryClientProvider>
   );
