@@ -87,7 +87,8 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Index />} />
+        {/* ===== TO REOPEN SITE: Change element from <ClosedBoard /> to <Index /> ===== */}
+        <Route path="/" element={<ClosedBoard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
@@ -111,9 +112,8 @@ const App = () => {
           <CustomCursor />
         </Suspense>
 
-        {/* ===== SITE CLOSED: show this board to all visitors ===== */}
-        <ClosedBoard />
-        {/* Remove the line above and restore the block below to reopen */}
+        {/* Note: WebsiteLoader is currently bypassed while the site is closed. 
+            To re-enable loader upon reopening, uncomment the AnimatePresence block and remove the standalone BrowserRouter block below. */}
         {/* <AnimatePresence mode="wait">
           {isLoading ? (
             <WebsiteLoader key="loader" onFinish={() => setIsLoading(false)} />
@@ -128,6 +128,15 @@ const App = () => {
             </BrowserRouter>
           )}
         </AnimatePresence> */}
+
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <AnimatedRoutes />
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
