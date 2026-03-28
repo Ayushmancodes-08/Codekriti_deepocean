@@ -31,7 +31,10 @@ interface Registration {
     payment_txn_id: string;
     payment_screenshot_url: string;
     screenshot_url?: string;
-    amount: number;
+    amount?: number;
+    college?: string;
+    branch?: string;
+    year?: string;
     abstract_url?: string;
     members?: {
         name: string;
@@ -126,13 +129,40 @@ const formatDate = (iso: string) =>
         hour: "2-digit", minute: "2-digit",
     });
 
+const getExpectedAmount = (eventId: string | undefined, college: string | undefined): number => {
+    const isPmec = (college || "").toLowerCase().includes("parala") || (college || "").toLowerCase().includes("pmec");
+    const ev = (eventId || "").toLowerCase();
+    
+    if (ev === "algo-to-code") return 30;
+    if (ev === "designathon") return 60;
+    if (ev === "innovation-challenge") return 60;
+    if (ev === "techmaze") return 90;
+    if (ev === "devxtreme") return isPmec ? 400 : 500;
+    
+    return 0; // fallback
+};
+
 const exportCSV = (rows: Registration[]) => {
-    const header = ["ID", "Date", "Team", "Leader", "Email", "Phone", "Event", "Status", "UTR", "Amount", "Members"];
-    const lines = rows.map(r => [
-        r.id, formatDate(r.created_at), r.team_name, r.leader_name,
-        r.email, r.phone, r.event_id, r.status, r.payment_txn_id,
-        r.amount, r.members?.length ?? 0
-    ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
+    let totalExpected = 0;
+    let totalApproved = 0;
+
+    const header = ["ID", "Date", "Team", "Leader", "Email", "Phone", "Event", "Status", "UTR", "Amount Paid", "Members"];
+    const lines = rows.map(r => {
+        const amt = (r.amount && r.amount > 0) ? r.amount : getExpectedAmount(r.event_id, r.college);
+        totalExpected += amt;
+        if (r.status === 'success') totalApproved += amt;
+
+        return [
+            r.id, formatDate(r.created_at), r.team_name, r.leader_name,
+            r.email, r.phone, r.event_id, r.status, r.payment_txn_id,
+            amt, r.members?.length ?? 0
+        ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",");
+    });
+    
+    lines.push("");
+    lines.push(["", "", "", "", "", "", "", "", "TOTAL EXPORTED AMOUNT", totalExpected, ""].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
+    lines.push(["", "", "", "", "", "", "", "", "TOTAL APPROVED REVENUE", totalApproved, ""].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
+
     const csv = [header.join(","), ...lines].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -194,10 +224,17 @@ const exportFullTeamDetailsExcel = (rows: Registration[], eventFilter: string) =
 
     wbData.push([
         "TEAM NAME", "EVENT", "ROLE", "NAME", "EMAIL", "PHONE",
-        "COLLEGE", "BRANCH", "YEAR", "STATUS", "PAYMENT UTR", "AMOUNT", "REG DATE"
+        "COLLEGE", "BRANCH", "YEAR", "STATUS", "PAYMENT UTR", "AMOUNT PAID", "REG DATE"
     ]);
 
+    let totalExpected = 0;
+    let totalApproved = 0;
+
     teams.forEach(r => {
+        const amt = (r.amount && r.amount > 0) ? r.amount : getExpectedAmount(r.event_id, r.college);
+        totalExpected += amt;
+        if (r.status === 'success') totalApproved += amt;
+
         wbData.push([
             r.team_name || "N/A",
             r.event_id || "N/A",
@@ -205,12 +242,12 @@ const exportFullTeamDetailsExcel = (rows: Registration[], eventFilter: string) =
             r.leader_name || "N/A",
             r.email || "N/A",
             r.phone || "N/A",
-            "N/A",
-            "N/A",
-            "N/A",
+            r.college || "N/A",
+            r.branch || "N/A",
+            r.year || "N/A",
             r.status || "pending",
             r.payment_txn_id || "N/A",
-            r.amount || 0,
+            amt,
             formatDate(r.created_at)
         ]);
 
@@ -236,6 +273,10 @@ const exportFullTeamDetailsExcel = (rows: Registration[], eventFilter: string) =
 
         wbData.push([]);
     });
+
+    wbData.push([]);
+    wbData.push(["", "", "", "", "", "", "", "", "", "TOTAL EXPORTED AMOUNT", "", totalExpected, ""]);
+    wbData.push(["", "", "", "", "", "", "", "", "", "TOTAL APPROVED REVENUE", "", totalApproved, ""]);
 
     const ws = XLSX.utils.aoa_to_sheet(wbData);
 
@@ -570,7 +611,7 @@ const AdminDashboard = () => {
         pending: registrations.filter(r => (r.status || "pending") === "pending").length,
         approved: registrations.filter(r => r.status === "success").length,
         rejected: registrations.filter(r => r.status === "rejected").length,
-        revenue: registrations.filter(r => r.status === "success").reduce((s, r) => s + (r.amount || 0), 0),
+        revenue: registrations.filter(r => r.status === "success").reduce((s, r) => s + ((r.amount && r.amount > 0) ? r.amount : getExpectedAmount(r.event_id, r.college)), 0),
     };
 
     const eventCounts = Object.entries(
@@ -601,7 +642,11 @@ const AdminDashboard = () => {
             let cmp = 0;
             if (sortKey === "date") cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
             else if (sortKey === "name") cmp = (a.team_name ?? "").localeCompare(b.team_name ?? "");
-            else if (sortKey === "amount") cmp = (a.amount ?? 0) - (b.amount ?? 0);
+            else if (sortKey === "amount") {
+                const amtA = (a.amount && a.amount > 0) ? a.amount : getExpectedAmount(a.event_id, a.college);
+                const amtB = (b.amount && b.amount > 0) ? b.amount : getExpectedAmount(b.event_id, b.college);
+                cmp = amtA - amtB;
+            }
             return sortAsc ? cmp : -cmp;
         });
 
@@ -1149,8 +1194,8 @@ const AdminDashboard = () => {
                                                                     <CreditCard className="w-3 h-3 text-[#00D9FF] shrink-0" />
                                                                     <CopyField value={reg.payment_txn_id || "N/A"} label={reg.payment_txn_id || "N/A"} />
                                                                 </div>
-                                                                {reg.amount > 0 && (
-                                                                    <p className="text-xs text-emerald-400 font-semibold">₹{reg.amount.toLocaleString("en-IN")}</p>
+                                                                {((reg.amount && reg.amount > 0) || getExpectedAmount(reg.event_id, reg.college) > 0) && (
+                                                                    <p className="text-xs text-emerald-400 font-semibold">₹{((reg.amount && reg.amount > 0) ? reg.amount : getExpectedAmount(reg.event_id, reg.college)).toLocaleString("en-IN")}</p>
                                                                 )}
                                                             </div>
                                                         </div>
